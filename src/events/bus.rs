@@ -1,5 +1,15 @@
-use crate::events::models::*;
+use std::future::IntoFuture;
 
-pub fn send(event: Option<Event>) {
-    println!("{}", event.unwrap().name)
+use futures::executor::block_on;
+
+use crate::events::models::*;
+use crate::models::Record;
+use crate::DB;
+
+#[allow(dead_code)]
+pub fn send(event: &Event) -> Result<Vec<Record>, surrealdb::Error> {
+    return block_on(DB.create("event").content(event).into_future());
 }
+
+#[allow(dead_code)]
+pub fn listen(event_type: &EventType) {}
