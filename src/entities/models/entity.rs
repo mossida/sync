@@ -6,5 +6,3 @@ pub struct Entity {
     id: Thing,
     name: String,
 }
-
-pub trait EntityActions {}

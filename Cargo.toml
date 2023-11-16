@@ -14,3 +14,4 @@ futures = "0.3.29"
 uuid = "1.5.0"
 chrono = "0.4.31"
 warp = "0.3.6"
+figment = { version = "0.10.12", features = ["toml"] }
