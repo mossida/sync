@@ -1,4 +1,5 @@
-use async_trait::async_trait;
+use std::collections::HashMap;
+
 use figment::providers::Format;
 use figment::{providers::Toml, Figment};
 use once_cell::sync::Lazy;
@@ -8,14 +9,14 @@ use tokio::sync::{Mutex, MutexGuard};
 use warp::Filter;
 
 use crate::config::Config;
-use crate::integrations::adapter::{Adapter, AdapterManager};
-use crate::integrations::interface::InterfaceManager;
+use crate::integrations::adapter::AdapterManager;
 use crate::scheduler::Scheduler;
 
 mod automations;
 mod config;
 mod entities;
 mod events;
+mod helpers;
 mod integrations;
 mod models;
 mod scheduler;
@@ -39,7 +40,12 @@ static CONFIG: Lazy<Mutex<Config>> = Lazy::new(|| {
     Mutex::new(figment.extract().unwrap())
 });
 
-static SCHEDULER: Lazy<Mutex<Scheduler>> = Lazy::new(|| Mutex::new(Scheduler { adapters: vec![] }));
+static SCHEDULER: Lazy<Mutex<Scheduler>> = Lazy::new(|| {
+    Mutex::new(Scheduler {
+        runners: HashMap::new(),
+        adapters: HashMap::new(),
+    })
+});
 
 #[tokio::main(flavor = "multi_thread")]
 async fn main() -> surrealdb::Result<()> {
@@ -54,20 +60,6 @@ async fn main() -> surrealdb::Result<()> {
             .allow_methods(["GET", "POST", "PATCH", "DELETE"])
             .allow_any_origin(),
     );
-
-    let adapter = Adapter {
-        id: Default::default(),
-        interfaces: vec![],
-    };
-
-    #[async_trait]
-    impl AdapterManager for Adapter {
-        async fn setup(&self) {
-            println!("adapter setup called")
-        }
-    }
-
-    scheduler.schedule_adapter_setup(adapter);
 
     warp::serve(routes).run(([127, 0, 0, 1], 3000)).await;
 
