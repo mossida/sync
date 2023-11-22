@@ -1,3 +1,5 @@
+use std::any::Any;
+
 use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
@@ -14,7 +16,7 @@ pub enum InterfaceType {
 
 // This is the base that every interface should include
 #[derive(Serialize, Deserialize)]
-pub struct Interface {
+pub struct InterfaceBase {
     pub id: InterfaceId,
     pub kind: InterfaceType,
     pub domain: EntitySchema,
@@ -23,8 +25,8 @@ pub struct Interface {
 
 #[async_trait]
 #[typetag::serde(tag = "type", content = "interface")]
-pub trait InterfaceManager: Send + Sync {
-    fn base(&self) -> &Interface;
+pub trait InterfaceManager: Any + Send + Sync {
+    fn base(&self) -> &InterfaceBase;
 
     // Called by Sync when the interface is registered
     async fn setup(&mut self);
