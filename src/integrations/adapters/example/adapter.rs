@@ -4,7 +4,6 @@ use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
 
 use crate::integrations::adapter::{AdapterId, AdapterManager};
-use crate::scheduler;
 
 #[derive(Serialize, Deserialize)]
 pub struct ExampleAdapter {
@@ -21,10 +20,6 @@ impl AdapterManager for ExampleAdapter {
     async fn setup(&mut self) {}
 
     async fn main(&self) {
-        /*for (_, recipient) in &self.base.interfaces {
-            Scheduler::schedule_update(recipient.clone());
-        }*/
-
         tokio::time::sleep(Duration::from_secs(2)).await;
     }
 }

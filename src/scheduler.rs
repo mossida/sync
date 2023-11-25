@@ -17,7 +17,7 @@ pub fn get() -> &'static Scheduler {
     SCHEDULER.deref()
 }
 
-struct Module<Instance, Collection: ?Sized + Any>(Instance, Collection);
+pub struct Module<Instance, Collection: ?Sized + Any>(pub Instance, pub Collection);
 
 #[derive(Default)]
 pub struct Scheduler {
@@ -30,11 +30,15 @@ impl Scheduler {
         Default::default()
     }
 
-    pub fn setup<T: AdapterManager>(&mut self, adapter: T) {
-        let rc = self.push_wrapper(adapter).clone();
+    pub fn setup<T>(&mut self, adapter: T)
+    where
+        T: AdapterManager + 'static,
+    {
+        let adapter_id = self.push_wrapper(adapter);
+        let reference = self.wrappers.get(&adapter_id).unwrap().0.clone();
 
         tokio::spawn(async move {
-            let mut guard = rc.lock().await;
+            let mut guard = reference.lock().await;
             guard.setup().await;
         });
 
@@ -42,24 +46,26 @@ impl Scheduler {
     }
 
     pub fn register(&mut self, module: Module<AdapterId, impl InterfaceManager>) {
+        let id = module.1.base().id;
         let reference = Helper::sync(module.1);
 
         self.wrappers.entry(module.0).and_modify(|m| {
-            m.1.insert(module.1.base().id, reference);
+            m.1.insert(id, reference);
         });
     }
 
     pub fn execute(&mut self) {
         for (key, module) in &self.wrappers {
-            self.handlers
-                .entry(*key)
-                .or_insert(tokio::spawn(async move {
-                    let guard = module.0.lock().await;
+            self.handlers.entry(*key).or_insert(tokio::spawn({
+                let reference = module.0.clone();
+                async move {
+                    let guard = reference.lock().await;
 
                     loop {
                         guard.main().await;
                     }
-                }));
+                }
+            }));
         }
     }
 }
@@ -70,11 +76,15 @@ impl Scheduler {
         self.handlers.drain().for_each(|h| h.1.abort());
     }
 
-    fn push_wrapper<T: AdapterManager>(&mut self, adapter: T) -> SyncObject<T> {
+    fn push_wrapper<T>(&mut self, adapter: T) -> AdapterId
+    where
+        T: AdapterManager + 'static,
+    {
+        let id = adapter.id();
         let reference = Helper::sync(adapter);
         self.wrappers
-            .insert(adapter.id(), Module(reference, Default::default()));
+            .insert(id, Module(reference, Default::default()));
 
-        reference
+        return id;
     }
 }
