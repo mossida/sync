@@ -1,17 +1,18 @@
-use serde::Serialize;
-use serde_repr::Serialize_repr;
+use serde::{Deserialize, Serialize};
+use typetag::serde;
 use warp::reject::Reject;
 
-#[derive(Serialize_repr, Debug)]
-#[repr(u16)]
+#[derive(Serialize, Deserialize, Debug)]
+#[serde(rename_all = "lowercase")]
 pub enum RejectionCode {
-    UNKNOWN = 0,
-    DATABASE = 500,
+    UNKNOWN,
+    DATABASE,
+    INTERFACE,
 }
 
-#[derive(Serialize, Debug)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct Rejection {
-    pub code: RejectionCode,
+    pub reason: RejectionCode,
     pub message: String,
 }
 

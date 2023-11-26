@@ -12,7 +12,7 @@ pub async fn fetch_events() -> Result<impl warp::Reply, warp::Rejection> {
         .map_err(Helper::reject_db)?;
 
     let list = response.take::<Vec<Event>>(0).map_err(|e| Rejection {
-        code: RejectionCode::DATABASE,
+        reason: RejectionCode::DATABASE,
         message: e.as_error().to_string(),
     })?;
 

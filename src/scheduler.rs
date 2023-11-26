@@ -1,8 +1,9 @@
 use std::any::Any;
 use std::collections::HashMap;
-use std::ops::Deref;
 
+use log::info;
 use once_cell::sync::Lazy;
+use tokio::sync::{Mutex, MutexGuard};
 use tokio::task::JoinHandle;
 
 use crate::helpers::Helper;
@@ -11,10 +12,10 @@ use crate::integrations::interface::{InterfaceId, InterfaceManager};
 use crate::integrations::{Adapter, Interface};
 use crate::types::{SyncMap, SyncObject};
 
-static SCHEDULER: Lazy<Scheduler> = Lazy::new(|| Scheduler::new());
+static SCHEDULER: Lazy<Mutex<Scheduler>> = Lazy::new(|| Mutex::new(Scheduler::new()));
 
-pub fn get() -> &'static Scheduler {
-    SCHEDULER.deref()
+pub async fn get() -> MutexGuard<'static, Scheduler> {
+    SCHEDULER.lock().await
 }
 
 pub struct Module<Instance, Collection: ?Sized + Any>(pub Instance, pub Collection);
@@ -55,9 +56,11 @@ impl Scheduler {
     }
 
     pub fn execute(&mut self) {
+        info!("Execution from scheduler has been requested");
         for (key, module) in &self.wrappers {
             self.handlers.entry(*key).or_insert(tokio::spawn({
                 let reference = module.0.clone();
+                info!("Starting adapter: {key}");
                 async move {
                     let guard = reference.lock().await;
 
