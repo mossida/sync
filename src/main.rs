@@ -3,8 +3,10 @@ use figment::{providers::Toml, Figment};
 use once_cell::sync::Lazy;
 use warp::Filter;
 
+use crate::api::handlers::handle_rejection;
 use crate::config::Config;
 
+mod api;
 mod automations;
 mod config;
 mod db;
@@ -16,17 +18,6 @@ mod models;
 mod scheduler;
 mod types;
 
-/*
-   https://github.com/rust-unofficial/awesome-rust
-   Useful libraries that needs implementation:
-
-   - Rayon (automatic parallelism)
-   - Anyhow (error handling)
-   - Rkyv (faster deserialization)
-   - PyO3 (to interact with python modules)
-   - Hyper (HTTP handling)
-*/
-
 static CONFIG: Lazy<Config> = Lazy::new(|| {
     let figment: Figment = Figment::new().merge(Toml::file("config.toml"));
 
@@ -35,13 +26,19 @@ static CONFIG: Lazy<Config> = Lazy::new(|| {
 
 #[tokio::main(flavor = "multi_thread")]
 async fn main() {
+    env_logger::init();
+
     let _ = db::init().await;
 
-    let routes = warp::any().and(entities::api::routes()).with(
-        warp::cors()
-            .allow_methods(["GET", "POST", "PATCH", "DELETE"])
-            .allow_any_origin(),
-    );
+    let routes = warp::any()
+        .and(entities::api::routes())
+        .with(
+            warp::cors()
+                .allow_methods(["GET", "POST", "PATCH", "DELETE"])
+                .allow_any_origin(),
+        )
+        .with(warp::log("info"))
+        .recover(handle_rejection);
 
     warp::serve(routes).run(([127, 0, 0, 1], 3000)).await;
 }
