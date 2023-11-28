@@ -1,8 +1,8 @@
 use std::future::IntoFuture;
 
-use crate::db;
 use futures::executor::block_on;
 
+use crate::db;
 use crate::events::models::*;
 use crate::models::Record;
 

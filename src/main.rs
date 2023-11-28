@@ -1,5 +1,5 @@
+use figment::{Figment, providers::Toml};
 use figment::providers::Format;
-use figment::{providers::Toml, Figment};
 use once_cell::sync::Lazy;
 use warp::Filter;
 
@@ -10,6 +10,7 @@ mod api;
 mod automations;
 mod config;
 mod db;
+mod devices;
 mod entities;
 mod events;
 mod helpers;
@@ -36,9 +37,9 @@ async fn main() {
 
     let routes = warp::any()
         .and(
-            entities::api::routes()
-                .or(events::api::routes())
-                .or(ws::api::route()),
+            entities::endpoints::routes()
+                .or(events::enpoints::routes())
+                .or(ws::enpoints::route()),
         )
         .with(
             warp::cors()

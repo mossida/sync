@@ -17,3 +17,12 @@ pub struct Rejection {
 }
 
 impl Reject for Rejection {}
+
+impl From<surrealdb::Error> for Rejection {
+    fn from(value: surrealdb::Error) -> Self {
+        Rejection {
+            reason: RejectionCode::DATABASE,
+            message: value.to_string(),
+        }
+    }
+}

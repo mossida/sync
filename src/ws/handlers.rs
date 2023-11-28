@@ -5,9 +5,8 @@ use tokio_stream::wrappers::UnboundedReceiverStream;
 use uuid::Uuid;
 use warp::ws::WebSocket;
 
+use crate::{db, entities};
 use crate::api::rejections::{Rejection, RejectionCode};
-use crate::db;
-use crate::entities::models::Entity;
 use crate::events::models::Event;
 use crate::ws::models::{Client, Clients, Message, Model};
 use crate::ws::reply::{error, result};
@@ -63,9 +62,12 @@ pub async fn handle_message(response: warp::ws::Message, client: &Client) {
 pub async fn handle_fetch(model: Model, client: &Client) {
     match model {
         Model::ENTITY => {
-            let mut response = db::get().query("SELECT * FROM entity").await.unwrap();
-            let list = response.take::<Vec<Entity>>(0).unwrap();
-            result(client, list);
+            let list = entities::api::fetch().await;
+
+            match list {
+                Ok(data) => result(client, data),
+                Err(err) => error(client, err),
+            }
         }
         Model::EVENT => {
             let mut response = db::get().query("SELECT * FROM event").await.unwrap();

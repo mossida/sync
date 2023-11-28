@@ -1,7 +1,9 @@
-use crate::types::SyncObject;
 use std::sync::Arc;
+
 use surrealdb::Error;
 use tokio::sync::Mutex;
+
+use crate::types::SyncObject;
 
 pub struct Helper {}
 

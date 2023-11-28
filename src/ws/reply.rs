@@ -1,6 +1,7 @@
+use serde::Serialize;
+
 use crate::api::rejections::Rejection;
 use crate::ws::models::{Client, Message};
-use serde::Serialize;
 
 pub fn error(client: &Client, rejection: Rejection) {
     let text = serde_json::to_string::<Message>(&rejection.into()).unwrap();

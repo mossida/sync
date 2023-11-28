@@ -7,9 +7,9 @@ use tokio::sync::{Mutex, MutexGuard};
 use tokio::task::JoinHandle;
 
 use crate::helpers::Helper;
+use crate::integrations::{Adapter, Interface};
 use crate::integrations::adapter::{AdapterId, AdapterManager};
 use crate::integrations::interface::{InterfaceId, InterfaceManager};
-use crate::integrations::{Adapter, Interface};
 use crate::types::{SyncMap, SyncObject};
 
 static SCHEDULER: Lazy<Mutex<Scheduler>> = Lazy::new(|| Mutex::new(Scheduler::new()));

@@ -5,9 +5,7 @@ use surrealdb::sql::{Datetime, Thing};
 pub struct Event {
     pub id: Option<Thing>,
     pub name: String,
-    //pub data: String,
-    //pub event_type: Thing,
-    //pub entity: Thing,
-    //pub fired_at: Datetime,
-    //pub created_at: Datetime,
+    pub r#type: String,
+    pub entity: Thing,
+    pub fired_at: Datetime,
 }

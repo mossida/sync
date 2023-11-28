@@ -8,7 +8,7 @@ use warp::Filter;
 use crate::types::SyncObject;
 use crate::ws::models::Clients;
 
-pub mod api;
+pub mod enpoints;
 mod handlers;
 mod models;
 mod reply;

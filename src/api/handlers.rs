@@ -1,20 +1,10 @@
 use std::convert::Infallible;
 
-use rkyv::bytecheck::Error;
 use warp::http::StatusCode;
 
 use crate::api::rejections::{Rejection, RejectionCode};
 
-pub fn handle_db_error(error: surrealdb::Error) -> warp::Rejection {
-    warp::reject::custom(Rejection {
-        reason: RejectionCode::DATABASE,
-        message: error.as_error().to_string(),
-    })
-}
-
 pub async fn handle_rejection(r: warp::Rejection) -> Result<impl warp::Reply, Infallible> {
-    dbg!(&r);
-
     let custom = r.find::<Rejection>();
 
     match custom {

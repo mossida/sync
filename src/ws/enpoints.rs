@@ -1,9 +1,10 @@
 use std::convert::Infallible;
-use warp::ws::Ws;
-use warp::{Filter, Reply};
 
+use warp::{Filter, Reply};
+use warp::ws::Ws;
+
+use crate::ws::{Clients, with_clients};
 use crate::ws::handlers::handle_connection;
-use crate::ws::{with_clients, Clients};
 
 async fn convert_connection(ws: Ws, clients: Clients) -> Result<impl Reply, Infallible> {
     Ok(ws.on_upgrade(move |socket| handle_connection(socket, clients)))

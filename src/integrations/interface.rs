@@ -4,7 +4,7 @@ use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
-use crate::entities::models::{EntityId, EntitySchema};
+use crate::entities::models::EntityId;
 
 pub type InterfaceId = Uuid;
 
@@ -19,7 +19,6 @@ pub enum InterfaceType {
 pub struct InterfaceBase {
     pub id: InterfaceId,
     pub kind: InterfaceType,
-    pub domain: EntitySchema,
     pub entities: Vec<EntityId>,
 }
 
