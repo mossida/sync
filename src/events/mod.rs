@@ -1,6 +1,6 @@
 pub mod bus;
 
-pub mod enpoints;
+pub mod endpoints;
 pub mod models;
 
 mod handlers;

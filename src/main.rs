@@ -1,5 +1,5 @@
-use figment::{Figment, providers::Toml};
 use figment::providers::Format;
+use figment::{providers::Toml, Figment};
 use once_cell::sync::Lazy;
 use warp::Filter;
 
@@ -38,8 +38,8 @@ async fn main() {
     let routes = warp::any()
         .and(
             entities::endpoints::routes()
-                .or(events::enpoints::routes())
-                .or(ws::enpoints::route()),
+                .or(events::endpoints::routes())
+                .or(ws::endpoints::route()),
         )
         .with(
             warp::cors()

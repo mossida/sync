@@ -1,5 +1,3 @@
-use rkyv::bytecheck::Error;
-
 use crate::api::rejections::{Rejection, RejectionCode};
 use crate::db;
 use crate::events::models::Event;
@@ -13,7 +11,7 @@ pub async fn fetch_events() -> Result<impl warp::Reply, warp::Rejection> {
 
     let list = response.take::<Vec<Event>>(0).map_err(|e| Rejection {
         reason: RejectionCode::DATABASE,
-        message: e.as_error().to_string(),
+        message: e.to_string(),
     })?;
 
     Ok(warp::reply::json(&list))

@@ -1,5 +1,5 @@
 pub mod api;
-pub mod enpoints;
+pub mod endpoints;
 pub mod models;
 
 mod handlers;

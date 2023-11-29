@@ -1,45 +1,81 @@
-use std::collections::HashMap;
-
+use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
 use tokio::sync::mpsc::UnboundedSender;
-use uuid::Uuid;
 
 use crate::api::rejections::Rejection;
-use crate::types::SyncObject;
+use crate::ws::reply::{error, result};
+use crate::{devices, entities};
 
-pub type Clients = SyncObject<HashMap<Uuid, Client>>;
+pub type MessageId = u16;
+pub type Sender = UnboundedSender<warp::ws::Message>;
 
-pub struct Client {
-    pub id: Uuid,
-    pub sender: UnboundedSender<Result<warp::ws::Message, warp::Error>>,
-}
-
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Debug)]
 #[serde(rename_all = "lowercase")]
-pub enum Model {
-    ENTITY,
-    EVENT,
-    STATE,
+pub enum ReplyType {
+    Result,
+    Error,
+}
+
+#[derive(Serialize, Debug)]
+pub struct ResponseMessage<T: Serialize> {
+    pub r#type: ReplyType,
+    pub id: MessageId,
+    pub data: T,
+}
+
+impl From<Rejection> for ResponseMessage<Rejection> {
+    fn from(value: Rejection) -> Self {
+        ResponseMessage {
+            id: 0,
+            r#type: ReplyType::Error,
+            data: value,
+        }
+    }
+}
+
+#[async_trait]
+#[typetag::serde(tag = "type")]
+pub trait MessageHandler: Send + Sync {
+    fn id(&self) -> MessageId;
+    async fn handle(&self, sender: &Sender);
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-#[serde(tag = "type", rename_all = "lowercase")]
-pub enum Message {
-    FETCH {
-        model: Model,
-    },
-    #[serde(skip_deserializing)]
-    RESULT {
-        data: String,
-    },
-    #[serde(skip_deserializing)]
-    ERROR {
-        error: Rejection,
-    },
+struct RequestDevicesMessage {
+    id: MessageId,
 }
 
-impl From<Rejection> for Message {
-    fn from(value: Rejection) -> Self {
-        Message::ERROR { error: value }
+#[derive(Serialize, Deserialize, Debug)]
+struct RequestEntitiesMessage {
+    id: MessageId,
+}
+
+#[async_trait]
+#[typetag::serde(name = "get/devices")]
+impl MessageHandler for RequestDevicesMessage {
+    fn id(&self) -> MessageId {
+        self.id
+    }
+
+    async fn handle(&self, sender: &Sender) {
+        match devices::api::list_all().await {
+            Ok(data) => result(self.id, sender, data),
+            Err(rejection) => error(self.id, sender, rejection),
+        };
+    }
+}
+
+#[async_trait]
+#[typetag::serde(name = "get/entities")]
+impl MessageHandler for RequestEntitiesMessage {
+    fn id(&self) -> MessageId {
+        self.id
+    }
+
+    async fn handle(&self, sender: &Sender) {
+        match entities::api::fetch().await {
+            Ok(data) => result(self.id, sender, data),
+            Err(rejection) => error(self.id, sender, rejection),
+        };
     }
 }
