@@ -6,7 +6,7 @@ use warp::{Filter, Reply};
 use crate::ws::handlers::handle_connection;
 
 async fn convert_connection(ws: Ws) -> Result<impl Reply, Infallible> {
-    Ok(ws.on_upgrade(move |socket| handle_connection(socket)))
+    Ok(ws.on_upgrade(handle_connection))
 }
 
 pub fn route() -> impl Filter<Extract = (impl Reply,), Error = warp::Rejection> + Clone {

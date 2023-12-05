@@ -4,6 +4,7 @@ use serde::Deserialize;
 pub struct Config {
     pub database: ConfigDatabase,
     pub general: ConfigGeneral,
+    pub secrets: ConfigSecrets,
 }
 
 #[derive(Debug, Deserialize)]
@@ -16,10 +17,7 @@ pub struct ConfigGeneral {
     pub log_level: String,
 }
 
-/*impl Default for Config {
-    fn default() -> Config {
-        Config {
-            db_endpoint: "localhost".to_string(),
-        }
-    }
-}*/
+#[derive(Debug, Deserialize)]
+pub struct ConfigSecrets {
+    pub path: String,
+}

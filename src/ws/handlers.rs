@@ -9,6 +9,16 @@ use crate::ws::actors::ClientActor;
 use crate::ws::models::MessageHandler;
 use crate::ws::reply::error;
 
+/**
+Here we use single threaded actors to handle every client
+and to handle every received message.
+
+In future please upgrade to a factory, to enable parallel message
+handling and efficient socket handling.
+
+Please see
+https://github.com/slawlor/ractor/blob/main/ractor/src/factory/tests/mod.rs
+ */
 pub async fn handle_connection(socket: WebSocket) {
     let (rx, mut tx) = socket.split();
     let (send, receive) = mpsc::unbounded_channel::<warp::ws::Message>();

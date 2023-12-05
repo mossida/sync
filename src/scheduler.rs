@@ -1,93 +1,86 @@
-use std::any::Any;
-use std::collections::HashMap;
+use async_trait::async_trait;
+use hashbrown::HashMap;
+use log::error;
+use ractor::{Actor, ActorProcessingErr, ActorRef, SupervisionEvent};
 
-use log::info;
-use once_cell::sync::Lazy;
-use tokio::sync::{Mutex, MutexGuard};
-use tokio::task::JoinHandle;
+use crate::integrations;
 
-use crate::helpers::Helper;
-use crate::integrations::{Adapter, Interface};
-use crate::integrations::adapter::{AdapterId, AdapterManager};
-use crate::integrations::interface::{InterfaceId, InterfaceManager};
-use crate::types::{SyncMap, SyncObject};
-
-static SCHEDULER: Lazy<Mutex<Scheduler>> = Lazy::new(|| Mutex::new(Scheduler::new()));
-
-pub async fn get() -> MutexGuard<'static, Scheduler> {
-    SCHEDULER.lock().await
+pub enum AdapterMessage {
+    Update, // Triggers forced update
 }
 
-pub struct Module<Instance, Collection: ?Sized + Any>(pub Instance, pub Collection);
+pub struct Scheduler {}
 
-#[derive(Default)]
-pub struct Scheduler {
-    handlers: HashMap<AdapterId, JoinHandle<()>>,
-    wrappers: HashMap<AdapterId, Module<SyncObject<Adapter>, SyncMap<InterfaceId, Interface>>>,
+pub struct SchedulerState {
+    adapters: HashMap<String, ActorRef<AdapterMessage>>,
 }
 
-impl Scheduler {
-    pub fn new() -> Self {
-        Default::default()
+pub enum SchedulerMessage {
+    Register, // Spawns a new adapter
+}
+
+#[async_trait]
+impl Actor for Scheduler {
+    type Msg = ();
+    type State = SchedulerState;
+    type Arguments = ();
+
+    async fn pre_start(
+        &self,
+        myself: ActorRef<Self::Msg>,
+        args: Self::Arguments,
+    ) -> Result<Self::State, ActorProcessingErr> {
+        Ok(SchedulerState {
+            adapters: Default::default(),
+        })
     }
 
-    pub fn setup<T>(&mut self, adapter: T)
-    where
-        T: AdapterManager + 'static,
-    {
-        let adapter_id = self.push_wrapper(adapter);
-        let reference = self.wrappers.get(&adapter_id).unwrap().0.clone();
+    async fn post_start(
+        &self,
+        myself: ActorRef<Self::Msg>,
+        state: &mut Self::State,
+    ) -> Result<(), ActorProcessingErr> {
+        // Fetch all existing components from database
+        let components = integrations::api::list_all().await;
 
-        tokio::spawn(async move {
-            let mut guard = reference.lock().await;
-            guard.setup().await;
-        });
+        /*for component in components {
+            Actor::spawn_linked(Some(component.id.to_string())).await;
+        }*/
 
-        self.execute();
+        Ok(())
     }
 
-    pub fn register(&mut self, module: Module<AdapterId, impl InterfaceManager>) {
-        let id = module.1.base().id;
-        let reference = Helper::sync(module.1);
-
-        self.wrappers.entry(module.0).and_modify(|m| {
-            m.1.insert(id, reference);
-        });
-    }
-
-    pub fn execute(&mut self) {
-        info!("Execution from scheduler has been requested");
-        for (key, module) in &self.wrappers {
-            self.handlers.entry(*key).or_insert(tokio::spawn({
-                let reference = module.0.clone();
-                info!("Starting adapter: {key}");
-                async move {
-                    let guard = reference.lock().await;
-
-                    loop {
-                        guard.main().await;
-                    }
-                }
-            }));
+    async fn handle(
+        &self,
+        myself: ActorRef<Self::Msg>,
+        message: Self::Msg,
+        state: &mut Self::State,
+    ) -> Result<(), ActorProcessingErr> {
+        match message {
+            _ => {}
         }
-    }
-}
 
-/** Private functions */
-impl Scheduler {
-    fn stop(&mut self) {
-        self.handlers.drain().for_each(|h| h.1.abort());
+        Ok(())
     }
 
-    fn push_wrapper<T>(&mut self, adapter: T) -> AdapterId
-    where
-        T: AdapterManager + 'static,
-    {
-        let id = adapter.id();
-        let reference = Helper::sync(adapter);
-        self.wrappers
-            .insert(id, Module(reference, Default::default()));
+    async fn handle_supervisor_evt(
+        &self,
+        _: ActorRef<Self::Msg>,
+        message: SupervisionEvent,
+        _: &mut Self::State,
+    ) -> Result<(), ActorProcessingErr> {
+        match message {
+            SupervisionEvent::ActorPanicked(cell, error) => {
+                // TODO: Report incident to user
+                error!(
+                    "Integration adapter ({}) panicked with error {}",
+                    cell.get_name().unwrap_or(cell.get_id().to_string()),
+                    error.to_string()
+                )
+            }
+            _ => {}
+        }
 
-        return id;
+        Ok(())
     }
 }

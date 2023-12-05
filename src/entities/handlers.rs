@@ -7,7 +7,7 @@ use crate::api::rejections::{Rejection, RejectionCode};
 use crate::entities::api::{delete, fetch};
 
 pub async fn create_entity() -> Result<impl warp::Reply, Infallible> {
-    Ok(warp::reply::html("test"))
+    Ok(warp::reply::html("Test"))
 }
 
 pub async fn fetch_entities() -> Result<impl warp::Reply, warp::Rejection> {

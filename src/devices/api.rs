@@ -2,6 +2,10 @@ use crate::api::rejections::Rejection;
 use crate::db;
 use crate::devices::models::{Device, DeviceId};
 
+pub async fn create(device: Device) -> Result<Vec<Device>, Rejection> {
+    Ok(db::get().create("device").content::<Device>(device).await?)
+}
+
 pub async fn get(device_id: DeviceId) -> Result<Option<Device>, Rejection> {
     let mut response = db::get()
         .query("SELECT * FROM ONLY device:$id")
