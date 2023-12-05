@@ -1,3 +1,7 @@
 /target
 /config.toml
 /secrets.key
+/.idea/modules.xml
+/.idea/prettier.xml
+/.idea/sync-core.iml
+/.idea/vcs.xml
