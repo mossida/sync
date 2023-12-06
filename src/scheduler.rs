@@ -40,15 +40,23 @@ impl Actor for Scheduler {
 
     async fn post_start(
         &self,
-        _myself: ActorRef<Self::Msg>,
-        _state: &mut Self::State,
+        myself: ActorRef<Self::Msg>,
+        state: &mut Self::State,
     ) -> Result<(), ActorProcessingErr> {
         // Fetch all existing components from database
-        let _components = integrations::api::list_all().await;
+        let components = integrations::api::list_all().await;
 
-        /*for component in components {
-            Actor::spawn_linked(Some(component.id.to_string())).await;
-        }*/
+        for component in components.unwrap() {
+            let handle = component
+                .reference
+                .spawn(&component, myself.get_cell())
+                .await?;
+
+            state
+                .adapters
+                .entry(component.id.to_string())
+                .or_insert_with(|| handle.0);
+        }
 
         Ok(())
     }
