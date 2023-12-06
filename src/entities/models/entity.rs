@@ -1,9 +1,13 @@
 use serde::{Deserialize, Serialize};
-use surrealdb::sql::Uuid;
+use surrealdb::sql::Thing;
 
 use crate::devices::models::DeviceId;
+use crate::integrations::classes::Class;
 
-pub type EntityId = Uuid;
+pub type EntityId = Thing;
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct EntityAttributes {}
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Entity {
@@ -11,7 +15,11 @@ pub struct Entity {
     name: String,
     enabled: bool,
     available: bool,
-    needs_polling: bool,
-    domain: String,
+    class: Class,
+    attributes: EntityAttributes,
     device: DeviceId,
+}
+
+pub trait EntityFactory {
+    fn build(&self) -> Entity;
 }

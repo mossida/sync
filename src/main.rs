@@ -23,6 +23,7 @@ mod scheduler;
 mod secrets;
 mod types;
 mod ws;
+mod states;
 
 static CONFIG: Lazy<Config> = Lazy::new(|| {
     let figment: Figment = Figment::new().merge(Toml::file("config.toml"));
@@ -37,9 +38,7 @@ async fn main() {
     db::init().await.unwrap();
     secrets::init();
 
-    let result = Actor::spawn(None, Scheduler {}, ()).await;
-
-    println!("{:?}", result);
+    let _ = Scheduler::start().await;
 
     let routes = warp::any()
         .and(

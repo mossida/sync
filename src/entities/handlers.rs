@@ -1,6 +1,6 @@
 use std::convert::Infallible;
 
-use surrealdb::sql::Uuid;
+use surrealdb::sql::{Id, Thing};
 use warp::http::StatusCode;
 
 use crate::api::rejections::{Rejection, RejectionCode};
@@ -16,12 +16,15 @@ pub async fn fetch_entities() -> Result<impl warp::Reply, warp::Rejection> {
 }
 
 pub async fn delete_entity(id: String) -> Result<impl warp::Reply, warp::Rejection> {
-    let _ = delete(Uuid::try_from(id).map_err(|_| {
-        warp::reject::custom(Rejection {
-            reason: RejectionCode::INTERFACE,
-            message: "Provided id is not valid".to_string(),
-        })
-    })?)
+    let _ = delete(Thing::from((
+        "entity",
+        Id::try_from(id).map_err(|_| {
+            warp::reject::custom(Rejection {
+                reason: RejectionCode::INTERFACE,
+                message: "Provided id is not valid".to_string(),
+            })
+        })?,
+    )))
     .await?;
     Ok(StatusCode::ACCEPTED)
 }
