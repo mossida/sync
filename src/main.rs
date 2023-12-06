@@ -1,7 +1,6 @@
 use figment::providers::Format;
 use figment::{providers::Toml, Figment};
 use once_cell::sync::Lazy;
-use ractor::Actor;
 use warp::Filter;
 
 use crate::api::handlers::handle_rejection;
@@ -18,10 +17,8 @@ mod events;
 mod helpers;
 mod integrations;
 mod models;
-mod registry;
 mod scheduler;
 mod secrets;
-mod types;
 mod ws;
 
 static CONFIG: Lazy<Config> = Lazy::new(|| {
@@ -37,9 +34,7 @@ async fn main() {
     db::init().await.unwrap();
     secrets::init();
 
-    let result = Actor::spawn(None, Scheduler {}, ()).await;
-
-    println!("{:?}", result);
+    let _ = Scheduler::start().await;
 
     let routes = warp::any()
         .and(

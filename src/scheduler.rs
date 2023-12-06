@@ -1,12 +1,15 @@
 use async_trait::async_trait;
 use hashbrown::HashMap;
 use log::error;
-use ractor::{Actor, ActorProcessingErr, ActorRef, SupervisionEvent};
+use ractor::concurrency::JoinHandle;
+use ractor::{Actor, ActorProcessingErr, ActorRef, SpawnErr, SupervisionEvent};
 
 use crate::integrations;
 
 pub enum AdapterMessage {
-    Update, // Triggers forced update
+    Update,
+    // Triggers forced update
+    Action(String), // Calls an action on the adapter,
 }
 
 pub struct Scheduler {}
@@ -53,13 +56,9 @@ impl Actor for Scheduler {
     async fn handle(
         &self,
         _myself: ActorRef<Self::Msg>,
-        message: Self::Msg,
+        _message: Self::Msg,
         _state: &mut Self::State,
     ) -> Result<(), ActorProcessingErr> {
-        match message {
-            _ => {}
-        }
-
         Ok(())
     }
 
@@ -69,18 +68,21 @@ impl Actor for Scheduler {
         message: SupervisionEvent,
         _: &mut Self::State,
     ) -> Result<(), ActorProcessingErr> {
-        match message {
-            SupervisionEvent::ActorPanicked(cell, error) => {
-                // TODO: Report incident to user
-                error!(
-                    "Integration adapter ({}) panicked with error {}",
-                    cell.get_name().unwrap_or(cell.get_id().to_string()),
-                    error.to_string()
-                )
-            }
-            _ => {}
+        if let SupervisionEvent::ActorPanicked(cell, error) = message {
+            // TODO: Report incident to user
+            error!(
+                "Integration adapter ({}) panicked with: {}",
+                cell.get_name().unwrap_or(cell.get_id().to_string()),
+                error.to_string()
+            );
         }
 
         Ok(())
+    }
+}
+
+impl Scheduler {
+    pub async fn start() -> Result<(ActorRef<()>, JoinHandle<()>), SpawnErr> {
+        Actor::spawn(Some("scheduler".to_string()), Scheduler {}, ()).await
     }
 }
