@@ -1,3 +1,4 @@
+use crate::integrations::components::Integration;
 use async_trait::async_trait;
 use ractor::concurrency::JoinHandle;
 use ractor::{Actor, ActorCell, ActorRef, SpawnErr};
@@ -5,7 +6,6 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use serde_repr::{Deserialize_repr, Serialize_repr};
 use surrealdb::sql::Thing;
-use crate::integrations::components::Integration;
 
 #[derive(Debug, Deserialize_repr, Serialize_repr)]
 #[repr(u8)]

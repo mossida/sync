@@ -1,6 +1,5 @@
 use std::fmt::{Display, Formatter};
 
-
 use reqwest::Url;
 use serde::{Deserialize, Serialize};
 
@@ -15,9 +14,9 @@ pub struct Configuration {
 #[derive(Clone, PartialEq, Default)]
 pub enum Domain {
     #[default]
-    HOME,
-    DEVICES,
-    ME,
+    Home,
+    Devices,
+    Me,
 }
 
 impl Display for Domain {
@@ -29,9 +28,9 @@ impl Display for Domain {
 impl From<Domain> for &str {
     fn from(value: Domain) -> Self {
         match value {
-            Domain::HOME => "homes",
-            Domain::DEVICES => "devices",
-            Domain::ME => "me",
+            Domain::Home => "homes",
+            Domain::Devices => "devices",
+            Domain::Me => "me",
         }
     }
 }
@@ -39,10 +38,10 @@ impl From<Domain> for &str {
 #[derive(Clone, PartialEq, Default)]
 pub enum Endpoint {
     #[default]
-    API,
-    MOBILE,
-    EQI,
-    AUTH,
+    Api,
+    Mobile,
+    Eqi,
+    Auth,
 }
 
 impl Display for Endpoint {
@@ -54,10 +53,10 @@ impl Display for Endpoint {
 impl From<Endpoint> for &str {
     fn from(endpoint: Endpoint) -> Self {
         match endpoint {
-            Endpoint::API => "https://my.tado.com/api/v2/",
-            Endpoint::MOBILE => "https://my.tado.com/mobile/1.9/",
-            Endpoint::EQI => "https://energy-insights.tado.com/api/",
-            Endpoint::AUTH => "https://auth.tado.com/oauth/token",
+            Endpoint::Api => "https://my.tado.com/api/v2/",
+            Endpoint::Mobile => "https://my.tado.com/mobile/1.9/",
+            Endpoint::Eqi => "https://energy-insights.tado.com/api/",
+            Endpoint::Auth => "https://auth.tado.com/oauth/token",
         }
     }
 }
@@ -65,10 +64,10 @@ impl From<Endpoint> for &str {
 impl From<Endpoint> for Url {
     fn from(endpoint: Endpoint) -> Self {
         match endpoint {
-            Endpoint::API => Url::parse("https://my.tado.com/api/v2/").unwrap(),
-            Endpoint::MOBILE => Url::parse("https://my.tado.com/mobile/1.9/").unwrap(),
-            Endpoint::EQI => Url::parse("https://energy-insights.tado.com/api/").unwrap(),
-            Endpoint::AUTH => Url::parse("https://auth.tado.com/oauth/token").unwrap(),
+            Endpoint::Api => Url::parse("https://my.tado.com/api/v2/").unwrap(),
+            Endpoint::Mobile => Url::parse("https://my.tado.com/mobile/1.9/").unwrap(),
+            Endpoint::Eqi => Url::parse("https://energy-insights.tado.com/api/").unwrap(),
+            Endpoint::Auth => Url::parse("https://auth.tado.com/oauth/token").unwrap(),
         }
     }
 }
