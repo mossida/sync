@@ -1,8 +1,6 @@
 use async_trait::async_trait;
 use ractor::{Actor, ActorProcessingErr, ActorRef};
 
-use crate::integrations::{ComponentManager};
-
 pub struct Interface {}
 
 pub struct State {}
@@ -30,5 +28,3 @@ impl Actor for Interface {
         todo!()
     }
 }
-
-impl ComponentManager for Interface {}
