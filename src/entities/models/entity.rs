@@ -11,12 +11,14 @@ pub struct EntityAttributes {}
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Entity {
-    id: EntityId,
-    name: String,
-    enabled: bool,
-    available: bool,
-    class: Class,
-    attributes: EntityAttributes,
-    domain: String,
-    device: DeviceId,
+    pub id: EntityId,
+    pub enabled: bool,
+    pub available: bool,
+    pub class: Class,
+    pub attributes: EntityAttributes,
+    pub device: DeviceId,
+}
+
+pub trait EntityFactory {
+    fn build_entity(device_id: DeviceId) -> Entity;
 }

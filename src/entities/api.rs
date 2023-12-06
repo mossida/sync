@@ -1,6 +1,11 @@
 use crate::api::rejections::{Rejection, RejectionCode};
 use crate::db;
+use crate::devices::models::Device;
 use crate::entities::models::{Entity, EntityId};
+
+pub async fn create(entity: Entity) -> Result<Vec<Entity>, Rejection> {
+    Ok(db::get().create("entity").content::<Entity>(entity).await?)
+}
 
 pub async fn fetch() -> Result<Vec<Entity>, Rejection> {
     let mut response = db::get()

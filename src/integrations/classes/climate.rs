@@ -1,8 +1,39 @@
 use async_trait::async_trait;
+use ractor::Actor;
 use serde::{Deserialize, Serialize};
+use surrealdb::sql::{Id, Thing};
+
+use crate::devices::models::DeviceId;
+use crate::entities::models::{Entity, EntityAttributes, EntityFactory};
+use crate::integrations::classes::Class;
+use crate::states::models::state::StateFactory;
 
 #[async_trait]
-pub trait Climate {}
+pub trait Climate: Actor {}
+
+impl<T> EntityFactory for T
+where
+    T: Climate,
+{
+    fn build_entity(device_id: DeviceId) -> Entity {
+        Entity {
+            id: Thing::from(("entity", Id::rand())),
+            enabled: true,
+            available: true,
+            class: Class::Climate,
+            attributes: EntityAttributes {},
+            device: device_id,
+        }
+    }
+}
+
+impl<T> StateFactory for T
+where
+    T: Climate,
+{
+    type State = Preset;
+    type Attributes = Attributes;
+}
 
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]

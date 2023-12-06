@@ -1,3 +1,6 @@
+use std::error::Error;
+use std::fmt::{Display, Formatter};
+
 use serde::{Deserialize, Serialize};
 use typetag::serde;
 use warp::reject::Reject;
@@ -17,6 +20,14 @@ pub struct Rejection {
 }
 
 impl Reject for Rejection {}
+
+impl Display for Rejection {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}", self.message)
+    }
+}
+
+impl Error for Rejection {}
 
 impl From<surrealdb::Error> for Rejection {
     fn from(value: surrealdb::Error) -> Self {

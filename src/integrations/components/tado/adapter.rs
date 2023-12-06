@@ -55,7 +55,7 @@ impl Actor for Adapter {
                 hw_version: "1.0".to_string(),
                 entities: vec![],
             })
-            .await;
+            .await?;
         }
 
         Ok(())

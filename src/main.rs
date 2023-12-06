@@ -20,6 +20,7 @@ mod models;
 mod scheduler;
 mod secrets;
 mod ws;
+mod states;
 
 static CONFIG: Lazy<Config> = Lazy::new(|| {
     let figment: Figment = Figment::new().merge(Toml::file("config.toml"));
