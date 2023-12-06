@@ -27,8 +27,8 @@ impl Actor for Scheduler {
 
     async fn pre_start(
         &self,
-        myself: ActorRef<Self::Msg>,
-        args: Self::Arguments,
+        _myself: ActorRef<Self::Msg>,
+        _args: Self::Arguments,
     ) -> Result<Self::State, ActorProcessingErr> {
         Ok(SchedulerState {
             adapters: Default::default(),
@@ -37,11 +37,11 @@ impl Actor for Scheduler {
 
     async fn post_start(
         &self,
-        myself: ActorRef<Self::Msg>,
-        state: &mut Self::State,
+        _myself: ActorRef<Self::Msg>,
+        _state: &mut Self::State,
     ) -> Result<(), ActorProcessingErr> {
         // Fetch all existing components from database
-        let components = integrations::api::list_all().await;
+        let _components = integrations::api::list_all().await;
 
         /*for component in components {
             Actor::spawn_linked(Some(component.id.to_string())).await;
@@ -52,9 +52,9 @@ impl Actor for Scheduler {
 
     async fn handle(
         &self,
-        myself: ActorRef<Self::Msg>,
+        _myself: ActorRef<Self::Msg>,
         message: Self::Msg,
-        state: &mut Self::State,
+        _state: &mut Self::State,
     ) -> Result<(), ActorProcessingErr> {
         match message {
             _ => {}

@@ -1,5 +1,6 @@
 use async_trait::async_trait;
 use ractor::{Actor, ActorProcessingErr, ActorRef, SupervisionEvent};
+use surrealdb::sql::Thing;
 
 use crate::devices;
 use crate::devices::models::Device;
@@ -23,7 +24,7 @@ impl Actor for Adapter {
 
     async fn pre_start(
         &self,
-        myself: ActorRef<Self::Msg>,
+        _myself: ActorRef<Self::Msg>,
         args: Self::Arguments,
     ) -> Result<Self::State, ActorProcessingErr> {
         // Init http client
@@ -36,14 +37,14 @@ impl Actor for Adapter {
 
     async fn post_start(
         &self,
-        myself: ActorRef<Self::Msg>,
+        _myself: ActorRef<Self::Msg>,
         state: &mut Self::State,
     ) -> Result<(), ActorProcessingErr> {
         let devices = state.client.get_devices().await?;
 
         for device in devices {
             let _ = devices::api::create(Device {
-                id: device.serial_no,
+                id: Thing::from(("device", device.serial_no.as_str())),
                 name: device.device_type,
                 serial: device.short_serial_no,
                 model: "".to_string(),
@@ -60,18 +61,18 @@ impl Actor for Adapter {
 
     async fn handle(
         &self,
-        myself: ActorRef<Self::Msg>,
-        message: Self::Msg,
-        state: &mut Self::State,
+        _myself: ActorRef<Self::Msg>,
+        _message: Self::Msg,
+        _state: &mut Self::State,
     ) -> Result<(), ActorProcessingErr> {
         todo!()
     }
 
     async fn handle_supervisor_evt(
         &self,
-        myself: ActorRef<Self::Msg>,
-        message: SupervisionEvent,
-        state: &mut Self::State,
+        _myself: ActorRef<Self::Msg>,
+        _message: SupervisionEvent,
+        _state: &mut Self::State,
     ) -> Result<(), ActorProcessingErr> {
         todo!()
     }

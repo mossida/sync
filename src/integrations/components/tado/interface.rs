@@ -1,7 +1,7 @@
 use async_trait::async_trait;
-use ractor::{Actor, ActorProcessingErr, ActorRef, SupervisionEvent};
+use ractor::{Actor, ActorProcessingErr, ActorRef};
 
-use crate::integrations::{Component, ComponentManager};
+use crate::integrations::{ComponentManager};
 
 pub struct Interface {}
 
@@ -15,17 +15,17 @@ impl Actor for Interface {
 
     async fn pre_start(
         &self,
-        myself: ActorRef<Self::Msg>,
-        args: Self::Arguments,
+        _myself: ActorRef<Self::Msg>,
+        _args: Self::Arguments,
     ) -> Result<Self::State, ActorProcessingErr> {
         Ok(State {})
     }
 
     async fn handle(
         &self,
-        myself: ActorRef<Self::Msg>,
-        message: Self::Msg,
-        state: &mut Self::State,
+        _myself: ActorRef<Self::Msg>,
+        _message: Self::Msg,
+        _state: &mut Self::State,
     ) -> Result<(), ActorProcessingErr> {
         todo!()
     }

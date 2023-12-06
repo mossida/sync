@@ -100,7 +100,7 @@ impl Client {
             .json()
             .await?;
 
-        let refresh_at = Utc::now() + Duration::from_secs((auth.expires_in - 30));
+        let refresh_at = Utc::now() + Duration::from_secs(auth.expires_in - 30);
 
         Ok(Client {
             home_id: 0,

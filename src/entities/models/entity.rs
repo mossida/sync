@@ -1,9 +1,9 @@
 use serde::{Deserialize, Serialize};
-use surrealdb::sql::Uuid;
+use surrealdb::sql::Thing;
 
 use crate::devices::models::DeviceId;
 
-pub type EntityId = Uuid;
+pub type EntityId = Thing;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Entity {

@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
-use surrealdb::sql::Uuid;
+use surrealdb::sql::{Thing};
 
-pub type DeviceId = String;
+pub type DeviceId = Thing;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Device {
@@ -12,5 +12,5 @@ pub struct Device {
     pub manufacturer: String,
     pub sw_version: String,
     pub hw_version: String,
-    pub entities: Vec<Uuid>,
+    pub entities: Vec<Thing>,
 }

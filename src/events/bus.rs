@@ -12,4 +12,4 @@ pub fn send(event: &Event) -> Result<Vec<Record>, surrealdb::Error> {
 }
 
 #[allow(dead_code)]
-pub fn listen(event_type: &EventType) {}
+pub fn listen(_event_type: &EventType) {}
