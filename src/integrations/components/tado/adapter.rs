@@ -1,7 +1,5 @@
 use async_trait::async_trait;
 use ractor::{Actor, ActorProcessingErr, ActorRef, SupervisionEvent};
-use serde_json::Value;
-use surrealdb::sql::Thing;
 
 use crate::devices;
 use crate::devices::models::Device;
@@ -9,7 +7,6 @@ use crate::integrations::components::tado::client::Client;
 use crate::integrations::components::tado::data::user::User;
 use crate::integrations::components::tado::models::Configuration;
 use crate::integrations::ComponentManager;
-use crate::scheduler::AdapterMessage;
 
 pub struct Adapter;
 
@@ -20,18 +17,17 @@ pub struct State {
 
 #[async_trait]
 impl Actor for Adapter {
-    type Msg = AdapterMessage;
+    type Msg = ();
     type State = State;
-    type Arguments = Value;
+    type Arguments = Configuration;
 
     async fn pre_start(
         &self,
-        _myself: ActorRef<Self::Msg>,
+        myself: ActorRef<Self::Msg>,
         args: Self::Arguments,
     ) -> Result<Self::State, ActorProcessingErr> {
         // Init http client
-        let configuration = serde_json::from_value::<Configuration>(args)?;
-        let mut client = Client::new(configuration).await?;
+        let mut client = Client::new(args).await?;
         let user = client.get_me().await?;
         client.use_home(user.homes[0].id);
 
@@ -40,14 +36,14 @@ impl Actor for Adapter {
 
     async fn post_start(
         &self,
-        _myself: ActorRef<Self::Msg>,
+        myself: ActorRef<Self::Msg>,
         state: &mut Self::State,
     ) -> Result<(), ActorProcessingErr> {
         let devices = state.client.get_devices().await?;
 
         for device in devices {
             let _ = devices::api::create(Device {
-                id: Thing::from(("device", device.serial_no.as_str())),
+                id: device.serial_no,
                 name: device.device_type,
                 serial: device.short_serial_no,
                 model: "".to_string(),
@@ -59,35 +55,26 @@ impl Actor for Adapter {
             .await;
         }
 
-        let zones = state.client.get_zones().await?;
-
-        dbg!(zones);
-
         Ok(())
     }
 
     async fn handle(
         &self,
-        _myself: ActorRef<Self::Msg>,
-        _message: Self::Msg,
-        _state: &mut Self::State,
+        myself: ActorRef<Self::Msg>,
+        message: Self::Msg,
+        state: &mut Self::State,
     ) -> Result<(), ActorProcessingErr> {
         todo!()
     }
 
     async fn handle_supervisor_evt(
         &self,
-        _myself: ActorRef<Self::Msg>,
-        _message: SupervisionEvent,
-        _state: &mut Self::State,
+        myself: ActorRef<Self::Msg>,
+        message: SupervisionEvent,
+        state: &mut Self::State,
     ) -> Result<(), ActorProcessingErr> {
         todo!()
     }
 }
 
-#[async_trait]
-impl ComponentManager for Adapter {
-    fn new() -> Self {
-        Adapter {}
-    }
-}
+impl ComponentManager for Adapter {}

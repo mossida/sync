@@ -1,5 +1,5 @@
 pub mod adapter;
 pub mod client;
 pub mod data;
-pub mod interfaces;
+mod interface;
 pub mod models;

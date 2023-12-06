@@ -35,8 +35,8 @@ struct Params<'a> {
 impl<'a> Default for Params<'a> {
     fn default() -> Self {
         Params {
-            endpoint: Endpoint::Api,
-            domain: Domain::Home,
+            endpoint: Endpoint::API,
+            domain: Domain::HOME,
             command: "",
             device: "",
         }
@@ -86,7 +86,7 @@ impl Client {
         let password: String = String::from(configuration.password);
 
         let auth: AuthenticationConfig = client
-            .post::<Url>(Endpoint::Auth.into())
+            .post::<Url>(Endpoint::AUTH.into())
             .query(&[
                 ("client_id", CLIENT_ID),
                 ("client_secret", CLIENT_SECRET),
@@ -100,7 +100,7 @@ impl Client {
             .json()
             .await?;
 
-        let refresh_at = Utc::now() + Duration::from_secs(auth.expires_in - 30);
+        let refresh_at = Utc::now() + Duration::from_secs((auth.expires_in - 30));
 
         Ok(Client {
             home_id: 0,
@@ -125,7 +125,7 @@ impl Client {
             "",
             Params {
                 endpoint: Default::default(),
-                domain: Domain::Me,
+                domain: Domain::ME,
                 command: "",
                 device: "",
             },
@@ -295,7 +295,7 @@ impl Client {
 
     pub async fn set_presence(&mut self, presence: Presence) -> Result<(), Error> {
         match presence {
-            Presence::Home | Presence::Away => {
+            Presence::HOME | Presence::AWAY => {
                 self.request(
                     reqwest::Method::PUT,
                     HomePresence {
@@ -311,7 +311,7 @@ impl Client {
                 )
                 .await
             }
-            Presence::Auto => {
+            Presence::AUTO => {
                 self.request(
                     reqwest::Method::DELETE,
                     "",
@@ -332,13 +332,13 @@ impl Client {
 impl Client {
     fn get_url(params: Params, home_id: Option<u64>) -> String {
         match params.endpoint {
-            Endpoint::Mobile => format!("{}{}", params.endpoint, params.command),
+            Endpoint::MOBILE => format!("{}{}", params.endpoint, params.command),
             _ => match params.domain {
-                Domain::Devices => format!(
+                Domain::DEVICES => format!(
                     "{}{}/{}/{}",
                     params.endpoint, params.domain, params.device, params.command
                 ),
-                Domain::Me => format!("{}{}", params.endpoint, params.domain),
+                Domain::ME => format!("{}{}", params.endpoint, params.domain),
                 _ => match home_id {
                     None => panic_any("No home has been assigned to this client"),
                     Some(id) => format!(
@@ -389,7 +389,7 @@ impl Client {
     async fn refresh_token(&mut self) -> Result<(), Error> {
         let response = self
             .client
-            .post::<Url>(Endpoint::Auth.into())
+            .post::<Url>(Endpoint::AUTH.into())
             .query(&[
                 ("client_id", CLIENT_ID),
                 ("client_secret", CLIENT_SECRET),

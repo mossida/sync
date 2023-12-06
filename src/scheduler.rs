@@ -1,14 +1,12 @@
 use async_trait::async_trait;
 use hashbrown::HashMap;
 use log::error;
-use ractor::concurrency::JoinHandle;
-use ractor::{Actor, ActorProcessingErr, ActorRef, SpawnErr, SupervisionEvent};
+use ractor::{Actor, ActorProcessingErr, ActorRef, SupervisionEvent};
 
 use crate::integrations;
 
 pub enum AdapterMessage {
-    Update,         // Triggers forced update
-    Action(String), // Calls an action on the adapter,
+    Update, // Triggers forced update
 }
 
 pub struct Scheduler {}
@@ -29,8 +27,8 @@ impl Actor for Scheduler {
 
     async fn pre_start(
         &self,
-        _myself: ActorRef<Self::Msg>,
-        _args: Self::Arguments,
+        myself: ActorRef<Self::Msg>,
+        args: Self::Arguments,
     ) -> Result<Self::State, ActorProcessingErr> {
         Ok(SchedulerState {
             adapters: Default::default(),
@@ -45,27 +43,23 @@ impl Actor for Scheduler {
         // Fetch all existing components from database
         let components = integrations::api::list_all().await;
 
-        for component in components.unwrap() {
-            let handle = component
-                .reference
-                .spawn(&component, myself.get_cell())
-                .await?;
-
-            state
-                .adapters
-                .entry(component.id.to_string())
-                .or_insert_with(|| handle.0);
-        }
+        /*for component in components {
+            Actor::spawn_linked(Some(component.id.to_string())).await;
+        }*/
 
         Ok(())
     }
 
     async fn handle(
         &self,
-        _myself: ActorRef<Self::Msg>,
-        _message: Self::Msg,
-        _state: &mut Self::State,
+        myself: ActorRef<Self::Msg>,
+        message: Self::Msg,
+        state: &mut Self::State,
     ) -> Result<(), ActorProcessingErr> {
+        match message {
+            _ => {}
+        }
+
         Ok(())
     }
 
@@ -75,21 +69,18 @@ impl Actor for Scheduler {
         message: SupervisionEvent,
         _: &mut Self::State,
     ) -> Result<(), ActorProcessingErr> {
-        if let SupervisionEvent::ActorPanicked(cell, error) = message {
-            // TODO: Report incident to user
-            error!(
-                "Integration adapter ({}) panicked with: {}",
-                cell.get_name().unwrap_or(cell.get_id().to_string()),
-                error.to_string()
-            );
+        match message {
+            SupervisionEvent::ActorPanicked(cell, error) => {
+                // TODO: Report incident to user
+                error!(
+                    "Integration adapter ({}) panicked with error {}",
+                    cell.get_name().unwrap_or(cell.get_id().to_string()),
+                    error.to_string()
+                )
+            }
+            _ => {}
         }
 
         Ok(())
-    }
-}
-
-impl Scheduler {
-    pub async fn start() -> Result<(ActorRef<()>, JoinHandle<()>), SpawnErr> {
-        Actor::spawn(Some("scheduler".to_string()), Scheduler {}, ()).await
     }
 }

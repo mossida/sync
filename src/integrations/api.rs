@@ -1,9 +1,8 @@
-use uuid::Uuid;
-
 use crate::api::rejections::Rejection;
 use crate::db;
 use crate::devices::models::Device;
 use crate::integrations::Component;
+use uuid::Uuid;
 
 pub async fn create(component: Component) -> Result<Vec<Component>, Rejection> {
     Ok(db::get()

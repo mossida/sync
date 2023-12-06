@@ -7,11 +7,10 @@ pub struct HomePresence {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-#[serde(rename_all = "UPPERCASE")]
 pub enum Presence {
-    Away,
-    Home,
-    Auto,
+    AWAY,
+    HOME,
+    AUTO,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
