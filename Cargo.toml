@@ -29,3 +29,4 @@ tokio-stream = "0.1.14"
 serde_json = { version = "1.0.108", features = ["raw_value"] }
 chrono = "0.4.31"
 hashbrown = "0.14.3"
+surrealdb-migrations = "1.0.0"

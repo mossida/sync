@@ -15,11 +15,11 @@ pub struct EntityAttributes {}
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Entity {
     pub id: EntityId,
+    pub state: String,
     pub enabled: bool,
     pub available: bool,
     pub class: Class,
     pub attributes: EntityAttributes,
-    pub device: DeviceId,
 }
 
 impl NewId for EntityId {

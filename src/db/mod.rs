@@ -4,6 +4,7 @@ use once_cell::sync::Lazy;
 use surrealdb::engine::remote::ws::{Client, Ws};
 use surrealdb::opt::auth::Database;
 use surrealdb::Surreal;
+use surrealdb_migrations::MigrationRunner;
 
 use crate::CONFIG;
 
@@ -18,6 +19,12 @@ pub async fn init() -> surrealdb::Result<()> {
         password: &CONFIG.database.password,
     })
     .await?;
+
+    // Run migrations
+    MigrationRunner::new(&DB)
+        .up()
+        .await
+        .expect("Failed to apply migrations");
 
     Ok(())
 }
