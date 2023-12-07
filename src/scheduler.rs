@@ -3,6 +3,7 @@ use hashbrown::HashMap;
 use log::error;
 use ractor::concurrency::JoinHandle;
 use ractor::{Actor, ActorProcessingErr, ActorRef, SpawnErr, SupervisionEvent};
+use surreal_id::NewId;
 
 use crate::integrations;
 
@@ -10,6 +11,10 @@ pub enum AdapterMessage {
     Update,
     // Triggers forced update
     Action(String), // Calls an action on the adapter,
+}
+
+pub enum InterfaceMessage {
+    Update,
 }
 
 pub struct Scheduler {}
@@ -49,12 +54,12 @@ impl Actor for Scheduler {
         for component in components.unwrap() {
             let handle = component
                 .reference
-                .spawn(&component, myself.get_cell())
+                .spawn(component.clone(), myself.get_cell())
                 .await?;
 
             state
                 .adapters
-                .entry(component.id.to_string())
+                .entry(component.id.id_without_brackets())
                 .or_insert_with(|| handle.0);
         }
 

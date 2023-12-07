@@ -2,6 +2,7 @@ use std::error::Error;
 use std::fmt::{Display, Formatter};
 
 use serde::{Deserialize, Serialize};
+use surreal_id::IdError;
 use typetag::serde;
 use warp::reject::Reject;
 
@@ -31,6 +32,15 @@ impl Error for Rejection {}
 
 impl From<surrealdb::Error> for Rejection {
     fn from(value: surrealdb::Error) -> Self {
+        Rejection {
+            reason: RejectionCode::DATABASE,
+            message: value.to_string(),
+        }
+    }
+}
+
+impl From<IdError> for Rejection {
+    fn from(value: IdError) -> Self {
         Rejection {
             reason: RejectionCode::DATABASE,
             message: value.to_string(),

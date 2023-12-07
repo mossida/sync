@@ -1,10 +1,15 @@
 use figment::providers::Format;
 use figment::{providers::Toml, Figment};
 use once_cell::sync::Lazy;
+use serde_json::json;
+use surrealdb::sql::Id;
+use surrealdb::sql::Thing;
 use warp::Filter;
 
 use crate::api::handlers::handle_rejection;
 use crate::config::Config;
+use crate::integrations::components::Integration;
+use crate::integrations::{Component, Priority};
 use crate::scheduler::Scheduler;
 
 mod api;
@@ -19,8 +24,8 @@ mod integrations;
 mod models;
 mod scheduler;
 mod secrets;
-mod ws;
 mod states;
+mod ws;
 
 static CONFIG: Lazy<Config> = Lazy::new(|| {
     let figment: Figment = Figment::new().merge(Toml::file("config.toml"));

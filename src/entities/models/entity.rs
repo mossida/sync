@@ -1,10 +1,13 @@
 use serde::{Deserialize, Serialize};
-use surrealdb::sql::Thing;
+use surreal_id::NewId;
+use surrealdb::opt::RecordId;
+use surrealdb::sql::Id;
 
 use crate::devices::models::DeviceId;
 use crate::integrations::classes::Class;
 
-pub type EntityId = Thing;
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct EntityId(RecordId);
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct EntityAttributes {}
@@ -17,6 +20,21 @@ pub struct Entity {
     pub class: Class,
     pub attributes: EntityAttributes,
     pub device: DeviceId,
+}
+
+impl NewId for EntityId {
+    const TABLE: &'static str = "entity";
+
+    fn from_inner_id<T: Into<Id>>(inner_id: T) -> Self {
+        EntityId(RecordId {
+            tb: Self::TABLE.to_string(),
+            id: inner_id.into(),
+        })
+    }
+
+    fn get_inner_string(&self) -> String {
+        self.0.to_string()
+    }
 }
 
 pub trait EntityFactory {

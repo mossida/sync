@@ -2,6 +2,7 @@ use crate::api::rejections::{Rejection, RejectionCode};
 use crate::db;
 use crate::devices::models::Device;
 use crate::entities::models::{Entity, EntityId};
+use surreal_id::NewId;
 
 pub async fn create(entity: Entity) -> Result<Vec<Entity>, Rejection> {
     Ok(db::get().create("entity").content::<Entity>(entity).await?)
@@ -22,6 +23,6 @@ pub async fn fetch() -> Result<Vec<Entity>, Rejection> {
     })
 }
 
-pub async fn delete(entity_id: EntityId) -> Result<Option<Entity>, Rejection> {
-    Ok(db::get().delete(("entity", entity_id)).await?)
+pub async fn delete(entity_id: EntityId) -> Result<Vec<Entity>, Rejection> {
+    Ok(db::get().delete(entity_id.id_without_brackets()).await?)
 }

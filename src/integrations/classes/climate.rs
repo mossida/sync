@@ -1,10 +1,11 @@
 use async_trait::async_trait;
 use ractor::Actor;
 use serde::{Deserialize, Serialize};
-use surrealdb::sql::{Id, Thing};
+use surreal_id::NewId;
+use surrealdb::sql::Id;
 
 use crate::devices::models::DeviceId;
-use crate::entities::models::{Entity, EntityAttributes, EntityFactory};
+use crate::entities::models::{Entity, EntityAttributes, EntityFactory, EntityId};
 use crate::integrations::classes::Class;
 use crate::states::models::state::StateFactory;
 
@@ -17,7 +18,7 @@ where
 {
     fn build_entity(device_id: DeviceId) -> Entity {
         Entity {
-            id: Thing::from(("entity", Id::rand())),
+            id: EntityId::new(Id::rand().to_string()).unwrap(),
             enabled: true,
             available: true,
             class: Class::Climate,

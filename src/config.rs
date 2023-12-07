@@ -10,6 +10,8 @@ pub struct Config {
 #[derive(Debug, Deserialize)]
 pub struct ConfigDatabase {
     pub host: String,
+    pub username: String,
+    pub password: String,
 }
 
 #[derive(Debug, Deserialize)]

@@ -6,6 +6,8 @@ use crate::entities;
 use crate::entities::models::{EntityFactory, EntityId};
 use crate::integrations::classes::climate::Climate;
 use crate::integrations::components::tado::client::Client;
+use crate::scheduler::InterfaceMessage;
+use crate::states::models::state::StateFactory;
 
 pub struct ClimateInterface {}
 
@@ -22,7 +24,7 @@ pub struct Arguments {
 
 #[async_trait]
 impl Actor for ClimateInterface {
-    type Msg = ();
+    type Msg = InterfaceMessage;
     type State = State;
     type Arguments = Arguments;
 

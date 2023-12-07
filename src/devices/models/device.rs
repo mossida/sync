@@ -1,7 +1,12 @@
 use serde::{Deserialize, Serialize};
-use surrealdb::sql::{Thing};
+use surreal_id::NewId;
+use surrealdb::opt::RecordId;
+use surrealdb::sql::{Id, Thing};
 
-pub type DeviceId = Thing;
+use crate::integrations::ComponentId;
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct DeviceId(RecordId);
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Device {
@@ -13,4 +18,20 @@ pub struct Device {
     pub sw_version: String,
     pub hw_version: String,
     pub entities: Vec<Thing>,
+    pub managed_by: ComponentId,
+}
+
+impl NewId for DeviceId {
+    const TABLE: &'static str = "device";
+
+    fn from_inner_id<T: Into<Id>>(inner_id: T) -> Self {
+        DeviceId(RecordId {
+            tb: Self::TABLE.to_string(),
+            id: inner_id.into(),
+        })
+    }
+
+    fn get_inner_string(&self) -> String {
+        self.0.id.to_string()
+    }
 }

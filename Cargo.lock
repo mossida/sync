@@ -3064,6 +3064,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "81cdd64d312baedb58e21336b31bc043b77e01cc99033ce76ef539f78e965ebc"
 
 [[package]]
+name = "surreal-id"
+version = "0.2.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b251f8aa7efbd7f7d35ff1115512a42a7458cf1a53ab4de1a77eaa693476ae9e"
+dependencies = [
+ "surrealdb",
+ "thiserror",
+]
+
+[[package]]
 name = "surrealdb"
 version = "1.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3216,6 +3226,7 @@ dependencies = [
  "serde",
  "serde_json",
  "serde_repr",
+ "surreal-id",
  "surrealdb",
  "tokio",
  "tokio-stream",
