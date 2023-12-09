@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 use std::ops::Deref;
 
 use crate::integrations::Component;
-use crate::scheduler::AdapterMessage;
+use crate::scheduler::definitions::AdapterMessage;
 
 pub mod tado;
 

@@ -1,25 +1,22 @@
 use serde::{Deserialize, Serialize};
+use serde_json::Value;
 use surreal_id::NewId;
 use surrealdb::opt::RecordId;
 use surrealdb::sql::Id;
 
-use crate::devices::models::DeviceId;
 use crate::integrations::classes::Class;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct EntityId(RecordId);
 
-#[derive(Debug, Serialize, Deserialize)]
-pub struct EntityAttributes {}
-
-#[derive(Debug, Serialize, Deserialize)]
-pub struct Entity {
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct Entity<T> {
     pub id: EntityId,
-    pub state: String,
+    pub state: T,
     pub enabled: bool,
     pub available: bool,
     pub class: Class,
-    pub attributes: EntityAttributes,
+    pub attributes: Option<Value>,
 }
 
 impl NewId for EntityId {
@@ -37,6 +34,6 @@ impl NewId for EntityId {
     }
 }
 
-pub trait EntityFactory {
-    fn build_entity(device_id: DeviceId) -> Entity;
+pub trait EntityFactory<T> {
+    fn build_entity() -> Entity<T>;
 }

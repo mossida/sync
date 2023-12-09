@@ -1,16 +1,13 @@
+#![forbid(unsafe_code)]
+
 use figment::providers::Format;
 use figment::{providers::Toml, Figment};
 use once_cell::sync::Lazy;
-use serde_json::json;
-use surrealdb::sql::Id;
-use surrealdb::sql::Thing;
+use surreal_id::NewId;
 use warp::Filter;
 
 use crate::api::handlers::handle_rejection;
 use crate::config::Config;
-use crate::integrations::components::Integration;
-use crate::integrations::{Component, Priority};
-use crate::scheduler::Scheduler;
 
 mod api;
 mod automations;
@@ -35,12 +32,11 @@ static CONFIG: Lazy<Config> = Lazy::new(|| {
 
 #[tokio::main(flavor = "multi_thread")]
 async fn main() {
+    secrets::init();
     env_logger::init();
 
-    db::init().await.unwrap();
-    secrets::init();
-
-    let _ = Scheduler::start().await;
+    db::init().await;
+    scheduler::init().await;
 
     let routes = warp::any()
         .and(

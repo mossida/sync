@@ -4,26 +4,25 @@ use serde::{Deserialize, Serialize};
 use surreal_id::NewId;
 use surrealdb::sql::Id;
 
-use crate::devices::models::DeviceId;
-use crate::entities::models::{Entity, EntityAttributes, EntityFactory, EntityId};
+use crate::entities::models::{Entity, EntityFactory, EntityId};
 use crate::integrations::classes::Class;
 use crate::states::models::state::StateFactory;
 
 #[async_trait]
 pub trait Climate: Actor {}
 
-impl<T> EntityFactory for T
+impl<T> EntityFactory<Preset> for T
 where
     T: Climate,
 {
-    fn build_entity(device_id: DeviceId) -> Entity {
+    fn build_entity() -> Entity<Preset> {
         Entity {
             id: EntityId::new(Id::rand().to_string()).unwrap(),
-            state: "".to_string(),
+            state: Preset::Unknown,
             enabled: true,
             available: true,
             class: Class::Climate,
-            attributes: EntityAttributes {},
+            attributes: None,
         }
     }
 }
@@ -46,7 +45,7 @@ pub enum Swing {
     Both,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 #[serde(rename_all = "snake_case")]
 pub enum Preset {
     Home,

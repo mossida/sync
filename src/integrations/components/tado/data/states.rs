@@ -13,7 +13,7 @@ pub struct Temperature {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-struct SensorDataPoints {
+pub struct SensorDataPoints {
     #[serde(rename = "insideTemperature")]
     pub inside_temperature: Temperature,
     pub humidity: Percentage,
@@ -28,24 +28,24 @@ pub struct Percentage {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-struct ActivityDataPoints {
+pub struct ActivityDataPoints {
     #[serde(rename = "heatingPower")]
     pub heating_power: Percentage,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-struct Link {
+pub struct Link {
     pub state: String,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-struct TemperatureUnit {
+pub struct TemperatureUnit {
     pub celsius: f64,
     pub fahrenheit: f64,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-struct Setting {
+pub struct Setting {
     #[serde(rename = "type")]
     pub r#type: String,
     pub power: String,
@@ -53,7 +53,7 @@ struct Setting {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
-struct State {
+pub struct State {
     #[serde(rename = "tadoMode")]
     pub tado_mode: String,
     #[serde(rename = "geolocationOverride")]

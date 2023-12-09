@@ -1,14 +1,12 @@
 use serde::{Deserialize, Serialize};
 use surreal_id::NewId;
 use surrealdb::opt::RecordId;
-use surrealdb::sql::{Id, Thing};
+use surrealdb::sql::Id;
 
-use crate::integrations::ComponentId;
-
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct DeviceId(RecordId);
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Device {
     pub id: DeviceId,
     pub name: String,
@@ -17,8 +15,6 @@ pub struct Device {
     pub manufacturer: String,
     pub sw_version: String,
     pub hw_version: String,
-    pub entities: Vec<Thing>,
-    pub managed_by: ComponentId,
 }
 
 impl NewId for DeviceId {

@@ -1,35 +1,15 @@
 use async_trait::async_trait;
-use hashbrown::HashMap;
-use log::error;
-use ractor::concurrency::JoinHandle;
-use ractor::{Actor, ActorProcessingErr, ActorRef, SpawnErr, SupervisionEvent};
-use surreal_id::NewId;
+use log::{debug, error, info, warn};
+use ractor::{Actor, ActorProcessingErr, ActorRef, SupervisionEvent};
 
 use crate::integrations;
-
-pub enum AdapterMessage {
-    Update,
-    // Triggers forced update
-    Action(String), // Calls an action on the adapter,
-}
-
-pub enum InterfaceMessage {
-    Update,
-}
-
-pub struct Scheduler {}
-
-pub struct SchedulerState {
-    adapters: HashMap<String, ActorRef<AdapterMessage>>,
-}
-
-pub enum SchedulerMessage {
-    Register, // Spawns a new adapter
-}
+use crate::scheduler::definitions::{
+    InterfaceMessage, Scheduler, SchedulerMessage, SchedulerState,
+};
 
 #[async_trait]
 impl Actor for Scheduler {
-    type Msg = ();
+    type Msg = SchedulerMessage;
     type State = SchedulerState;
     type Arguments = ();
 
@@ -38,29 +18,22 @@ impl Actor for Scheduler {
         _myself: ActorRef<Self::Msg>,
         _args: Self::Arguments,
     ) -> Result<Self::State, ActorProcessingErr> {
-        Ok(SchedulerState {
-            adapters: Default::default(),
-        })
+        Ok(SchedulerState::new())
     }
 
     async fn post_start(
         &self,
         myself: ActorRef<Self::Msg>,
-        state: &mut Self::State,
+        _: &mut Self::State,
     ) -> Result<(), ActorProcessingErr> {
         // Fetch all existing components from database
         let components = integrations::api::list_all().await;
 
         for component in components.unwrap() {
-            let handle = component
+            let _ = component
                 .reference
                 .spawn(component.clone(), myself.get_cell())
                 .await?;
-
-            state
-                .adapters
-                .entry(component.id.id_without_brackets())
-                .or_insert_with(|| handle.0);
         }
 
         Ok(())
@@ -69,9 +42,34 @@ impl Actor for Scheduler {
     async fn handle(
         &self,
         _myself: ActorRef<Self::Msg>,
-        _message: Self::Msg,
-        _state: &mut Self::State,
+        message: Self::Msg,
+        state: &mut Self::State,
     ) -> Result<(), ActorProcessingErr> {
+        match message {
+            SchedulerMessage::RequestPolling(interval, cell) => {
+                debug!("Scheduler received polling request for {}", cell.get_id());
+                state.add_poller(
+                    cell.get_id().to_string(),
+                    cell.send_interval(interval, || InterfaceMessage::Update),
+                )
+            }
+            SchedulerMessage::StopPolling(cell) => {
+                debug!(
+                    "Scheduler received polling stop request for {}",
+                    cell.get_id()
+                );
+                let handle = state.remove_poller(cell.get_id().to_string());
+                if handle.is_none() {
+                    warn!("Cannot stop poller, the interface is not polling.")
+                } else {
+                    handle.unwrap().abort()
+                }
+            }
+            SchedulerMessage::Ping => {
+                info!("Scheduler pong");
+            }
+        }
+
         Ok(())
     }
 
@@ -91,11 +89,5 @@ impl Actor for Scheduler {
         }
 
         Ok(())
-    }
-}
-
-impl Scheduler {
-    pub async fn start() -> Result<(ActorRef<()>, JoinHandle<()>), SpawnErr> {
-        Actor::spawn(Some("scheduler".to_string()), Scheduler {}, ()).await
     }
 }

@@ -1,5 +1,6 @@
 use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
+use serde_json::Value;
 use tokio::sync::mpsc::UnboundedSender;
 
 use crate::api::rejections::Rejection;
@@ -73,7 +74,7 @@ impl MessageHandler for RequestEntitiesMessage {
     }
 
     async fn handle(&self, sender: &Sender) {
-        match entities::api::fetch().await {
+        match entities::api::fetch::<Value>().await {
             Ok(data) => result(self.id, sender, data),
             Err(rejection) => error(self.id, sender, rejection),
         };

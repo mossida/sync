@@ -10,23 +10,24 @@ use crate::CONFIG;
 
 static DB: Lazy<Surreal<Client>> = Lazy::new(Surreal::init);
 
-pub async fn init() -> surrealdb::Result<()> {
-    DB.connect::<Ws>(&CONFIG.database.host).await?;
+pub async fn init() {
+    DB.connect::<Ws>(&CONFIG.database.host)
+        .await
+        .expect("Failed to connect to database");
     DB.signin(Database {
         namespace: "general",
         database: "main",
         username: &CONFIG.database.username,
         password: &CONFIG.database.password,
     })
-    .await?;
+    .await
+    .expect("Failed to sign in to database");
 
     // Run migrations
     MigrationRunner::new(&DB)
         .up()
         .await
         .expect("Failed to apply migrations");
-
-    Ok(())
 }
 
 pub fn get() -> &'static Surreal<Client> {

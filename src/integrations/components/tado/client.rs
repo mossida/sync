@@ -2,6 +2,7 @@ use std::panic::panic_any;
 use std::time::Duration;
 
 use chrono::{DateTime, Utc};
+use log::debug;
 use once_cell::sync::Lazy;
 use reqwest::header::{HeaderMap, REFERER};
 use reqwest::{Error, Request, RequestBuilder, Url};
@@ -9,6 +10,7 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
 use crate::integrations::components::tado::data::device::Device;
+use crate::integrations::components::tado::data::states::State;
 use crate::integrations::components::tado::data::user::{HomePresence, HomeState, Presence, User};
 use crate::integrations::components::tado::data::weather::Weather;
 use crate::integrations::components::tado::data::zone::Zone;
@@ -66,6 +68,7 @@ struct AuthenticationRequest<'a> {
     pub refresh_token: Option<&'a str>,
 }
 
+#[derive(Debug, Clone)]
 pub struct Client {
     home_id: u64,
     refresh_at: DateTime<Utc>,
@@ -178,6 +181,21 @@ impl Client {
                 endpoint: Default::default(),
                 domain: Default::default(),
                 command: "zoneStates",
+                device: "",
+            },
+            false,
+        )
+        .await
+    }
+
+    pub async fn get_zone_state(&mut self, zone: &Zone) -> Result<State, Error> {
+        self.request(
+            reqwest::Method::GET,
+            "",
+            Params {
+                endpoint: Default::default(),
+                domain: Default::default(),
+                command: format!("zones/{}/state", zone.id).as_str(),
                 device: "",
             },
             false,
@@ -387,6 +405,8 @@ impl Client {
     }
 
     async fn refresh_token(&mut self) -> Result<(), Error> {
+        debug!("Refreshing auth token");
+
         let response = self
             .client
             .post::<Url>(Endpoint::Auth.into())

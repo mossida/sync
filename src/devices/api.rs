@@ -1,9 +1,37 @@
+use serde_json::Value;
+
 use crate::api::rejections::Rejection;
 use crate::db;
 use crate::devices::models::{Device, DeviceId};
+use crate::integrations::ComponentId;
 
-pub async fn create(device: Device) -> Result<Vec<Device>, Rejection> {
-    Ok(db::get().create("device").content::<Device>(device).await?)
+pub async fn create(device: Device, component_id: ComponentId) -> Result<Vec<Value>, Rejection> {
+    create_multiple(vec![device], component_id).await
+}
+
+pub async fn create_multiple(
+    devices: Vec<Device>,
+    component_id: ComponentId,
+) -> Result<Vec<Value>, Rejection> {
+    let mut insert_response = db::get()
+        .query("INSERT INTO device $devices")
+        .bind(("devices", devices))
+        .await?;
+
+    // Only relate inserted devices
+    let inserted_devices = insert_response.take::<Vec<Device>>(0)?;
+    let ids = inserted_devices
+        .iter()
+        .map(|d| d.id.clone())
+        .collect::<Vec<DeviceId>>();
+
+    let mut response = db::get()
+        .query("RELATE $component->controls->$devices")
+        .bind(("component", component_id))
+        .bind(("devices", ids))
+        .await?;
+
+    Ok(response.take(0)?)
 }
 
 pub async fn get(device_id: DeviceId) -> Result<Option<Device>, Rejection> {

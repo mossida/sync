@@ -1,11 +1,11 @@
 use futures_util::StreamExt;
-use ractor::Actor;
+use ractor::{pg, Actor, GroupName};
 use tokio::sync::mpsc;
 use tokio_stream::wrappers::UnboundedReceiverStream;
 use warp::ws::WebSocket;
 
 use crate::api::rejections::{Rejection, RejectionCode};
-use crate::ws::actors::ClientActor;
+use crate::ws::actors::{ClientActor, GROUP_NAME};
 use crate::ws::models::MessageHandler;
 use crate::ws::reply::error;
 
@@ -26,8 +26,10 @@ pub async fn handle_connection(socket: WebSocket) {
     let receive = UnboundedReceiverStream::new(receive);
     tokio::spawn(receive.map(Ok).forward(rx));
 
+    // FIXME: This is a workaround to avoid a deadlock
     let _ = (|| async move {
         let (actor, actor_handle) = Actor::spawn(None, ClientActor, send.clone()).await?;
+        pg::join(GroupName::from(GROUP_NAME), vec![actor.get_cell()]);
 
         while let Some(result) = tx.next().await {
             let message = result?;

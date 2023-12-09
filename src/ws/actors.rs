@@ -1,8 +1,10 @@
-use ractor::{Actor, ActorProcessingErr, ActorRef};
+use ractor::{Actor, ActorProcessingErr, ActorRef, GroupName};
 
 use crate::api::rejections::{Rejection, RejectionCode};
 use crate::ws::models::{MessageHandler, Sender};
 use crate::ws::reply::error;
+
+pub const GROUP_NAME: &str = "websocket_clients";
 
 pub struct ClientActor;
 

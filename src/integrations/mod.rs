@@ -54,7 +54,7 @@ impl Component {
     where
         T: ComponentManager,
     {
-        Actor::spawn_linked(Some(self.id.id_without_brackets()), T::new(), args, supervisor).await
+        Actor::spawn_linked(Some(self.id.get_inner_string()), T::new(), args, supervisor).await
     }
 }
 

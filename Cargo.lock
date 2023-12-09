@@ -3668,6 +3668,7 @@ dependencies = [
  "surreal-id",
  "surrealdb",
  "surrealdb-migrations",
+ "time",
  "tokio",
  "tokio-stream",
  "typetag",
