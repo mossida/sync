@@ -1,5 +1,6 @@
 use async_trait::async_trait;
 use hashbrown::HashMap;
+use log::error;
 use ractor::{Actor, ActorProcessingErr, ActorRef, SupervisionEvent};
 use surreal_id::NewId;
 use surrealdb::sql::Id;
@@ -112,7 +113,8 @@ impl Actor for Adapter {
         _state: &mut Self::State,
     ) -> Result<(), ActorProcessingErr> {
         match message {
-            SupervisionEvent::ActorPanicked(cell, _) => {
+            SupervisionEvent::ActorPanicked(cell, msg) => {
+                error!("Interface {} panicked: {}", cell.get_name().unwrap(), msg);
                 scheduler::get()
                     .send_message(SchedulerMessage::StopPolling(cell))
                     .unwrap();

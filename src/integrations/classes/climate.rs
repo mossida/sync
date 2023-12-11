@@ -1,41 +1,21 @@
 use async_trait::async_trait;
 use ractor::Actor;
 use serde::{Deserialize, Serialize};
-use surreal_id::NewId;
-use surrealdb::sql::Id;
 
-use crate::entities::models::{Entity, EntityFactory, EntityId};
-use crate::integrations::classes::Class;
 use crate::states::models::state::StateFactory;
 
 #[async_trait]
 pub trait Climate: Actor {}
-
-impl<T> EntityFactory<Preset> for T
-where
-    T: Climate,
-{
-    fn build_entity() -> Entity<Preset> {
-        Entity {
-            id: EntityId::new(Id::rand().to_string()).unwrap(),
-            state: Preset::Unknown,
-            enabled: true,
-            available: true,
-            class: Class::Climate,
-            attributes: None,
-        }
-    }
-}
 
 impl<T> StateFactory for T
 where
     T: Climate,
 {
     type State = Preset;
-    type Attributes = Attributes;
+    type Attributes = Attribute;
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 #[serde(rename_all = "snake_case")]
 pub enum Swing {
     On,
@@ -59,7 +39,7 @@ pub enum Preset {
     Unknown,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 #[serde(rename_all = "snake_case")]
 pub enum HVACMode {
     Off,
@@ -70,7 +50,7 @@ pub enum HVACMode {
     Dry,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 #[serde(rename_all = "snake_case")]
 pub enum HVACAction {
     Preheating,
@@ -81,7 +61,7 @@ pub enum HVACAction {
     Fan,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Clone)]
 #[serde(rename_all = "snake_case")]
 pub enum FanStatus {
     On,
@@ -96,17 +76,19 @@ pub enum FanStatus {
     Diffuse,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
-#[serde(rename_all = "snake_case", tag = "type", content = "value")]
-pub enum Attributes {
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[serde(rename_all = "snake_case")]
+pub enum Attribute {
     AuxHeat(bool),
     CurrentTemperature(f32),
     CurrentHumidity(f32),
+    Preset(Preset),
     FanModes(Vec<FanStatus>),
     FanMode(FanStatus),
-    HVACModes(Vec<HVACMode>),
-    HVACMode(HVACMode),
-    HVACAction(HVACAction),
+    HvacModes(Vec<HVACMode>),
+    HvacMode(HVACMode),
+    HvacAction(HVACAction),
+    HvacPower(f32),
     Humidity(f32),
     MaxHumidity(f32),
     MinHumidity(f32),

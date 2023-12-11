@@ -1,18 +1,36 @@
-use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
-use surrealdb::sql::Thing;
+use surreal_id::NewId;
+use surrealdb::opt::RecordId;
+use surrealdb::sql::{Datetime, Id};
 
 use crate::entities::models::EntityId;
+use crate::integrations::classes::Attributes;
 
-pub type StateId = Thing;
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct StateId(RecordId);
 
-#[derive(Debug, Serialize, Deserialize)]
-pub struct State<T> {
+impl NewId for StateId {
+    const TABLE: &'static str = "state";
+
+    fn from_inner_id<T: Into<Id>>(inner_id: T) -> Self {
+        StateId(RecordId {
+            tb: Self::TABLE.to_string(),
+            id: inner_id.into(),
+        })
+    }
+
+    fn get_inner_string(&self) -> String {
+        self.0.to_string()
+    }
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct State {
     pub id: StateId,
-    pub entity_id: EntityId,
     pub state: String,
-    pub attributes: Vec<T>,
-    pub last_updated: DateTime<Utc>,
+    pub attributes: Attributes,
+    pub updated_at: Datetime,
+    pub entity_id: EntityId,
 }
 
 pub trait StateFactory {

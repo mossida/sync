@@ -74,7 +74,7 @@ impl MessageHandler for RequestEntitiesMessage {
     }
 
     async fn handle(&self, sender: &Sender) {
-        match entities::api::fetch::<Value>().await {
+        match entities::api::fetch().await {
             Ok(data) => result(self.id, sender, data),
             Err(rejection) => error(self.id, sender, rejection),
         };

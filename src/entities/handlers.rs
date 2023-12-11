@@ -13,7 +13,7 @@ pub async fn create_entity() -> Result<impl warp::Reply, Infallible> {
 }
 
 pub async fn fetch_entities() -> Result<impl warp::Reply, warp::Rejection> {
-    let list = fetch::<Value>().await.map_err(warp::reject::custom)?;
+    let list = fetch().await.map_err(warp::reject::custom)?;
     Ok(warp::reply::json(&list))
 }
 

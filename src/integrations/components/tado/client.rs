@@ -9,6 +9,7 @@ use reqwest::{Error, Request, RequestBuilder, Url};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
+use crate::integrations::components::tado::data::capability::Capability;
 use crate::integrations::components::tado::data::device::Device;
 use crate::integrations::components::tado::data::states::State;
 use crate::integrations::components::tado::data::user::{HomePresence, HomeState, Presence, User};
@@ -206,7 +207,7 @@ impl Client {
     /**
     Get the capabilities of a zone.
      */
-    pub async fn get_capabilities(&mut self, zone: &Zone) -> Result<Value, Error> {
+    pub async fn get_capabilities(&mut self, zone: &Zone) -> Result<Capability, Error> {
         self.request(
             reqwest::Method::GET,
             "",

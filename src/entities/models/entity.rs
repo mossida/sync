@@ -5,18 +5,19 @@ use surrealdb::opt::RecordId;
 use surrealdb::sql::Id;
 
 use crate::integrations::classes::Class;
+use crate::states::models::state::StateId;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct EntityId(RecordId);
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
-pub struct Entity<T> {
+pub struct Entity {
     pub id: EntityId,
-    pub state: T,
     pub enabled: bool,
     pub available: bool,
     pub class: Class,
     pub attributes: Option<Value>,
+    pub state_id: Option<StateId>,
 }
 
 impl NewId for EntityId {
@@ -34,6 +35,6 @@ impl NewId for EntityId {
     }
 }
 
-pub trait EntityFactory<T> {
-    fn build_entity() -> Entity<T>;
+pub trait EntityFactory {
+    fn build_entity() -> Entity;
 }
