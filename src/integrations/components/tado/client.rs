@@ -3,12 +3,14 @@ use std::time::Duration;
 
 use chrono::{DateTime, Utc};
 use log::debug;
+use miette::Result;
 use once_cell::sync::Lazy;
 use reqwest::header::{HeaderMap, REFERER};
-use reqwest::{Error, Request, RequestBuilder, Url};
+use reqwest::{Request, RequestBuilder, Url};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
+use crate::errors::Error;
 use crate::integrations::components::tado::data::capability::Capability;
 use crate::integrations::components::tado::data::device::Device;
 use crate::integrations::components::tado::data::states::State;
@@ -84,7 +86,7 @@ impl Client {
         builder = builder.connect_timeout(TIMEOUT);
         builder = builder.https_only(true);
 
-        let client = builder.build().unwrap();
+        let client = builder.build()?;
 
         let username: String = String::from(configuration.username);
         let password: String = String::from(configuration.password);

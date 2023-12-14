@@ -1,1 +1,0 @@
-CREATE component SET reference='tado', priority=4, configuration='{"username": "tado:username", "password": "tado:password"}';

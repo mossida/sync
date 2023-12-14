@@ -1,18 +1,21 @@
 use serde_json::Value;
 
-use crate::api::rejections::Rejection;
 use crate::db;
 use crate::devices::models::{Device, DeviceId};
+use crate::errors::Error;
 use crate::integrations::ComponentId;
 
-pub async fn create(device: Device, component_id: ComponentId) -> Result<Vec<Value>, Rejection> {
+pub async fn create(
+    device: Device,
+    component_id: ComponentId,
+) -> miette::Result<Vec<Value>, Error> {
     create_multiple(vec![device], component_id).await
 }
 
 pub async fn create_multiple(
     devices: Vec<Device>,
     component_id: ComponentId,
-) -> Result<Vec<Value>, Rejection> {
+) -> miette::Result<Vec<Value>, Error> {
     let mut insert_response = db::get()
         .query("INSERT INTO device $devices")
         .bind(("devices", devices))
@@ -34,7 +37,7 @@ pub async fn create_multiple(
     Ok(response.take(0)?)
 }
 
-pub async fn get(device_id: DeviceId) -> Result<Option<Device>, Rejection> {
+pub async fn get(device_id: DeviceId) -> miette::Result<Option<Device>, Error> {
     let mut response = db::get()
         .query("SELECT * FROM ONLY device:$id")
         .bind(("id", device_id))
@@ -43,7 +46,7 @@ pub async fn get(device_id: DeviceId) -> Result<Option<Device>, Rejection> {
     Ok(response.take::<Option<Device>>(0)?)
 }
 
-pub async fn list_all() -> Result<Vec<Device>, Rejection> {
+pub async fn list_all() -> miette::Result<Vec<Device>, Error> {
     let mut response = db::get().query("SELECT * FROM device").await?;
     Ok(response.take::<Vec<Device>>(0)?)
 }

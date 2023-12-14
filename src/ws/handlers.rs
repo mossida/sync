@@ -4,7 +4,6 @@ use tokio::sync::mpsc;
 use tokio_stream::wrappers::UnboundedReceiverStream;
 use warp::ws::WebSocket;
 
-use crate::api::rejections::{Rejection, RejectionCode};
 use crate::ws::actors::{ClientActor, GROUP_NAME};
 use crate::ws::models::MessageHandler;
 use crate::ws::reply::error;
@@ -40,14 +39,7 @@ pub async fn handle_connection(socket: WebSocket) {
 
                 match handler_result {
                     Ok(handler) => actor.cast(handler)?,
-                    Err(err) => error(
-                        0,
-                        &send,
-                        Rejection {
-                            reason: RejectionCode::INTERFACE,
-                            message: err.to_string(),
-                        },
-                    ),
+                    Err(err) => error(0, &send, err.into()),
                 }
             }
         }

@@ -5,7 +5,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::secrets::models::Secret;
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct Configuration {
     pub username: Secret,
     pub password: Secret,

@@ -1,6 +1,25 @@
+use derive_more::{From, Into};
 use hashbrown::HashMap;
 use ractor::concurrency::{Duration, JoinHandle};
 use ractor::{ActorCell, ActorRef};
+use serde::{Deserialize, Serialize};
+use surrealdb::sql::Id;
+
+use crate::integrations::classes::Class;
+
+#[derive(Debug, From, Into, Serialize, Deserialize, Clone)]
+pub struct InterfaceName(String);
+
+impl InterfaceName {
+    pub fn new(adapter_name: String, class: Class) -> Self {
+        InterfaceName(format!(
+            "{}/{}/{}",
+            adapter_name,
+            Id::rand(),
+            class.to_string()
+        ))
+    }
+}
 
 // Messages
 

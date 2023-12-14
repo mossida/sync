@@ -1,6 +1,6 @@
-use ractor::{Actor, ActorProcessingErr, ActorRef, GroupName};
+use ractor::{Actor, ActorProcessingErr, ActorRef};
 
-use crate::api::rejections::{Rejection, RejectionCode};
+use crate::errors::Error;
 use crate::ws::models::{MessageHandler, Sender};
 use crate::ws::reply::error;
 
@@ -40,10 +40,7 @@ impl Actor for ClientActor {
             error(
                 message.id(),
                 &state.sender,
-                Rejection {
-                    reason: RejectionCode::INTERFACE,
-                    message: "Message has not incremental id".to_string(),
-                },
+                Error::Interface("Message doesn't have incremental error".to_string()),
             );
         } else {
             message.handle(&state.sender).await;

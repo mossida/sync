@@ -1,3 +1,4 @@
+use derive_more::Display;
 use hashbrown::HashMap;
 use serde::de::DeserializeOwned;
 use serde::{Deserialize, Serialize};
@@ -8,7 +9,7 @@ pub mod climate;
 #[derive(Default, Debug, Serialize, Deserialize, Clone)]
 pub struct Attributes(HashMap<String, Value>);
 
-#[derive(Debug, Serialize, Deserialize, Clone, PartialEq)]
+#[derive(Debug, Display, Serialize, Deserialize, Clone, PartialEq)]
 #[serde(rename_all = "snake_case")]
 pub enum Class {
     Climate,

@@ -2,10 +2,10 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use surreal_id::NewId;
 use surrealdb::opt::RecordId;
-use surrealdb::sql::Id;
+use surrealdb::sql::{Datetime, Id};
 
-use crate::integrations::classes::Class;
-use crate::states::models::state::StateId;
+use crate::integrations::classes::{Attributes, Class};
+use crate::scheduler::definitions::InterfaceName;
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct EntityId(RecordId);
@@ -17,7 +17,8 @@ pub struct Entity {
     pub available: bool,
     pub class: Class,
     pub attributes: Option<Value>,
-    pub state_id: Option<StateId>,
+    pub interface: InterfaceName,
+    pub state: State,
 }
 
 impl NewId for EntityId {
@@ -37,4 +38,16 @@ impl NewId for EntityId {
 
 pub trait EntityFactory {
     fn build_entity() -> Entity;
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct State {
+    pub state: Value,
+    pub attributes: Attributes,
+    pub updated_at: Datetime,
+}
+
+pub trait StateFactory {
+    type State;
+    type Attributes;
 }

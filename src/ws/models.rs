@@ -1,9 +1,8 @@
 use async_trait::async_trait;
 use serde::{Deserialize, Serialize};
-use serde_json::Value;
 use tokio::sync::mpsc::UnboundedSender;
 
-use crate::api::rejections::Rejection;
+use crate::errors::Error;
 use crate::ws::reply::{error, result};
 use crate::{devices, entities};
 
@@ -24,12 +23,12 @@ pub struct ResponseMessage<T: Serialize> {
     pub data: T,
 }
 
-impl From<Rejection> for ResponseMessage<Rejection> {
-    fn from(value: Rejection) -> Self {
+impl From<Error> for ResponseMessage<String> {
+    fn from(value: Error) -> Self {
         ResponseMessage {
             id: 0,
             r#type: ReplyType::Error,
-            data: value,
+            data: value.to_string(),
         }
     }
 }
@@ -61,7 +60,7 @@ impl MessageHandler for RequestDevicesMessage {
     async fn handle(&self, sender: &Sender) {
         match devices::api::list_all().await {
             Ok(data) => result(self.id, sender, data),
-            Err(rejection) => error(self.id, sender, rejection),
+            Err(err) => error(self.id, sender, err),
         };
     }
 }
@@ -74,9 +73,9 @@ impl MessageHandler for RequestEntitiesMessage {
     }
 
     async fn handle(&self, sender: &Sender) {
-        match entities::api::fetch().await {
+        match entities::api::fetch_all().await {
             Ok(data) => result(self.id, sender, data),
-            Err(rejection) => error(self.id, sender, rejection),
+            Err(err) => error(self.id, sender, err),
         };
     }
 }

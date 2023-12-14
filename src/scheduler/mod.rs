@@ -1,5 +1,6 @@
 use std::sync::OnceLock;
 
+use crate::errors::Error;
 use ractor::{Actor, ActorRef};
 
 use crate::scheduler::definitions::{Scheduler, SchedulerMessage};
@@ -9,9 +10,11 @@ pub mod definitions;
 
 static SCHEDULER: OnceLock<ActorRef<SchedulerMessage>> = OnceLock::new();
 
-pub async fn init() {
-    let (cell, _) = Actor::spawn(None, Scheduler {}, ()).await.unwrap();
-    SCHEDULER.set(cell).expect("Cannot initialize scheduler");
+pub async fn init() -> miette::Result<(), Error> {
+    let (cell, _) = Actor::spawn(None, Scheduler {}, ()).await?;
+    let _ = SCHEDULER.set(cell);
+
+    Ok(())
 }
 
 pub fn get() -> &'static ActorRef<SchedulerMessage> {

@@ -3,15 +3,18 @@ use hashbrown::HashMap;
 use log::error;
 use ractor::{Actor, ActorProcessingErr, ActorRef, SupervisionEvent};
 use surreal_id::NewId;
-use surrealdb::sql::Id;
 
 use crate::devices::models::{Device, DeviceId};
+use crate::integrations::classes::Class;
 use crate::integrations::components::tado::client::Client;
 use crate::integrations::components::tado::data::user::User;
 use crate::integrations::components::tado::interfaces::climate::{Arguments, ClimateInterface};
+use crate::integrations::components::tado::models::Configuration;
 use crate::integrations::{Component, ComponentManager};
-use crate::scheduler::definitions::{AdapterMessage, InterfaceMessage, SchedulerMessage};
-use crate::{devices, scheduler};
+use crate::scheduler::definitions::{
+    AdapterMessage, InterfaceMessage, InterfaceName, SchedulerMessage,
+};
+use crate::{devices, entities, scheduler};
 
 pub struct Adapter;
 
@@ -34,7 +37,7 @@ impl Actor for Adapter {
         args: Self::Arguments,
     ) -> Result<Self::State, ActorProcessingErr> {
         // Init http client
-        let configuration = serde_json::from_value(args.configuration.clone()).unwrap();
+        let configuration: Configuration = serde_json::from_value(args.configuration.clone())?;
         let mut client = Client::new(configuration).await?;
         let user = client.get_me().await?;
         client.use_home(user.homes[0].id);
@@ -75,23 +78,32 @@ impl Actor for Adapter {
 
         // Spawn climate interfaces
         for zone in tado_zones {
-            let (cell, handle) = Actor::spawn_linked(
-                Some(format!(
-                    "{}/{}/climate",
-                    myself.get_name().unwrap(),
-                    Id::rand()
-                )),
+            let entities = entities::api::fetch_by_device_and_class(
+                DeviceId::new(zone.devices[0].serial_no.clone()).unwrap(),
+                Class::Climate,
+            )
+            .await?;
+
+            let name = match entities.is_empty() {
+                true => InterfaceName::new(myself.get_name().unwrap(), Class::Climate).into(),
+                false => entities[0].interface.clone(),
+            };
+
+            let (cell, _) = Actor::spawn_linked(
+                Some(name.clone().into()),
                 ClimateInterface { zone },
                 Arguments {
                     client: state.client.clone(),
+                    entity: match entities.is_empty() {
+                        true => None,
+                        false => Some(entities[0].clone()),
+                    },
                 },
                 myself.get_cell(),
             )
             .await?;
 
-            state
-                .interfaces
-                .insert(cell.get_name().unwrap().to_string(), cell);
+            state.interfaces.insert(name.into(), cell);
         }
 
         Ok(())

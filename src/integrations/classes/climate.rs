@@ -2,7 +2,7 @@ use async_trait::async_trait;
 use ractor::Actor;
 use serde::{Deserialize, Serialize};
 
-use crate::states::models::state::StateFactory;
+use crate::entities::models::StateFactory;
 
 #[async_trait]
 pub trait Climate: Actor {}
@@ -39,7 +39,7 @@ pub enum Preset {
     Unknown,
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone)]
+#[derive(Debug, Serialize, Deserialize, Clone, Eq, PartialEq)]
 #[serde(rename_all = "snake_case")]
 pub enum HVACMode {
     Off,

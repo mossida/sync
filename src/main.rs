@@ -1,5 +1,7 @@
 #![forbid(unsafe_code)]
 
+extern crate core;
+
 use figment::providers::Format;
 use figment::{providers::Toml, Figment};
 use once_cell::sync::Lazy;
@@ -8,6 +10,7 @@ use warp::Filter;
 
 use crate::api::handlers::handle_rejection;
 use crate::config::Config;
+use crate::errors::Error;
 
 mod api;
 mod automations;
@@ -15,13 +18,13 @@ mod config;
 mod db;
 mod devices;
 mod entities;
+mod errors;
 mod events;
 mod helpers;
 mod integrations;
 mod models;
 mod scheduler;
 mod secrets;
-mod states;
 mod ws;
 
 static CONFIG: Lazy<Config> = Lazy::new(|| {
@@ -31,12 +34,12 @@ static CONFIG: Lazy<Config> = Lazy::new(|| {
 });
 
 #[tokio::main(flavor = "multi_thread")]
-async fn main() {
+async fn main() -> miette::Result<(), Error> {
     secrets::init();
     env_logger::init();
 
-    db::init().await;
-    scheduler::init().await;
+    db::init().await?;
+    scheduler::init().await?;
 
     let routes = warp::any()
         .and(
@@ -52,5 +55,8 @@ async fn main() {
         .with(warp::log(&CONFIG.general.log_level))
         .recover(handle_rejection);
 
+    // FIXME: Use better error handling of rejections
     warp::serve(routes).run(([127, 0, 0, 1], 3000)).await;
+
+    Ok(())
 }

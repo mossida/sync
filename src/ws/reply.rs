@@ -1,12 +1,12 @@
 use serde::Serialize;
 
-use crate::api::rejections::Rejection;
+use crate::errors::Error;
 use crate::ws::models::{MessageId, ReplyType, ResponseMessage, Sender};
 
-pub fn error(id: MessageId, sender: &Sender, rejection: Rejection) {
-    let mut message: ResponseMessage<Rejection> = rejection.into();
+pub fn error(id: MessageId, sender: &Sender, err: Error) {
+    let mut message: ResponseMessage<String> = err.into();
     message.id = id;
-    let text = serde_json::to_string::<ResponseMessage<Rejection>>(&message).unwrap();
+    let text = serde_json::to_string::<ResponseMessage<String>>(&message).unwrap();
     let _ = sender.send(warp::ws::Message::text(text));
 }
 
