@@ -1,9 +1,29 @@
+use crate::configuration;
 use log::warn;
+use securestore::{KeySource, SecretsManager};
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
+use std::path::Path;
+use std::sync::OnceLock;
 
-use crate::secrets;
+static SECRETS: OnceLock<SecretsManager> = OnceLock::new();
 
-// Newtype pattern
+pub fn create() -> SecretsManager {
+    let configuration = configuration::get();
+
+    SecretsManager::load(
+        &configuration.secrets.path,
+        KeySource::Path(Path::new("secrets.key")),
+    )
+    .unwrap()
+}
+
+pub fn init() {
+    let _ = SECRETS.set(create());
+}
+
+pub fn get() -> &'static SecretsManager {
+    SECRETS.get().unwrap()
+}
 
 #[derive(Clone, Debug)]
 pub struct Secret(String, Option<String>);
@@ -17,12 +37,12 @@ impl Secret {
         let key = secret_key.into();
         let value = secret_value.into();
 
-        let mut manager = secrets::create();
+        let mut manager = create();
 
         manager.set(&key, &*value);
         manager.save().unwrap();
 
-        secrets::init();
+        init();
         Self(key, Some(value))
     }
 }
@@ -48,7 +68,7 @@ impl<'de> Deserialize<'de> for Secret {
         D: Deserializer<'de>,
     {
         let secret_key = String::deserialize(deserializer)?;
-        let secret_value = secrets::get().get(&secret_key);
+        let secret_value = get().get(&secret_key);
 
         if secret_value.is_err() {
             warn!("Secret deserialization cannot be done, the secret key doesn't exist")
