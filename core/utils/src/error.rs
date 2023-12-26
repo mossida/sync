@@ -7,6 +7,10 @@ pub enum Error {
     Database(#[from] surrealdb::Error),
     #[error("Migration error")]
     Migration(String),
+    #[error("Integration cannot start: {0}")]
+    Integration(#[from] ractor::SpawnErr),
+    #[error("Something wrong happened when trying to make a request: {0}")]
+    HttpClient(#[from] reqwest::Error),
 }
 
 pub fn log<T>(result: types::Result<T>) {

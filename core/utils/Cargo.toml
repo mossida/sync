@@ -6,8 +6,12 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+ractor = "0.9.3"
 thiserror = "1.0.50"
 surrealdb = "1.0.1"
 surrealdb-migrations = "1.0.0"
 log = { version = "0.4.20", features = [] }
 securestore = "0.100.0"
+reqwest = "0.11.22"
+serde = { version = "1.0.193", features = ["derive"] }
+nanoid = "0.4.0"

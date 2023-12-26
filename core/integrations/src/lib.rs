@@ -1,14 +1,15 @@
-pub fn add(left: usize, right: usize) -> usize {
-    left + right
-}
+use revision::revisioned;
+use serde::{Deserialize, Serialize};
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+use macros::VendorBuilder;
 
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
-    }
+pub mod classes;
+pub mod scheduler;
+pub mod vendors;
+
+#[derive(VendorBuilder, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+#[revisioned(revision = 1)]
+pub enum Vendor {
+    Tado,
 }

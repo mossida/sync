@@ -1,19 +1,4 @@
-use async_trait::async_trait;
-use ractor::Actor;
 use serde::{Deserialize, Serialize};
-
-use crate::entities::models::StateFactory;
-
-#[async_trait]
-pub trait Climate: Actor {}
-
-impl<T> StateFactory for T
-where
-    T: Climate,
-{
-    type State = Preset;
-    type Attributes = Attribute;
-}
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[serde(rename_all = "snake_case")]

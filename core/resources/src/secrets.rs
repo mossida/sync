@@ -1,9 +1,12 @@
-use crate::configuration;
+use std::path::Path;
+use std::sync::OnceLock;
+
 use log::warn;
 use securestore::{KeySource, SecretsManager};
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
-use std::path::Path;
-use std::sync::OnceLock;
+use zeroize::{Zeroize, ZeroizeOnDrop};
+
+use crate::configuration;
 
 static SECRETS: OnceLock<SecretsManager> = OnceLock::new();
 
@@ -25,7 +28,7 @@ pub fn get() -> &'static SecretsManager {
     SECRETS.get().unwrap()
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Zeroize, ZeroizeOnDrop)]
 pub struct Secret(String, Option<String>);
 
 impl Secret {
@@ -47,9 +50,13 @@ impl Secret {
     }
 }
 
+/*
+FIXME: The drop is not handled correctly
+the option will be removed from the memory but not the String
+ */
 impl From<Secret> for String {
     fn from(secret: Secret) -> Self {
-        secret.1.unwrap_or_default()
+        secret.1.clone().unwrap_or_default()
     }
 }
 

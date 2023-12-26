@@ -5,6 +5,6 @@ members = [
     "core/integrations",
     "core/macros",
     "core/utils",
-    "core/scheduler",
-    "core/resources"
+    "core/resources",
+    "core/models",
 ]

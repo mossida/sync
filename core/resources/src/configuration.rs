@@ -1,19 +1,20 @@
 use config::Config;
 use once_cell::sync::Lazy;
 use serde::Deserialize;
+use zeroize::{Zeroize, ZeroizeOnDrop};
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Zeroize, ZeroizeOnDrop)]
 pub struct Configuration {
     pub database: DatabaseConfiguration,
     pub secrets: SecretsConfiguration,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Zeroize, ZeroizeOnDrop)]
 pub struct SecretsConfiguration {
     pub path: String,
 }
 
-#[derive(Deserialize)]
+#[derive(Deserialize, Zeroize, ZeroizeOnDrop)]
 pub struct DatabaseConfiguration {
     pub host: String,
     pub username: String,

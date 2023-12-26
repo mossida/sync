@@ -1,14 +1,18 @@
-pub fn add(left: usize, right: usize) -> usize {
-    left + right
+use proc_macro::TokenStream;
+
+use syn::{parse_macro_input, DeriveInput};
+
+mod id;
+mod vendors;
+
+#[proc_macro_derive(VendorBuilder, attributes(vendor))]
+pub fn vendors_build(item: TokenStream) -> TokenStream {
+    let input = parse_macro_input!(item as DeriveInput);
+    vendors::implement(input)
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
-    }
+#[proc_macro_derive(Id, attributes(actor))]
+pub fn custom_id(item: TokenStream) -> TokenStream {
+    let input = parse_macro_input!(item as DeriveInput);
+    id::implement(input)
 }
