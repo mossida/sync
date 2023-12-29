@@ -15,7 +15,10 @@ tokio = { version = "1.0.0", features = ["rt", "rt-multi-thread", "macros"] }
 utils = { version = "0.1.0", path = "../utils" }
 resources = { version = "0.1.0", path = "../resources" }
 integrations = { version = "0.1.0", path = "../integrations" }
+models = { version = "0.1.0", path = "../models" }
 env_logger = "0.10.1"
 ractor = "0.9.3"
 serde_json = "1.0.108"
 revision = "0.5.0"
+schemars = "0.8.16"
+warp = "0.3.6"

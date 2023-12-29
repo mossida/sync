@@ -1,10 +1,12 @@
 use std::fmt::{Display, Formatter};
 
 use reqwest::Url;
-use resources::secrets::Secret;
+use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
-#[derive(Serialize, Deserialize, Clone, Debug)]
+use resources::secrets::Secret;
+
+#[derive(Serialize, Deserialize, Clone, Debug, JsonSchema)]
 pub struct Configuration {
     pub username: Secret,
     pub password: Secret,

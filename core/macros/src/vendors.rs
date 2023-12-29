@@ -29,7 +29,7 @@ pub fn implement(ast: DeriveInput) -> TokenStream {
                         impl_all::<#struct_name>();
                     };
 
-                    let (_macro_ref, _) = ractor::actor::Actor::spawn_linked(None, #struct_name {}, configuration, supervisor).await?;
+                    let (_macro_ref, _) = ractor::actor::Actor::spawn_linked(None, #struct_name {}, component, supervisor).await?;
                     Ok(_macro_ref.get_cell())
                 }
             }
@@ -38,7 +38,7 @@ pub fn implement(ast: DeriveInput) -> TokenStream {
     // Convert the expanded code into a token stream and return it
     TokenStream::from(quote! {
         impl #enum_name {
-            pub async fn build(&self, configuration: serde_json::Value, supervisor: ractor::ActorCell) -> utils::types::Result<ractor::ActorCell> {
+            pub async fn build(&self, component: models::component::Component, supervisor: ractor::ActorCell) -> utils::types::Result<ractor::ActorCell> {
                 match self {
                     #(#variants)*
                 }

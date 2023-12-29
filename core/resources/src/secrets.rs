@@ -2,6 +2,9 @@ use std::path::Path;
 use std::sync::OnceLock;
 
 use log::warn;
+use schemars::gen::SchemaGenerator;
+use schemars::schema::{Schema, SchemaObject};
+use schemars::JsonSchema;
 use securestore::{KeySource, SecretsManager};
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use zeroize::{Zeroize, ZeroizeOnDrop};
@@ -30,6 +33,18 @@ pub fn get() -> &'static SecretsManager {
 
 #[derive(Clone, Debug, Zeroize, ZeroizeOnDrop)]
 pub struct Secret(String, Option<String>);
+
+impl JsonSchema for Secret {
+    fn schema_name() -> String {
+        "Secret".to_owned()
+    }
+
+    fn json_schema(gen: &mut SchemaGenerator) -> Schema {
+        let mut object: SchemaObject = String::json_schema(gen).into();
+        object.format = Some("secret".to_owned());
+        object.into()
+    }
+}
 
 impl Secret {
     pub fn new<T: Into<String>>(secret_key: T) -> Self {

@@ -58,7 +58,7 @@ impl Actor for Worker {
                 SchedulerMessage::Ping(message) => {
                     dbg!(message);
                 }
-                SchedulerMessage::RequestPolling(interval, interface) => {
+                SchedulerMessage::PollInterface(interval, interface) => {
                     self.handlers
                         .entry(interface.get_name().unwrap())
                         .insert(interface.send_interval(interval, || InterfaceMessage::Update));

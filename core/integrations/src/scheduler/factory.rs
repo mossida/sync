@@ -4,9 +4,11 @@ use ractor::factory::{Factory, FactoryMessage, Job, RoutingMode};
 use ractor::{Actor, ActorRef};
 
 use crate::scheduler::models::{SchedulerMessage, WorkerKey};
+use crate::scheduler::spawner::Spawner;
 use crate::scheduler::worker::WorkerBuilder;
 
 static FACTORY: OnceLock<ActorRef<FactoryMessage<WorkerKey, SchedulerMessage>>> = OnceLock::new();
+static SPAWNER: OnceLock<ActorRef<()>> = OnceLock::new();
 
 pub(super) async fn init() -> utils::types::Result<()> {
     let builder: WorkerBuilder = Default::default();
@@ -23,6 +25,11 @@ pub(super) async fn init() -> utils::types::Result<()> {
     .await
     .unwrap();
 
+    let (spawner, _) = Actor::spawn(Some(String::from("spawner")), Spawner {}, ())
+        .await
+        .unwrap();
+
+    SPAWNER.set(spawner).unwrap();
     FACTORY.set(factory).unwrap();
     Ok(())
 }
@@ -37,4 +44,20 @@ pub(super) async fn send(message: SchedulerMessage) -> utils::types::Result<()> 
         }))
         .unwrap();
     Ok(())
+}
+
+pub(super) fn get() -> ActorRef<FactoryMessage<WorkerKey, SchedulerMessage>> {
+    FACTORY
+        .get()
+        .ok_or("Factory not initialized")
+        .unwrap()
+        .clone()
+}
+
+pub(super) fn get_spawner() -> ActorRef<()> {
+    SPAWNER
+        .get()
+        .ok_or("Spawner not initialized")
+        .unwrap()
+        .clone()
 }
