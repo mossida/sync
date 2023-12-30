@@ -5,8 +5,8 @@ use surrealdb::sql::Thing;
 
 use models::component::Component;
 use models::device::Device;
-use models::entity::Entity;
-use models::{device, entity};
+use models::entities::Entity;
+use models::{device, entities};
 
 use crate::classes::Class;
 use crate::scheduler::models::AdapterMessage;
@@ -81,23 +81,25 @@ impl ractor::Actor for Tado {
 
             let entity = Entity {
                 id: Thing {
-                    tb: entity::RESOURCE.to_owned(),
+                    tb: entities::RESOURCE.to_owned(),
                     id: device.serial.clone().into(),
                 },
                 enabled: true,
                 available: false,
                 class: Class::Climate.to_string(),
                 attributes: Default::default(),
-                state: Default::default(),
+                status: Default::default(),
             };
 
             device.updates(&entity).await?;
 
+            // TODO: Define standard name for interfaces
             Actor::spawn_linked(
                 Some("test".to_owned()),
-                ClimateInterface { zone, entity },
+                ClimateInterface { zone },
                 ClimateState {
                     client: state.client.clone(),
+                    entity,
                 },
                 myself.get_cell(),
             )

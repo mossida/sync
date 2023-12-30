@@ -3,8 +3,8 @@ use surrealdb::sql::Thing;
 
 use resources::database;
 
-use crate::entity;
-use crate::entity::Entity;
+use crate::entities;
+use crate::entities::Entity;
 
 pub const RESOURCE: &str = "device";
 
@@ -35,12 +35,9 @@ impl Device {
     pub async fn updates(&self, entity: &Entity) -> utils::types::Result<()> {
         let client = database::get();
 
-        // Insertion errors are not reported
-        client
-            .query("INSERT INTO $resource $content")
-            .bind(("resource", entity::RESOURCE))
-            .bind(("content", entity))
-            .await?;
+        if !entity.exists().await? {
+            let _: Vec<Entity> = client.create(entities::RESOURCE).content(entity).await?;
+        }
 
         client
             .query(r#"RELATE $device->updates->$entity"#)

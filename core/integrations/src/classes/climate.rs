@@ -1,3 +1,4 @@
+use derive_more::Display;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -24,7 +25,7 @@ pub enum Preset {
     Unknown,
 }
 
-#[derive(Debug, Serialize, Deserialize, Clone, Eq, PartialEq)]
+#[derive(Debug, Serialize, Deserialize, Display, Clone, Eq, PartialEq)]
 #[serde(rename_all = "snake_case")]
 pub enum HVACMode {
     Off,
