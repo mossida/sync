@@ -31,6 +31,12 @@ impl Entity {
         Ok(entity.is_some())
     }
 
+    pub async fn list() -> utils::types::Result<Vec<Entity>> {
+        let client = database::get();
+        let entities: Vec<Entity> = client.select(RESOURCE).await?;
+        Ok(entities)
+    }
+
     pub async fn merge(&mut self, state: EntityState) -> utils::types::Result<()> {
         let client = database::get();
 

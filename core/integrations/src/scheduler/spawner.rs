@@ -11,7 +11,7 @@ impl Actor for Spawner {
 
     async fn pre_start(
         &self,
-        myself: ActorRef<Self::Msg>,
+        _: ActorRef<Self::Msg>,
         args: Self::Arguments,
     ) -> Result<Self::State, ActorProcessingErr> {
         Ok(args)
@@ -29,7 +29,6 @@ impl Actor for Spawner {
             SupervisionEvent::ActorPanicked(_, err) => {
                 error!("Actor panicked: {:?}", err);
             }
-            SupervisionEvent::ProcessGroupChanged(_) => {}
             _ => {}
         }
 

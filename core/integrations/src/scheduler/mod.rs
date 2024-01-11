@@ -19,7 +19,7 @@ pub async fn send(message: models::SchedulerMessage) -> utils::types::Result<()>
     factory::send(message).await
 }
 
-pub async fn register(components: Vec<Component>) {
+pub async fn register(components: Vec<Component>) -> utils::types::Result<()> {
     // FIXME: Define how to control vendors actors group
     // Create a priority queue from the components
     let mut queue: PriorityQueue<Component, u8, DefaultHashBuilder> = components
@@ -33,10 +33,11 @@ pub async fn register(components: Vec<Component>) {
 
     // FIXME: Define how to control vendors actors group and handle errors
     while let Some((component, _)) = queue.pop() {
-        let vendor: Vendor = serde_json::from_value(component.vendor.clone()).unwrap();
-        let cell = vendor
+        let vendor: Vendor = serde_json::from_value(component.vendor.clone())?;
+        vendor
             .build(component, factory::get_spawner().get_cell())
-            .await
-            .unwrap();
+            .await?;
     }
+
+    Ok(())
 }

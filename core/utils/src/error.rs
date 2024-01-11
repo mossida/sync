@@ -12,6 +12,10 @@ pub enum Error {
     Integration(#[from] ractor::SpawnErr),
     #[error("Something wrong happened when trying to make a request: {0}")]
     HttpClient(#[from] reqwest::Error),
+    #[error("Something wrong with the serialization")]
+    InterfaceError(#[from] serde_json::Error),
+    #[error("Something wrong with the IO: {0}")]
+    IoError(#[from] std::io::Error),
 }
 
 pub fn log<T>(result: types::Result<T>) {

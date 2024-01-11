@@ -1,12 +1,14 @@
 use std::ops::Deref;
 
-use crate::configuration;
 use once_cell::sync::Lazy;
 use surrealdb::engine::remote::ws::{Client, Ws};
 use surrealdb::opt::auth::Database;
 use surrealdb::Surreal;
 use surrealdb_migrations::MigrationRunner;
+
 use utils::error::Error;
+
+use crate::configuration;
 
 static DB: Lazy<Surreal<Client>> = Lazy::new(Surreal::init);
 

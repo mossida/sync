@@ -1,25 +1,26 @@
 #![forbid(unsafe_code)]
 
-use warp::Filter;
-
 use integrations::scheduler;
 use models::component;
 use models::component::Component;
 use resources::{database, secrets};
 use utils::error::log;
 
+mod net;
+mod rpc;
+
+// https://github.com/surrealdb/surrealdb/blob/7b197c2acdcfdf9161813e9f904b8f2bc40db3f9/src/net/mod.rs
+
 #[tokio::main]
 async fn main() {
+    tracing_subscriber::fmt::init();
     secrets::init();
-    env_logger::init();
 
     log(database::init().await);
     log(scheduler::init().await);
 
     let components: Vec<Component> = database::get().select(component::RESOURCE).await.unwrap();
-    scheduler::register(components).await;
+    log(scheduler::register(components).await);
 
-    let hello = warp::path!("hello" / String).map(|name| format!("Hello, {}!", name));
-
-    warp::serve(hello).run(([127, 0, 0, 1], 3030)).await;
+    log(net::init().await);
 }

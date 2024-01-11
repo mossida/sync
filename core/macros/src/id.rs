@@ -13,7 +13,7 @@ fn extract_struct_data(ast: &DeriveInput) -> &DataStruct {
 
 pub fn implement(ast: DeriveInput) -> TokenStream {
     let name = &ast.ident;
-    let data = extract_struct_data(&ast);
+    let _ = extract_struct_data(&ast);
 
     TokenStream::from(quote!(
         impl NewId for #name {

@@ -7,7 +7,7 @@ edition = "2021"
 
 [dependencies]
 securestore = "0.100.0"
-surrealdb = "1.0.1"
+surrealdb = { version = "1.0.2", features = ["default", "kv-rocksdb"] }
 surrealdb-migrations = "1.0.1"
 utils = { version = "0.1.0", path = "../utils" }
 once_cell = "1.19.0"

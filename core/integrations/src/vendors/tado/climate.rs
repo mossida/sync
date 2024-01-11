@@ -2,6 +2,10 @@ use async_trait::async_trait;
 use log::debug;
 use ractor::concurrency::Duration;
 use ractor::{Actor, ActorProcessingErr, ActorRef};
+use uom::si::f64::{Ratio, TemperatureInterval, ThermodynamicTemperature};
+use uom::si::ratio::percent;
+use uom::si::temperature_interval;
+use uom::si::thermodynamic_temperature::degree_celsius;
 
 use models::attributes::Attributes;
 use models::entities::{Entity, EntityState};
@@ -31,7 +35,7 @@ impl Actor for ClimateInterface {
 
     async fn pre_start(
         &self,
-        myself: ActorRef<Self::Msg>,
+        _: ActorRef<Self::Msg>,
         args: Self::Arguments,
     ) -> Result<Self::State, ActorProcessingErr> {
         Ok(args)
@@ -50,13 +54,19 @@ impl Actor for ClimateInterface {
                 .merge(EntityState {
                     state: entity.status.state.clone(),
                     attributes: Attributes::from(vec![
-                        Attribute::MaxHumidity(100.0),
-                        Attribute::MinHumidity(0.0),
-                        Attribute::MaxTemp(capabilities.temperatures.celsius.max as f32),
-                        Attribute::MinTemp(capabilities.temperatures.celsius.min as f32),
-                        Attribute::TargetTemperatureStep(
-                            capabilities.temperatures.celsius.step as f32,
-                        ),
+                        Attribute::MaxHumidity(Ratio::new::<percent>(100.0)),
+                        Attribute::MinHumidity(Ratio::new::<percent>(0.0)),
+                        Attribute::MaxTemp(ThermodynamicTemperature::new::<degree_celsius>(
+                            capabilities.temperatures.celsius.max,
+                        )),
+                        Attribute::MinTemp(ThermodynamicTemperature::new::<degree_celsius>(
+                            capabilities.temperatures.celsius.min,
+                        )),
+                        Attribute::TargetTemperatureStep(TemperatureInterval::new::<
+                            temperature_interval::degree_celsius,
+                        >(
+                            capabilities.temperatures.celsius.step
+                        )),
                     ]),
                     updated_at: Default::default(),
                 })
@@ -83,14 +93,16 @@ impl Actor for ClimateInterface {
                 debug!("Update received");
                 let data = state.client.get_zone_state(&self.zone).await?;
 
-                let hvac_action = data.activity_data_points.heating_power.map_or(
-                    HVACAction::Idle,
-                    |heating_power| match heating_power.percentage {
-                        // FIXME: don't use numbers in matching
-                        0.0 => HVACAction::Idle,
-                        _ => HVACAction::Heating,
-                    },
-                );
+                let heating_power = data
+                    .activity_data_points
+                    .heating_power
+                    .map_or(0.0, |heating_power| heating_power.percentage);
+
+                let hvac_action = if heating_power > 0.0 {
+                    HVACAction::Heating
+                } else {
+                    HVACAction::Idle
+                };
 
                 let hvac_mode = data.overlay.map_or(Mode::SmartSchedule.into(), |_| {
                     data.setting.map_or(HVACMode::Off, |s| {
@@ -103,15 +115,18 @@ impl Actor for ClimateInterface {
                     .merge(EntityState {
                         state: hvac_mode.clone().to_string(),
                         attributes: Attributes::from(vec![
-                            Attribute::CurrentTemperature(
-                                data.sensor_data_points.inside_temperature.celsius as f32,
-                            ),
-                            Attribute::CurrentHumidity(
-                                data.sensor_data_points.humidity.percentage as f32,
-                            ),
+                            Attribute::CurrentTemperature(ThermodynamicTemperature::new::<
+                                degree_celsius,
+                            >(
+                                data.sensor_data_points.inside_temperature.celsius,
+                            )),
+                            Attribute::CurrentHumidity(Ratio::new::<percent>(
+                                data.sensor_data_points.humidity.percentage,
+                            )),
                             Attribute::HvacMode(hvac_mode.clone()),
                             Attribute::HvacAction(hvac_action),
                             Attribute::Preset(data.tado_mode.into()),
+                            Attribute::HvacPower(Ratio::new::<percent>(heating_power)),
                         ]),
                         updated_at: Default::default(),
                     })

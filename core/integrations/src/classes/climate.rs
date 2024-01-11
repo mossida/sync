@@ -1,5 +1,6 @@
 use derive_more::Display;
 use serde::{Deserialize, Serialize};
+use uom::si::f64::{Ratio, TemperatureInterval, ThermodynamicTemperature};
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[serde(rename_all = "snake_case")]
@@ -66,21 +67,21 @@ pub enum FanStatus {
 #[serde(rename_all = "snake_case")]
 pub enum Attribute {
     AuxHeat(bool),
-    CurrentTemperature(f32),
-    CurrentHumidity(f32),
+    CurrentTemperature(ThermodynamicTemperature),
+    CurrentHumidity(Ratio),
     Preset(Preset),
     FanModes(Vec<FanStatus>),
     FanMode(FanStatus),
     HvacModes(Vec<HVACMode>),
     HvacMode(HVACMode),
     HvacAction(HVACAction),
-    HvacPower(f32),
-    Humidity(f32),
-    MaxHumidity(f32),
-    MinHumidity(f32),
-    MaxTemp(f32),
-    MinTemp(f32),
-    TargetTemperatureHigh(f32),
-    TargetTemperatureLow(f32),
-    TargetTemperatureStep(f32),
+    HvacPower(Ratio),
+    Humidity(Ratio),
+    MaxHumidity(Ratio),
+    MinHumidity(Ratio),
+    MaxTemp(ThermodynamicTemperature),
+    MinTemp(ThermodynamicTemperature),
+    TargetTemperatureHigh(ThermodynamicTemperature),
+    TargetTemperatureLow(ThermodynamicTemperature),
+    TargetTemperatureStep(TemperatureInterval),
 }
