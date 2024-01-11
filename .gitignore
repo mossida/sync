@@ -1,8 +1,8 @@
 /target
-/config.toml
-/secrets.key
-/.idea/modules.xml
-/.idea/prettier.xml
-/.idea/sync-core.iml
-/.idea/vcs.xml
-/dev.db
+/.idea/*
+
+/**/dev.db
+/**/Cargo.lock
+/**/secrets.key
+/**/secrets.json
+/**/config.json5

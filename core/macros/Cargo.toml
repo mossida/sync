@@ -1,0 +1,17 @@
+[package]
+name = "macros"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+proc-macro = true
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+ractor = "0.9.3"
+quote = "1.0.33"
+syn = "2.0.41"
+derive_more = "0.99.17"
+proc-macro2 = "1.0.70"
+static_assertions = "1.1.0"
