@@ -5,8 +5,15 @@ jobs:
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v3
+            - uses: oven-sh/setup-bun@v1
 
-            - name: Check commits format
-              uses: siderolabs/conform@v0.1.0-alpha.27
-              with:
-                token: "${{ secrets.GITHUB_TOKEN }}"
+            - name: Install commit lint
+              run: bun install commitlint@latest
+            
+            - name: Validate current commit (last commit)
+              if: github.event_name == 'push'
+              run: bunx commitlint --from HEAD~1 --to HEAD --verbose
+      
+            - name: Validate PR commits with commitlint
+              if: github.event_name == 'pull_request'
+              run: bunx commitlint --from ${{ github.event.pull_request.head.sha }}~${{ github.event.pull_request.commits }} --to ${{ github.event.pull_request.head.sha }} --verbose
