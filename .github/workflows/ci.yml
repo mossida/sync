@@ -11,7 +11,7 @@ jobs:
             - uses: oven-sh/setup-bun@v1
 
             - name: Install commit lint
-              run: bun install commitlint@latest
+              run: bun install commitlint@latest | bun install @commitlint/config-conventional@latest
             
             - name: Validate current commit (last commit)
               if: github.event_name == 'push'
