@@ -1,0 +1,10 @@
+name: "CI"
+on: [push, pull_request]
+jobs:
+    conform:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Commits safety
+              uses: siderolabs/conform@v0.1.0-alpha.27
+              with:
+                token: "${{ secrets.GITHUB_TOKEN }}"
