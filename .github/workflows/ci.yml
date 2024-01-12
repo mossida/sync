@@ -1,12 +1,12 @@
 name: "CI"
 on: [push, pull_request]
 jobs:
-    precheck:
+    commits:
         runs-on: ubuntu-latest
         steps:
             - uses: actions/checkout@v3
-            
-            - name: Commits safety
+
+            - name: Check commits format
               uses: siderolabs/conform@v0.1.0-alpha.27
               with:
                 token: "${{ secrets.GITHUB_TOKEN }}"
