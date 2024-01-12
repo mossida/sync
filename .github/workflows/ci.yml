@@ -1,7 +1,7 @@
 name: "CI"
 on: [push, pull_request]
 jobs:
-    conform:
+    precheck:
         runs-on: ubuntu-latest
         steps:
             - name: Commits safety
