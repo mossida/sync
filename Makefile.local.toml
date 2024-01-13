@@ -1,4 +1,37 @@
+[tasks.cargo-upgrade]
+private = true
+command = "cargo"
+args = ["upgrade", "--pinned"]
+
+[tasks.cargo-update]
+private = true
+command = "cargo"
+args = ["update"]
+
 [tasks.cargo-fmt]
 category = "Local commands"
 command = "cargo"
 args = ["fmt", "--all", "--check"]
+
+[tasks.cargo-audit]
+category = "Local commands"
+command = "cargo"
+args = ["audit"]
+
+[tasks.cargo-clippy]
+category = "Local commands"
+command = "cargo"
+args = ["clippy", "--all-targets", "--all-features", "--", "-D", "warnings"]
+
+[tasks.setup]
+category = "Local commands"
+dependencies = ["cargo-upgrade", "cargo-update"]
+
+[tasks.clean]
+category = "Local commands"
+command = "cargo"
+args = ["clean"]
+
+[tasks.check]
+category = "Local commands"
+dependencies = ["cargo-fmt", "cargo-audit", "cargo-clippy"]

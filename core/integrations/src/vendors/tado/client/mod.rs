@@ -125,9 +125,7 @@ impl Client {
 		self.home_id = home_id;
 	}
 
-	/**
-	Get the current signed in user, with information about homes and devices.
-	 */
+	/** Get the current signed in user, with information about homes and devices. */
 	pub async fn get_me(&mut self) -> utils::types::Result<User> {
 		self.request(
 			reqwest::Method::GET,
@@ -143,9 +141,7 @@ impl Client {
 		.await
 	}
 
-	/**
-	Get the list of devices for the current home.
-	 */
+	/** Get the list of devices for the current home. */
 	pub async fn get_devices(&mut self) -> utils::types::Result<Vec<Device>> {
 		self.request(
 			reqwest::Method::GET,
@@ -161,9 +157,7 @@ impl Client {
 		.await
 	}
 
-	/**
-	Get the list of zones for the current home.
-	 */
+	/** Get the list of zones for the current home. */
 	pub async fn get_zones(&mut self) -> utils::types::Result<Vec<Zone>> {
 		self.request(
 			reqwest::Method::GET,
@@ -209,9 +203,7 @@ impl Client {
 		.await
 	}
 
-	/**
-	Get the capabilities of a zone.
-	 */
+	/** Get the capabilities of a zone. */
 	pub async fn get_capabilities(&mut self, zone: &Zone) -> utils::types::Result<Capability> {
 		self.request(
 			reqwest::Method::GET,
@@ -219,7 +211,7 @@ impl Client {
 			Params {
 				endpoint: Default::default(),
 				domain: Default::default(),
-				command: &*format!("zones/{}/capabilities", zone.id),
+				command: format!("zones/{}/capabilities", zone.id).as_str(),
 				device: "",
 			},
 			false,
@@ -227,9 +219,7 @@ impl Client {
 		.await
 	}
 
-	/**
-	Get the state of the selected home.
-	 */
+	/** Get the state of the selected home. */
 	pub async fn get_home_state(&mut self) -> utils::types::Result<HomeState> {
 		self.request(
 			reqwest::Method::GET,
@@ -245,9 +235,7 @@ impl Client {
 		.await
 	}
 
-	/**
-	Get the weather for the current home.
-	 */
+	/** Get the weather for the current home. */
 	pub async fn get_weather(&mut self) -> utils::types::Result<Weather> {
 		self.request::<_, _>(
 			reqwest::Method::GET,
@@ -263,9 +251,7 @@ impl Client {
 		.await
 	}
 
-	/**
-	Get the air comfort for the current home.
-	 */
+	/** Get the air comfort for the current home. */
 	pub async fn get_air_comfort(&mut self) -> utils::types::Result<Value> {
 		self.request(
 			reqwest::Method::GET,
@@ -281,9 +267,7 @@ impl Client {
 		.await
 	}
 
-	/**
-	Get all the users that can control the homes
-	 */
+	/** Get all the users that can control the homes */
 	pub async fn get_users(&mut self) -> utils::types::Result<Value> {
 		self.request(
 			reqwest::Method::GET,
@@ -299,9 +283,7 @@ impl Client {
 		.await
 	}
 
-	/**
-	Get all the mobile devices that can control the homes
-	 */
+	/** Get all the mobile devices that can control the homes */
 	pub async fn get_mobile_devices(&mut self) -> utils::types::Result<Value> {
 		self.request(
 			reqwest::Method::GET,
