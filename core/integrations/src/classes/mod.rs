@@ -7,5 +7,5 @@ mod sensor;
 #[derive(Debug, Display, Serialize, Deserialize, Clone, PartialEq)]
 #[serde(rename_all = "snake_case")]
 pub enum Class {
-    Climate,
+	Climate,
 }

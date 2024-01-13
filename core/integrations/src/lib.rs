@@ -11,5 +11,5 @@ pub mod vendors;
 #[serde(rename_all = "snake_case")]
 #[revisioned(revision = 1)]
 pub enum Vendor {
-    Tado,
+	Tado,
 }

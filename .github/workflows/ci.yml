@@ -5,7 +5,7 @@ jobs:
         runs-on: ubuntu-latest
         if: github.event_name == 'pull_request'
         steps:
-            - uses: actions/checkout@v3
+            - uses: actions/checkout@v4
               with:
                 fetch-depth: 0
             
@@ -16,3 +16,22 @@ jobs:
       
             - name: Validate PR commits with commitlint
               run: bunx commitlint --from ${{ github.event.pull_request.head.sha }}~${{ github.event.pull_request.commits }} --to ${{ github.event.pull_request.head.sha }} --verbose
+
+    format:
+      runs-on: ubuntu-latest
+      if: github.event_name == 'merge_group'
+      steps:
+        - name: Install stable toolchain
+          uses: dtolnay/rust-toolchain@stable
+          with:
+            toolchain: stable
+            components: rustfmt
+
+        - name: Checkout sources
+          uses: actions/checkout@v4
+
+        - name: Install cargo-make
+          run: cargo install --debug --locked cargo-make
+
+        - name: Check format
+          run: cargo make ci-format

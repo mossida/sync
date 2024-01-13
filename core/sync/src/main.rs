@@ -13,14 +13,14 @@ mod rpc;
 
 #[tokio::main]
 async fn main() {
-    tracing_subscriber::fmt::init();
-    secrets::init();
+	tracing_subscriber::fmt::init();
+	secrets::init();
 
-    log(database::init().await);
-    log(scheduler::init().await);
+	log(database::init().await);
+	log(scheduler::init().await);
 
-    let components: Vec<Component> = database::get().select(component::RESOURCE).await.unwrap();
-    log(scheduler::register(components).await);
+	let components: Vec<Component> = database::get().select(component::RESOURCE).await.unwrap();
+	log(scheduler::register(components).await);
 
-    log(net::init().await);
+	log(net::init().await);
 }

@@ -1,0 +1,4 @@
+[tasks.cargo-fmt]
+category = "Local commands"
+command = "cargo"
+args = ["fmt", "--all", "--check"]
