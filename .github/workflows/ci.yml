@@ -41,7 +41,7 @@ jobs:
         - name: Install required packages
           run: cargo install --debug --locked cargo-make
 
-        - name: Check format
+        - name: Run ci:format
           run: cargo make ci-format
 
     clippy:
@@ -52,7 +52,6 @@ jobs:
           uses: dtolnay/rust-toolchain@stable
           with:
             toolchain: stable
-            components: rustfmt
       
         - name: Checkout sources
           uses: actions/checkout@v4
@@ -63,7 +62,7 @@ jobs:
         - name: Install required packages
           run: cargo install --debug --locked cargo-make
       
-        - name: Check format
+        - name: Run ci:clippy
           run: cargo make ci-clippy
 
     audit:
@@ -74,7 +73,6 @@ jobs:
           uses: dtolnay/rust-toolchain@stable
           with:
             toolchain: stable
-            components: rustfmt
       
         - name: Checkout sources
           uses: actions/checkout@v4
@@ -85,7 +83,7 @@ jobs:
         - name: Install required packages
           run: cargo install --debug --locked cargo-make cargo-audit
       
-        - name: Check format
+        - name: Run ci:audit
           run: cargo make ci-audit
 
     workspace:
@@ -96,7 +94,6 @@ jobs:
           uses: dtolnay/rust-toolchain@stable
           with:
             toolchain: stable
-            components: rustfmt
       
         - name: Checkout sources
           uses: actions/checkout@v4
@@ -107,6 +104,6 @@ jobs:
         - name: Install required packages
           run: cargo install --debug --locked cargo-make
       
-        - name: Check format
+        - name: Run ci:check
           run: cargo make ci-check
 
