@@ -2,10 +2,6 @@ name: "Continuous Integration"
 
 on: [pull_request, merge_group]
 
-defaults:
-  run:
-    shell: bash
-
 jobs:
     commits:
       name: Check commits standard
@@ -112,5 +108,5 @@ jobs:
           run: cargo install --debug --locked cargo-make
       
         - name: Check format
-          run: cargo make ci-workspace
+          run: cargo make ci-check
 
