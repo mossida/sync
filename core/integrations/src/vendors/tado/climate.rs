@@ -82,51 +82,48 @@ impl Actor for ClimateInterface {
 		message: Self::Msg,
 		state: &mut Self::State,
 	) -> Result<(), ActorProcessingErr> {
-		match message {
-			InterfaceMessage::Update => {
-				debug!("Update received");
-				let data = state.client.get_zone_state(&self.zone).await?;
+		if let InterfaceMessage::Update = message {
+			debug!("Update received");
+			let data = state.client.get_zone_state(&self.zone).await?;
 
-				let heating_power = data
-					.activity_data_points
-					.heating_power
-					.map_or(0.0, |heating_power| heating_power.percentage);
+			let heating_power = data
+				.activity_data_points
+				.heating_power
+				.map_or(0.0, |heating_power| heating_power.percentage);
 
-				let hvac_action = if heating_power > 0.0 {
-					HVACAction::Heating
-				} else {
-					HVACAction::Idle
-				};
+			let hvac_action = if heating_power > 0.0 {
+				HVACAction::Heating
+			} else {
+				HVACAction::Idle
+			};
 
-				let hvac_mode = data.overlay.map_or(Mode::SmartSchedule.into(), |_| {
-					data.setting.map_or(HVACMode::Off, |s| {
-						s.r#type.unwrap_or(s.mode.unwrap_or(Action::Off)).into()
-					})
-				});
+			let hvac_mode = data.overlay.map_or(Mode::SmartSchedule.into(), |_| {
+				data.setting.map_or(HVACMode::Off, |s| {
+					s.r#type.unwrap_or(s.mode.unwrap_or(Action::Off)).into()
+				})
+			});
 
-				state
-					.entity
-					.merge(EntityState {
-						state: hvac_mode.clone().to_string(),
-						attributes: Attributes::from(vec![
-							Attribute::CurrentTemperature(ThermodynamicTemperature::new::<
-								degree_celsius,
-							>(
-								data.sensor_data_points.inside_temperature.celsius,
-							)),
-							Attribute::CurrentHumidity(Ratio::new::<percent>(
-								data.sensor_data_points.humidity.percentage,
-							)),
-							Attribute::HvacMode(hvac_mode.clone()),
-							Attribute::HvacAction(hvac_action),
-							Attribute::Preset(data.tado_mode.into()),
-							Attribute::HvacPower(Ratio::new::<percent>(heating_power)),
-						]),
-						updated_at: Default::default(),
-					})
-					.await?;
-			}
-			_ => {}
+			state
+				.entity
+				.merge(EntityState {
+					state: hvac_mode.clone().to_string(),
+					attributes: Attributes::from(vec![
+						Attribute::CurrentTemperature(ThermodynamicTemperature::new::<
+							degree_celsius,
+						>(
+							data.sensor_data_points.inside_temperature.celsius,
+						)),
+						Attribute::CurrentHumidity(Ratio::new::<percent>(
+							data.sensor_data_points.humidity.percentage,
+						)),
+						Attribute::HvacMode(hvac_mode.clone()),
+						Attribute::HvacAction(hvac_action),
+						Attribute::Preset(data.tado_mode.into()),
+						Attribute::HvacPower(Ratio::new::<percent>(heating_power)),
+					]),
+					updated_at: Default::default(),
+				})
+				.await?;
 		}
 
 		Ok(())

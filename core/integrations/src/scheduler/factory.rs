@@ -44,6 +44,7 @@ pub(super) async fn send(message: SchedulerMessage) -> utils::types::Result<()> 
 	Ok(())
 }
 
+#[allow(dead_code)]
 pub(super) fn get() -> ActorRef<FactoryMessage<WorkerKey, SchedulerMessage>> {
 	FACTORY.get().ok_or("Factory not initialized").unwrap().clone()
 }

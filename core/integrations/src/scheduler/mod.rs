@@ -25,7 +25,7 @@ pub async fn register(components: Vec<Component>) -> utils::types::Result<()> {
 	let mut queue: PriorityQueue<Component, u8, DefaultHashBuilder> = components
 		.into_par_iter()
 		.map(|component| {
-			let priority = component.priority.clone();
+			let priority = component.priority;
 			(component, priority)
 		})
 		.collect::<Vec<(Component, u8)>>()

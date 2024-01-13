@@ -69,9 +69,7 @@ impl Actor for Worker {
 				Message::Text(_) => {
 					state
 						.sender
-						.send(Message::Text(
-							format!("Hello from worker: {}", state.context.wid).into(),
-						))
+						.send(Message::Text(format!("Hello from worker: {}", state.context.wid)))
 						.await?;
 
 					state

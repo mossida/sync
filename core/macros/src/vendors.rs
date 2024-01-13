@@ -19,7 +19,7 @@ pub fn implement(ast: DeriveInput) -> TokenStream {
 	let variants = data.variants.iter().map(|variant| {
         let variant_name = &variant.ident;
         let struct_name: proc_macro2::TokenStream =
-            syn::parse_str(format!("vendors::{}::adapter::{}", variant_name.to_string().to_lowercase(), variant_name.to_string()).as_str()).unwrap();
+            syn::parse_str(format!("vendors::{}::adapter::{}", variant_name.to_string().to_lowercase(), variant_name).as_str()).unwrap();
 
         quote_spanned! {
                 variant.span()=>

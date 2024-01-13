@@ -20,10 +20,10 @@ jobs:
         - name: Validate PR commits with commitlint
           run: bunx commitlint --from ${{ github.event.pull_request.head.sha }}~${{ github.event.pull_request.commits }} --to ${{ github.event.pull_request.head.sha }} --verbose
 
-    format:
-      name: Check format
+    prechecks:
+      name: Check code standard
       runs-on: ubuntu-latest
-      if: github.event_name == 'merge_group'
+      if: github.event_name == 'pull_request'
       steps:
         - name: Install stable toolchain
           uses: dtolnay/rust-toolchain@stable
@@ -37,31 +37,17 @@ jobs:
         - name: Setup cache
           uses: Swatinem/rust-cache@v2
 
-        - name: Install cargo-make
-          run: cargo install --debug --locked cargo-make
+        - name: Install required packages
+          run: cargo install --debug --locked cargo-make cargo-audit
 
         - name: Check format
           run: cargo make ci-format
 
-    check:
-      name: Check workspace
-      runs-on: ubuntu-latest
-      if: github.event_name == 'merge_group'
-      steps:
-        
-        - name: Install stable toolchain
-          uses: dtolnay/rust-toolchain@stable
-          with:
-            toolchain: stable
-        
-        - name: Checkout sources
-          uses: actions/checkout@v4
-
-        - name: Setup cache
-          uses: Swatinem/rust-cache@v2
-        
-        - name: Install cargo-make
-          run: cargo install --debug --locked cargo-make
-        
         - name: Check workspace
           run: cargo make ci-check
+
+        - name: Check clippy
+          run: cargo make ci-clippy
+
+        - name: Check audit
+          run: cargo make ci-audit
