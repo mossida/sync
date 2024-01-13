@@ -13,25 +13,22 @@ use crate::configuration;
 static DB: Lazy<Surreal<Client>> = Lazy::new(Surreal::init);
 
 pub async fn init() -> utils::types::Result<()> {
-    let config = configuration::get();
-    DB.connect::<Ws>(&config.database.host).await?;
-    DB.signin(Database {
-        namespace: &config.database.namespace,
-        database: &config.database.database,
-        username: &config.database.username,
-        password: &config.database.password,
-    })
-    .await?;
+	let config = configuration::get();
+	DB.connect::<Ws>(&config.database.host).await?;
+	DB.signin(Database {
+		namespace: &config.database.namespace,
+		database: &config.database.database,
+		username: &config.database.username,
+		password: &config.database.password,
+	})
+	.await?;
 
-    // Run migrations
-    MigrationRunner::new(&DB)
-        .up()
-        .await
-        .map_err(|e| Error::Migration(e.to_string()))?;
+	// Run migrations
+	MigrationRunner::new(&DB).up().await.map_err(|e| Error::Migration(e.to_string()))?;
 
-    Ok(())
+	Ok(())
 }
 
 pub fn get() -> &'static Surreal<Client> {
-    DB.deref()
+	DB.deref()
 }

@@ -1,0 +1,3 @@
+[tasks.ci-format]
+category = "CI - Checks"
+dependencies = ["cargo-fmt"]

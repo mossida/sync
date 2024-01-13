@@ -10,27 +10,27 @@ use serde_json::Value;
 pub struct Attributes(HashMap<String, Value>);
 
 impl Attributes {
-    pub fn new() -> Attributes {
-        Attributes(Default::default())
-    }
+	pub fn new() -> Attributes {
+		Attributes(Default::default())
+	}
 }
 
 impl<T> From<Vec<T>> for Attributes
 where
-    T: Serialize,
+	T: Serialize,
 {
-    fn from(value: Vec<T>) -> Self {
-        // TODO: Optimize this conversion
-        let object = serde_json::to_value(value).unwrap_or(Value::Array(vec![]));
-        let items: &Vec<Value> = object.as_array().unwrap(); // This is safe
+	fn from(value: Vec<T>) -> Self {
+		// TODO: Optimize this conversion
+		let object = serde_json::to_value(value).unwrap_or(Value::Array(vec![]));
+		let items: &Vec<Value> = object.as_array().unwrap(); // This is safe
 
-        let map: HashMap<String, Value> = items.iter().fold(HashMap::new(), |mut acc, item| {
-            if let Value::Object(object) = item {
-                acc.extend(object.to_owned());
-            }
-            acc
-        });
+		let map: HashMap<String, Value> = items.iter().fold(HashMap::new(), |mut acc, item| {
+			if let Value::Object(object) = item {
+				acc.extend(object.to_owned());
+			}
+			acc
+		});
 
-        Attributes(map)
-    }
+		Attributes(map)
+	}
 }
