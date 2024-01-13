@@ -2,6 +2,10 @@ name: "Continuous Integration"
 
 on: [pull_request, merge_group]
 
+concurrency: 
+  group: ${{ github.head_ref }}
+  cancel-in-progress: true
+
 jobs:
     commits:
       name: Check commits standard
