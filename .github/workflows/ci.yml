@@ -1,5 +1,11 @@
 name: "Continuous Integration"
+
 on: [pull_request, merge_group]
+
+defaults:
+  run:
+    shell: bash
+
 jobs:
     commits:
       name: Check commits standard
@@ -20,10 +26,9 @@ jobs:
         - name: Validate PR commits with commitlint
           run: bunx commitlint --from ${{ github.event.pull_request.head.sha }}~${{ github.event.pull_request.commits }} --to ${{ github.event.pull_request.head.sha }} --verbose
 
-    prechecks:
-      name: Check code standard
+    format:
+      name: Check code formatting
       runs-on: ubuntu-latest
-      if: github.event_name == 'pull_request'
       steps:
         - name: Install stable toolchain
           uses: dtolnay/rust-toolchain@stable
@@ -38,16 +43,74 @@ jobs:
           uses: Swatinem/rust-cache@v2
 
         - name: Install required packages
-          run: cargo install --debug --locked cargo-make cargo-audit
+          run: cargo install --debug --locked cargo-make
 
         - name: Check format
           run: cargo make ci-format
 
-        - name: Check workspace
-          run: cargo make ci-check
-
-        - name: Check clippy
+    clippy:
+      name: Check code lints
+      runs-on: ubuntu-latest
+      steps:
+        - name: Install stable toolchain
+          uses: dtolnay/rust-toolchain@stable
+          with:
+            toolchain: stable
+            components: rustfmt
+      
+        - name: Checkout sources
+          uses: actions/checkout@v4
+      
+        - name: Setup cache
+          uses: Swatinem/rust-cache@v2
+      
+        - name: Install required packages
+          run: cargo install --debug --locked cargo-make
+      
+        - name: Check format
           run: cargo make ci-clippy
 
-        - name: Check audit
+    audit:
+      name: Check dependencies issues
+      runs-on: ubuntu-latest
+      steps:
+        - name: Install stable toolchain
+          uses: dtolnay/rust-toolchain@stable
+          with:
+            toolchain: stable
+            components: rustfmt
+      
+        - name: Checkout sources
+          uses: actions/checkout@v4
+      
+        - name: Setup cache
+          uses: Swatinem/rust-cache@v2
+      
+        - name: Install required packages
+          run: cargo install --debug --locked cargo-make cargo-audit
+      
+        - name: Check format
           run: cargo make ci-audit
+
+    workspace:
+      name: Check workspace
+      runs-on: ubuntu-latest
+      steps:
+        - name: Install stable toolchain
+          uses: dtolnay/rust-toolchain@stable
+          with:
+            toolchain: stable
+            components: rustfmt
+      
+        - name: Checkout sources
+          uses: actions/checkout@v4
+      
+        - name: Setup cache
+          uses: Swatinem/rust-cache@v2
+      
+        - name: Install required packages
+          run: cargo install --debug --locked cargo-make
+      
+        - name: Check format
+          run: cargo make ci-workspace
+
