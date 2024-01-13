@@ -1,23 +1,24 @@
-name: "CI"
+name: "Continuous Integration"
 on: [pull_request, merge_group]
 jobs:
     commits:
-        runs-on: ubuntu-latest
-        if: github.event_name == 'pull_request'
-        steps:
-            - name: Checkout sources
-              uses: actions/checkout@v4
-              with:
-                fetch-depth: 0
+      name: Check commits standard
+      runs-on: ubuntu-latest
+      if: github.event_name == 'pull_request'
+      steps:
+        - name: Checkout sources
+          uses: actions/checkout@v4
+          with:
+            fetch-depth: 0
             
-            - name: Install bun
-              uses: oven-sh/setup-bun@v1
+        - name: Install bun
+          uses: oven-sh/setup-bun@v1
 
-            - name: Install commit lint
-              run: bun install commitlint@latest | bun install @commitlint/config-conventional@latest
+        - name: Install commit lint
+          run: bun install commitlint@latest | bun install @commitlint/config-conventional@latest
       
-            - name: Validate PR commits with commitlint
-              run: bunx commitlint --from ${{ github.event.pull_request.head.sha }}~${{ github.event.pull_request.commits }} --to ${{ github.event.pull_request.head.sha }} --verbose
+        - name: Validate PR commits with commitlint
+          run: bunx commitlint --from ${{ github.event.pull_request.head.sha }}~${{ github.event.pull_request.commits }} --to ${{ github.event.pull_request.head.sha }} --verbose
 
     format:
       name: Check format
@@ -32,6 +33,11 @@ jobs:
 
         - name: Checkout sources
           uses: actions/checkout@v4
+
+        - name: Setup cache
+          uses: Swatinem/rust-cache@v2
+          with:
+            save-if: ${{ github.ref == 'refs/heads/main' }}
 
         - name: Install cargo-make
           run: cargo install --debug --locked cargo-make
@@ -52,6 +58,11 @@ jobs:
         
         - name: Checkout sources
           uses: actions/checkout@v4
+
+        - name: Setup cache
+          uses: Swatinem/rust-cache@v2
+          with:
+            save-if: ${{ github.ref == 'refs/heads/main' }}
         
         - name: Install cargo-make
           run: cargo install --debug --locked cargo-make

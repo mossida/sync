@@ -2,7 +2,6 @@
 /.idea/*
 
 /**/dev.db
-/**/Cargo.lock
 /**/secrets.key
 /**/secrets.json
 /**/config.json5
