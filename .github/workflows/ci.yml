@@ -1,6 +1,14 @@
-name: "Continuous Integration"
+# Partially based on https://github.com/surrealdb/surrealdb/blob/main/.github/workflows/ci.yml
 
-on: [pull_request, merge_group]
+name: "Continuous Integration"
+run-name: "CI run '${{ github.head_ref || github.ref_name }}'"
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+  merge_group:
 
 concurrency: 
   group: ci-${{ github.ref }}
@@ -41,6 +49,8 @@ jobs:
 
         - name: Setup cache
           uses: Swatinem/rust-cache@v2
+          with:
+            save-if: ${{ github.ref == 'refs/heads/main' }}
 
         - name: Install required packages
           run: cargo install --debug --locked cargo-make
@@ -62,6 +72,8 @@ jobs:
       
         - name: Setup cache
           uses: Swatinem/rust-cache@v2
+          with:
+            save-if: ${{ github.ref == 'refs/heads/main' }}
       
         - name: Install required packages
           run: cargo install --debug --locked cargo-make
@@ -83,6 +95,8 @@ jobs:
       
         - name: Setup cache
           uses: Swatinem/rust-cache@v2
+          with:
+            save-if: ${{ github.ref == 'refs/heads/main' }}
       
         - name: Install required packages
           run: cargo install --debug --locked cargo-make cargo-audit
@@ -104,6 +118,8 @@ jobs:
       
         - name: Setup cache
           uses: Swatinem/rust-cache@v2
+          with:
+            save-if: ${{ github.ref == 'refs/heads/main' }}
       
         - name: Install required packages
           run: cargo install --debug --locked cargo-make
