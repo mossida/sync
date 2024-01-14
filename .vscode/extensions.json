@@ -1,0 +1,7 @@
+{
+	"recommendations": [
+		"surrealdb.surrealql",
+        "vivaxy.vscode-conventional-commits",
+        "rust-lang.rust-analyzer"
+	]
+}
