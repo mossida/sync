@@ -1,0 +1,8 @@
+[devshell]
+name = "sync"
+packages = ["cargo-make"]
+
+[[commands]]
+name = "lint"
+category = "project"
+command = "cargo make check"
