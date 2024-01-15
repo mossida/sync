@@ -6,3 +6,8 @@ packages = ["cargo-make"]
 name = "lint"
 category = "project"
 command = "cargo make check"
+
+[[commands]]
+name = "run"
+category = "project"
+command = "cargo run"
