@@ -9,10 +9,10 @@
     "packages": "sudo apt install -y acl pkg-config libclang-dev direnv"
   },
   "updateContentCommand": {
-    "dirEnvHook": "echo -e 'eval \"$(direnv hook bash)\"' >> /etc/bash.bashrc",
     "permissions": "sudo setfacl -k /tmp"
   },
   "postCreateCommand": {
+    "dirEnvHook": "echo -e 'eval \"$(direnv hook bash)\"' >> /etc/bash.bashrc",
     "allowDirEnv": "direnv allow"
   }
 }
