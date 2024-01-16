@@ -1,12 +1,18 @@
 {
   "image":"mcr.microsoft.com/devcontainers/base:ubuntu",
   "features": {
+    "ghcr.io/devcontainers-community/features/direnv:1": {},
     "ghcr.io/devcontainers/features/nix:1": {
       "extraNixConfig": "experimental-features = nix-command flakes"
     }
   },
+  "onCreateCommand": {
+    "packages": "sudo apt install -y acl pkg-config libclang-dev"
+  },
+  "updateContentCommand": {
+    "permissions": "sudo setfacl -k /tmp"
+  },
   "postCreateCommand": {
-    "packages": "sudo apt install -y acl pkg-config libclang-dev",
-    "setPermissions": "sudo setfacl -k /tmp"
+    "allowDirEnv": "direnv allow"
   }
 }
