@@ -12,7 +12,7 @@
     "permissions": "sudo setfacl -k /tmp"
   },
   "postCreateCommand": {
-    "dirEnvHook": "echo -e 'eval \"$(direnv hook bash)\"' >> /etc/bash.bashrc",
-    "allowDirEnv": "direnv allow"
+    "dirEnvHook": "echo -e 'eval \"$(direnv hook bash)\"' >> ~/.bashrc",
+    "allowDirEnv": "direnv allow ."
   }
 }
