@@ -3,11 +3,13 @@ name = "sync"
 packages = ["cargo-make"]
 
 [[commands]]
-name = "lint"
+name = "check"
+help = "Runs all the checks for code standard"
 category = "project"
 command = "cargo make check"
 
 [[commands]]
 name = "run"
+help = "Starts the project"
 category = "project"
 command = "cargo run"

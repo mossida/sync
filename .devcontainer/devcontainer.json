@@ -5,8 +5,25 @@
       "extraNixConfig": "experimental-features = nix-command flakes"
     }
   },
+  "onCreateCommand": {
+    "packages": "sudo apt install -y acl pkg-config libclang-dev direnv"
+  },
+  "updateContentCommand": {
+    "permissions": "sudo setfacl -k /tmp"
+  },
   "postCreateCommand": {
-    "packages": "sudo apt install -y acl pkg-config libclang-dev",
-    "setPermissions": "sudo setfacl -k /tmp"
+    "dirEnvHook": "echo 'eval \"$(direnv hook bash)\"' >> ~/.bashrc",
+    "allowDirEnv": "direnv allow ."
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "surrealdb.surrealql",
+        "vivaxy.vscode-conventional-commits",
+        "rust-lang.rust-analyzer",
+        "tamasfe.even-better-toml",
+        "GitHub.copilot"
+      ]
+    }
   }
 }
