@@ -12,7 +12,18 @@
     "permissions": "sudo setfacl -k /tmp"
   },
   "postCreateCommand": {
-    "dirEnvHook": "echo -e 'eval \"$(direnv hook bash)\"' >> ~/.bashrc",
+    "dirEnvHook": "echo 'eval \"$(direnv hook bash)\"' >> ~/.bashrc",
     "allowDirEnv": "direnv allow ."
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "surrealdb.surrealql",
+        "vivaxy.vscode-conventional-commits",
+        "rust-lang.rust-analyzer",
+        "tamasfe.even-better-toml",
+        "GitHub.copilot"
+      ]
+    }
   }
 }
