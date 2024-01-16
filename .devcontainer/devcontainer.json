@@ -1,15 +1,15 @@
 {
   "image":"mcr.microsoft.com/devcontainers/base:ubuntu",
   "features": {
-    "ghcr.io/devcontainers-community/features/direnv:1": {},
     "ghcr.io/devcontainers/features/nix:1": {
       "extraNixConfig": "experimental-features = nix-command flakes"
     }
   },
   "onCreateCommand": {
-    "packages": "sudo apt install -y acl pkg-config libclang-dev"
+    "packages": "sudo apt install -y acl pkg-config libclang-dev direnv"
   },
   "updateContentCommand": {
+    "dirEnvHook": "echo 'eval \\\"\\$(direnv hook bash)\\\"' >> ~/.bashrc",
     "permissions": "sudo setfacl -k /tmp"
   },
   "postCreateCommand": {
