@@ -1,45 +1,109 @@
-# DRAFT
+
+[//]: # (External links)
+
+[code-of-conduct]: CODE_OF_CONDUCT.md
+[github-discussions]: https://github.com/mossida/sync/discussions
+[github-issues]: https://github.com/mossida/sync/issues
+[github-advisories]: https://github.com/mossida/sync/security/advisories
+[rustup-toolchain]: https://rustup.rs/
+
+# Contributing to Sync
+
+👍🎉 First off, thanks for taking the time to contribute! 🎉👍
+
+#### Table of contents
+
+- [Code of Conduct](#code-of-conduct)
+- [What should i know before starting?](#what-should-i-know-before-starting)
+- [How to contribute](#how-to-contribute)
+    - [Reporting bugs](#reporting-bugs)
+    - [Suggesting features](#suggesting-features)
+    - [Conventions](#conventions)
+    - [Your first contribution](#your-first-contribution)
+    - [Pull requests](#pull-requests)
+- [Code style and guidlines](#code-style-and-guidlines)
+    - [Enviroment](#enviroment)
+    - [Code style](#code-style)
+    - [External dependecies](#external-dependecies)
+- [Additional notes](#additional-notes)
+    - [Security](#security)
 
 ## Code of Conduct
 
-Help us keep Sync open and inclusive. Please read and follow our Code of Conduct.
+Help us keep Sync open and inclusive. Please read and follow our [Code of Conduct][code-of-conduct].
 
-## Getting started
+## What should i know before starting?
 
-To setup a working develop enviroment we configured some options to facilitate your contributions. We prepared a Nix develop enviroment with everything needed and custom commands to simplify your development and contributions. If you already use
-nix (please make sure flakes are enabled) just run `nix develop` in the directory to start the enviroment (first time will require some minutes to install and the dependecies). Additionally we configurated a devcontainer so you can start working on codespaces (we enabled direnv, so there is no need to run the command).
+//////
 
-If you prefer to go with manually install just be sure to have Rust toolchain (with rustfmt) installed and cargo-make installed. Then you can run commands with `cargo make <command>`. See the complete list of commands [here](https://github.com/mossida/sync/blob/main/Makefile.local.toml).
+## How to contribute
 
-## Coding standards
+### Reporting bugs
 
-Please make sure your code is properly formatted with `rustfmt`. We also use clippy to be sure that common coding mistakes are prevented. To check if everything is ok please run `cargo make check` or check command (if in nix enviroment) before every commit.
+### Suggesting features
 
-## Submitting a Pull Request
+### Conventions
 
-You should start with a correct branch name:
+### Your first contribution
 
-type/issueid-description
+### Pull requests
 
-If your don't have the issue id you directly write the description (Remember that a issue is preferred).
+## Code style and guidlines
 
-Type can be one of the conventional commits standards. So for example
+### Enviroment
 
-feat/5459-add-dynamic-fetching
-fix/2342-replace-handler-from-actor
+Before you start working on sync, ensure you have the following prerequisites installed on your system:
 
-### Commits
+- <b>Rust</b>: The project is developed in Rust, so you need to have the toolchain installed. You can install it using [rustup][rustup-toolchain].
+- <b>Nix (optional)</b>: We configured a Nix develop enviroment to manage dependencies and simplify development. This is not required, you can work using simply cargo.
 
-We strictly follow the convetional commits standard (there is a check in CI process) to ensure that all pushed commits respect a common standard.
+For those who prefer using Cargo, we've set up cargo-make tasks to simplify the development workflow. To use `cargo-make`, first install it using the following command:
 
-For every commit please provide also a body to explain the reason of the changes you made (helps to speed up PRs and to have a clean commit history).
+```sh
+cargo install cargo-make
+```
 
-Use the commit history in your favour: Small and self-contained commits allow the reviewer to see exactly how you solved the problem. By reading the commit history of the PR, the reviewer can already understand what they'll be reviewing, even before seeing a single line of code.
+Once installed, you can run predefined tasks. For example, to build the project, simply run:
 
-### Create a PR
+```sh
+cargo make build
+```
 
-The title of your pull request should be clear and descriptive (please follow convetional commits). It should summarize the changes you are making in a concise manner.
+Check the Makefile.local.toml file for a list of available tasks.
 
-Provide a detailed description of the changes you are making. Explain the reasoning behind the changes, the problem it solves, and the impact it may have on the codebase. Keep in mind that a reviewer was not working on your task, so you should explain why you wrote the code the way you did.
+If you prefer using your custom Cargo commands, you can still do so. Standard Cargo commands work as usual within this project (be aware that some commands require additional flags/options, we suggest using cargo-make).
 
-Describe the scene and provide everything that will help to understand the background and a context for the reviewers by adding related GitHub issues to the description, and links to the related PRs, projects or third-party documentation. If there are any potential drawbacks or trade-offs to your changes, be sure to mention them too.
+### Code style
+
+#### Using rustfmt, clippy, and audit
+To maintain a high standard of code quality and consistency in the sync project, we use several tools:
+
+<b>rustfmt</b>: This is an automatic code formatter for Rust. It ensures that all our code adheres to the style guidelines. Before submitting your code, make sure it's formatted with `rustfmt`. You can do this by running `cargo fmt`.
+
+<b>cargo-clippy</b>: Clippy is a collection of lints to catch common mistakes and improve your Rust code. You should regularly run Clippy to catch any issues. Use the command `cargo clippy` to check your code with Clippy.
+
+<b>cargo-audit</b>: This tool audits your Cargo.lock file for dependencies with known vulnerabilities. Keeping our dependencies secure is crucial for the integrity of the sync project. Run `cargo audit` to check for any security vulnerabilities in the dependencies.
+
+#### Unified Check Command
+
+To simplify the process of checking your code against these tools, we have a single command that runs rustfmt, Clippy, and cargo-audit consecutively:
+
+```sh
+cargo make check
+```
+
+This command is especially useful to run before committing your changes. It ensures that your code is not only stylistically consistent but also free from common coding mistakes and security vulnerabilities.
+
+##### Best Practices
+
+- Run cargo make check regularly, ideally before each commit, to catch and resolve issues early.
+- If cargo make check reports any warnings or errors, address them before pushing your code.
+- In addition to automated checks, always review your code manually for readability, maintainability, and adherence to Rust best practices.
+
+By following these guidelines, you contribute to maintaining the high quality and consistency of the sync codebase. Your attention to code style and quality is greatly appreciated.
+
+### External dependecies
+
+## Additional notes
+
+### Security
