@@ -104,6 +104,26 @@ By following these guidelines, you contribute to maintaining the high quality an
 
 ### External dependecies
 
+In the sync project, while we aim to leverage the rich ecosystem of Rust crates, we also need to be cautious about the introduction of new external dependencies. Before adding a new crate to the project, it's important to consider the following:
+
+- <b>Necessity</b>: Evaluate if the new crate is truly necessary. Can the functionality it provides be efficiently implemented without adding the external dependency? Remember, each new crate increases the complexity and the potential security vulnerabilities of the project.
+
+- <b>Quality and Maintenance</b>: Assess the quality of the crate. Look for crates that are well-maintained, have a good community backing, are well-documented, and have a track record of regular updates and handling of issues.
+
+- <b>License Compatibility</b>: Ensure that the license of the crate is compatible with the sync project's license. It's crucial to maintain legal compliance and respect the intellectual property rights of others.
+
+Before integrating a new crate:
+
+- <b>Consult the Community and Maintainers</b>: Start a discussion with the sync community and maintainers. This can be done through GitHub issues, pull requests, or other communication channels used by the project.
+
+- <b>Provide Justification</b>: Clearly articulate why the crate is needed, its benefits, and how it fits into the existing architecture. Include your assessment of the crate's quality, maintenance status, and license compatibility.
+
+- <b>Seek Consensus</b>: Engage in the discussion to seek consensus. Be open to feedback and alternative suggestions from other contributors and maintainers.
+
+- <b>Document Decisions</b>: Once a decision is made, ensure that it is documented, either in the relevant GitHub issue, pull request, or project documentation. This helps future contributors understand the rationale behind the inclusion of specific crates.
+
+By following these guidelines, we ensure that new external dependencies are added thoughtfully and responsibly, maintaining the integrity, security, and quality of the sync project.
+
 ## Additional notes
 
 ### Security
