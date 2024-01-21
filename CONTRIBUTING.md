@@ -120,11 +120,11 @@ If you prefer using your custom Cargo commands, you can still do so. Standard Ca
 #### Using rustfmt, clippy, and audit
 To maintain a high standard of code quality and consistency in the sync project, we use several tools:
 
-<b>rustfmt</b>: This is an automatic code formatter for Rust. It ensures that all our code adheres to the style guidelines. Before submitting your code, make sure it's formatted with `rustfmt`. You can do this by running `cargo fmt`.
+- <b>rustfmt</b>: This is an automatic code formatter for Rust. It ensures that all our code adheres to the style guidelines. Before submitting your code, make sure it's formatted with `rustfmt`. You can do this by running `cargo fmt`.
 
-<b>cargo-clippy</b>: Clippy is a collection of lints to catch common mistakes and improve your Rust code. You should regularly run Clippy to catch any issues. Use the command `cargo clippy` to check your code with Clippy.
+- <b>clippy</b>: Clippy is a collection of lints to catch common mistakes and improve your Rust code. You should regularly run Clippy to catch any issues. Use the command `cargo clippy` to check your code with Clippy.
 
-<b>cargo-audit</b>: This tool audits your Cargo.lock file for dependencies with known vulnerabilities. Keeping our dependencies secure is crucial for the integrity of the sync project. Run `cargo audit` to check for any security vulnerabilities in the dependencies.
+- <b>cargo-audit</b>: This tool audits your Cargo.lock file for dependencies with known vulnerabilities. Keeping our dependencies secure is crucial for the integrity of the sync project. Run `cargo audit` to check for any security vulnerabilities in the dependencies.
 
 #### Unified Check Command
 
@@ -150,19 +150,19 @@ In the sync project, while we aim to leverage the rich ecosystem of Rust crates,
 
 - <b>Necessity</b>: Evaluate if the new crate is truly necessary. Can the functionality it provides be efficiently implemented without adding the external dependency? Remember, each new crate increases the complexity and the potential security vulnerabilities of the project.
 
-- <b>Quality and Maintenance</b>: Assess the quality of the crate. Look for crates that are well-maintained, have a good community backing, are well-documented, and have a track record of regular updates and handling of issues.
+- <b>Quality and maintenance</b>: Assess the quality of the crate. Look for crates that are well-maintained, have a good community backing, are well-documented, and have a track record of regular updates and handling of issues.
 
-- <b>License Compatibility</b>: Ensure that the license of the crate is compatible with the sync project's license. It's crucial to maintain legal compliance and respect the intellectual property rights of others.
+- <b>License compatibility</b>: Ensure that the license of the crate is compatible with the sync project's license. It's crucial to maintain legal compliance and respect the intellectual property rights of others.
 
 Before integrating a new crate:
 
-- <b>Consult the Community and Maintainers</b>: Start a discussion with the sync community and maintainers. This can be done through GitHub issues, pull requests, or other communication channels used by the project.
+- <b>Consult the community and maintainers</b>: Start a discussion with the sync community and maintainers. This can be done through GitHub issues, pull requests, or other communication channels used by the project.
 
-- <b>Provide Justification</b>: Clearly articulate why the crate is needed, its benefits, and how it fits into the existing architecture. Include your assessment of the crate's quality, maintenance status, and license compatibility.
+- <b>Provide justification</b>: Clearly articulate why the crate is needed, its benefits, and how it fits into the existing architecture. Include your assessment of the crate's quality, maintenance status, and license compatibility.
 
-- <b>Seek Consensus</b>: Engage in the discussion to seek consensus. Be open to feedback and alternative suggestions from other contributors and maintainers.
+- <b>Seek consensus</b>: Engage in the discussion to seek consensus. Be open to feedback and alternative suggestions from other contributors and maintainers.
 
-- <b>Document Decisions</b>: Once a decision is made, ensure that it is documented, either in the relevant GitHub issue, pull request, or project documentation. This helps future contributors understand the rationale behind the inclusion of specific crates.
+- <b>Document decisions</b>: Once a decision is made, ensure that it is documented, either in the relevant GitHub issue, pull request, or project documentation. This helps future contributors understand the rationale behind the inclusion of specific crates.
 
 By following these guidelines, we ensure that new external dependencies are added thoughtfully and responsibly, maintaining the integrity, security, and quality of the sync project.
 
