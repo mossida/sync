@@ -6,6 +6,7 @@
 [github-issues]: https://github.com/mossida/sync/issues
 [github-advisories]: https://github.com/mossida/sync/security/advisories
 [rustup-toolchain]: https://rustup.rs/
+[conventional-commits]: https://www.conventionalcommits.org/en/v1.0.0/
 
 # Contributing to Sync
 
@@ -22,6 +23,7 @@
     - [Your first contribution](#your-first-contribution)
     - [Pull requests](#pull-requests)
 - [Code style and guidlines](#code-style-and-guidlines)
+    - [Git commit messages](#git-commit-messages)
     - [Enviroment](#enviroment)
     - [Code style](#code-style)
     - [External dependecies](#external-dependecies)
@@ -49,6 +51,30 @@ Help us keep Sync open and inclusive. Please read and follow our [Code of Conduc
 ### Pull requests
 
 ## Code style and guidlines
+
+### Git commit messages
+
+In the sync project, we adhere strictly to the [Conventional Commits][conventional-commits] specification for structuring our commit messages. This standardized format for commit messages ensures clarity and consistency across the project's history. To enforce this, we use `commitlint`, a tool that checks if commit messages meet the Conventional Commits format.
+
+Recommendations for writing commit messages:
+
+- <b>Use conventional commits plugins</b>: To simplify writing commit messages, we recommend using Conventional Commits plugins available for various IDEs. These plugins can help format your commit messages correctly, reducing the chance of errors.
+
+- <b>CI checks for commit messages</b>: Our Continuous Integration (CI) pipeline includes a check that validates all commit messages in a pull request (PR) against the Conventional Commits format.
+
+- <b>Impact on code reviews</b>: PRs with commit messages that fail the CI check will be temporarily skipped for code review. We believe that well-written commit messages are essential for efficient code reviews and for making the codebase easier to understand and navigate. Therefore, ensuring your commits adhere to the Conventional Commits format is crucial for receiving timely reviews.
+
+Writing effective commit messages:
+
+- <b>Follow the format</b>: A conventional commit message should typically follow this format: `<type>[optional scope]: <description>`. For example, `feat(database): add new indexing feature`.
+
+- <b>Types</b>: Common types include feat (new feature), fix (bug fix), docs (documentation changes), style (code style changes), refactor (refactoring code), test (adding or modifying tests), and chore (maintenance tasks).
+
+- <b>Scope</b>: Optionally, include a scope to specify the part of the codebase your commit affects.
+
+- <b>Description</b>: The description should be concise yet descriptive, explaining what the commit does and why, if not obvious (you can also add emojies).
+
+By adhering to these guidelines and utilizing tools like Conventional Commits plugins and `commitlint`, you contribute to the maintainability and readability of the sync project. Your effort in writing clear and structured commit messages is greatly appreciated.
 
 ### Enviroment
 
