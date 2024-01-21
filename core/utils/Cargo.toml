@@ -8,7 +8,7 @@ edition = "2021"
 [dependencies]
 ractor = "0.9.3"
 thiserror = "1.0.56"
-surrealdb = "1.1.0"
+surrealdb = "1.1.1"
 surrealdb-migrations = "1.0.1"
 log = { version = "0.4.20", features = [] }
 securestore = "0.100.0"

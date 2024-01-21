@@ -10,120 +10,119 @@ on:
   pull_request:
   merge_group:
 
-concurrency: 
+concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-    commits:
-      name: Check commits standard
-      runs-on: ubuntu-latest
-      if: github.event_name == 'pull_request'
-      steps:
-        - name: Checkout sources
-          uses: actions/checkout@v4
-          with:
-            fetch-depth: 0
-            
-        - name: Install bun
-          uses: oven-sh/setup-bun@v1
+  commits:
+    name: Check commits standard
+    runs-on: ubuntu-latest
+    if: ${{ github.actor != 'dependabot[bot]' && github.event_name == 'pull_request' }}
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-        - name: Install commit lint
-          run: bun install commitlint@latest | bun install @commitlint/config-conventional@latest
-      
-        - name: Validate PR commits with commitlint
-          run: bunx commitlint --from ${{ github.event.pull_request.head.sha }}~${{ github.event.pull_request.commits }} --to ${{ github.event.pull_request.head.sha }} --verbose
+      - name: Install bun
+        uses: oven-sh/setup-bun@v1
 
-    format:
-      name: Check code formatting
-      runs-on: ubuntu-latest
-      steps:
-        - name: Install stable toolchain
-          uses: dtolnay/rust-toolchain@stable
-          with:
-            toolchain: stable
-            components: rustfmt
+      - name: Install commit lint
+        run: bun install commitlint@latest | bun install @commitlint/config-conventional@latest
 
-        - name: Checkout sources
-          uses: actions/checkout@v4
+      - name: Validate PR commits with commitlint
+        run: bunx commitlint --from ${{ github.event.pull_request.head.sha }}~${{ github.event.pull_request.commits }} --to ${{ github.event.pull_request.head.sha }} --verbose
 
-        - name: Setup cache
-          uses: Swatinem/rust-cache@v2
-          with:
-            save-if: ${{ github.ref == 'refs/heads/main' }}
+  format:
+    name: Check code formatting
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install stable toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+          components: rustfmt
 
-        - name: Install required packages
-          run: cargo install --debug --locked cargo-make
+      - name: Checkout sources
+        uses: actions/checkout@v4
 
-        - name: Run ci:format
-          run: cargo make ci-format
+      - name: Setup cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          save-if: ${{ github.ref == 'refs/heads/main' }}
 
-    clippy:
-      name: Check code lints
-      runs-on: ubuntu-latest
-      steps:
-        - name: Install stable toolchain
-          uses: dtolnay/rust-toolchain@stable
-          with:
-            toolchain: stable
-      
-        - name: Checkout sources
-          uses: actions/checkout@v4
-      
-        - name: Setup cache
-          uses: Swatinem/rust-cache@v2
-          with:
-            save-if: ${{ github.ref == 'refs/heads/main' }}
-      
-        - name: Install required packages
-          run: cargo install --debug --locked cargo-make
-      
-        - name: Run ci:clippy
-          run: cargo make ci-clippy
+      - name: Install required packages
+        run: cargo install --debug --locked cargo-make
 
-    audit:
-      name: Check dependencies issues
-      runs-on: ubuntu-latest
-      steps:
-        - name: Install stable toolchain
-          uses: dtolnay/rust-toolchain@stable
-          with:
-            toolchain: stable
-      
-        - name: Checkout sources
-          uses: actions/checkout@v4
-      
-        - name: Setup cache
-          uses: Swatinem/rust-cache@v2
-          with:
-            save-if: ${{ github.ref == 'refs/heads/main' }}
-      
-        - name: Install required packages
-          run: cargo install --debug --locked cargo-make cargo-audit
-      
-        - name: Run ci:audit
-          run: cargo make ci-audit
+      - name: Run ci:format
+        run: cargo make ci-format
 
-    workspace:
-      name: Check workspace
-      runs-on: ubuntu-latest
-      steps:
-        - name: Install stable toolchain
-          uses: dtolnay/rust-toolchain@stable
-          with:
-            toolchain: stable
-      
-        - name: Checkout sources
-          uses: actions/checkout@v4
-      
-        - name: Setup cache
-          uses: Swatinem/rust-cache@v2
-          with:
-            save-if: ${{ github.ref == 'refs/heads/main' }}
-      
-        - name: Install required packages
-          run: cargo install --debug --locked cargo-make
-      
-        - name: Run ci:check
-          run: cargo make ci-check
+  clippy:
+    name: Check code lints
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install stable toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
 
+      - name: Checkout sources
+        uses: actions/checkout@v4
+
+      - name: Setup cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          save-if: ${{ github.ref == 'refs/heads/main' }}
+
+      - name: Install required packages
+        run: cargo install --debug --locked cargo-make
+
+      - name: Run ci:clippy
+        run: cargo make ci-clippy
+
+  audit:
+    name: Check dependencies issues
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install stable toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+
+      - name: Checkout sources
+        uses: actions/checkout@v4
+
+      - name: Setup cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          save-if: ${{ github.ref == 'refs/heads/main' }}
+
+      - name: Install required packages
+        run: cargo install --debug --locked cargo-make cargo-audit
+
+      - name: Run ci:audit
+        run: cargo make ci-audit
+
+  workspace:
+    name: Check workspace
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install stable toolchain
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+
+      - name: Checkout sources
+        uses: actions/checkout@v4
+
+      - name: Setup cache
+        uses: Swatinem/rust-cache@v2
+        with:
+          save-if: ${{ github.ref == 'refs/heads/main' }}
+
+      - name: Install required packages
+        run: cargo install --debug --locked cargo-make
+
+      - name: Run ci:check
+        run: cargo make ci-check
