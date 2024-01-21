@@ -10,7 +10,13 @@
 
 # Contributing to Sync
 
-👍🎉 First off, thanks for taking the time to contribute! 🎉👍
+Thank you so much for taking the time to contribute to our project! 🎉
+
+We genuinely appreciate your interest and efforts in making a contribution. Your willingness to share your ideas and collaborate with us plays a vital role in the growth and success of our project. Contributions from community members like you bring new perspectives, innovations, and enhancements that are invaluable.
+
+Every contribution, whether big or small, is a significant step towards achieving our collective goals. We're excited about your participation and are eager to see the positive impact of your work. Your involvement is not just beneficial to the project but also an opportunity for us all to learn and grow together.
+
+Once again, thank you for your contribution! We're thrilled to have you as part of our community and look forward to the wonderful things we'll accomplish together.
 
 #### Table of contents
 
@@ -44,6 +50,10 @@ Help us keep Sync open and inclusive. Please read and follow our [Code of Conduc
 
 ### Suggesting features
 
+We are excited for you to contribute to Sync, and we aim to ensure that Sync remains a high-quality project that stays true to its vision and mission. To strike the right balance, we ask that you first open a question on [GitHub discussions][github-discussions] for any ideas you have before creating a GitHub Issue. This approach allows the Sync community to engage in meaningful discussions about the value of the new feature and its alignment with the product's roadmap and vision before a new pull request is introduced.
+
+Engaging in GitHub discussions is also crucial for the Sync lead developers to provide technical input and perspectives on feature design and architecture. This collaborative process helps in shaping features that are well-integrated and beneficial to the project's overall goals. By following this approach, your contributions can be more effectively aligned with the needs and direction of Sync, ensuring that your efforts have the greatest possible impact.
+
 ### Conventions
 
 ### Your first contribution
@@ -62,7 +72,7 @@ Recommendations for writing commit messages:
 
 - <b>CI checks for commit messages</b>: Our Continuous Integration (CI) pipeline includes a check that validates all commit messages in a pull request (PR) against the Conventional Commits format.
 
-- <b>Impact on code reviews</b>: PRs with commit messages that fail the CI check will be temporarily skipped for code review. We believe that well-written commit messages are essential for efficient code reviews and for making the codebase easier to understand and navigate. Therefore, ensuring your commits adhere to the Conventional Commits format is crucial for receiving timely reviews.
+- <b>Impact on code reviews</b>: PRs with commit messages that fail the CI check will be temporarily skipped for code review (will be marked invalid). We believe that well-written commit messages are essential for efficient code reviews and for making the codebase easier to understand and navigate. Therefore, ensuring your commits adhere to the Conventional Commits format is crucial for receiving timely reviews.
 
 Writing effective commit messages:
 
