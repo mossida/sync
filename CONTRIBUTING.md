@@ -117,7 +117,7 @@ Provide context to the reviewers by linking related GitHub issues, associated PR
 
 #### Finalizing Your Contribution
 
-In Sync, we use threaded discussions for detailed and focused conversations on specific parts of a pull request. A resolved thread indicates that the conversation is addressed. Reviewers are responsible for resolving the thread, while the author should reply to confirm changes are made or decline a request if necessary.
+We use threaded discussions for detailed and focused conversations on specific parts of a pull request. A resolved thread indicates that the conversation is addressed. Reviewers are responsible for resolving the thread, while the author should reply to confirm changes are made or decline a request if necessary.
 
 When your pull request is approved, our team will merge it responsibly, ensuring additional tests and checks are conducted to maintain the functionality of the codebase.
 
