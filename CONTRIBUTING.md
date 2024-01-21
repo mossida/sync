@@ -25,7 +25,6 @@ Once again, thank you for your contribution! We're thrilled to have you as part 
 - [How to contribute](#how-to-contribute)
     - [Reporting bugs](#reporting-bugs)
     - [Suggesting features](#suggesting-features)
-    - [Conventions](#conventions)
     - [Your first contribution](#your-first-contribution)
     - [Pull requests](#pull-requests)
 - [Code style and guidlines](#code-style-and-guidlines)
@@ -60,9 +59,29 @@ We are excited for you to contribute to Sync, and we aim to ensure that Sync rem
 
 Engaging in GitHub discussions is also crucial for the Sync lead developers to provide technical input and perspectives on feature design and architecture. This collaborative process helps in shaping features that are well-integrated and beneficial to the project's overall goals. By following this approach, your contributions can be more effectively aligned with the needs and direction of Sync, ensuring that your efforts have the greatest possible impact.
 
-### Conventions
-
 ### Your first contribution
+
+We're excited to guide you through your first contribution to Sync. Your involvement is essential to the project's growth, and we're here to support you every step of the way. Follow these steps to make your initial contribution:
+
+- <b>Choose an issue</b>: Browse the [GitHub issues][github-issues] for Sync and look for those labeled `good first issue` or `help wanted`. These are ideal for newcomers.
+
+- <b>Engage with the community</b>: If you're unsure about anything or need more details, feel free to ask. Comment on the issue or use other available communication channels.
+
+- <b>Fork and Set Up</b>: Fork the Sync repository to your account and clone it to your local machine. This setup allows you to work on the code in your own environment (please read how to setup your [local enviroment](#enviroment)).
+
+- <b>Implement your changes</b>: Address the issue in your local setup, keeping in mind the project's coding standards and guidelines.
+
+- <b>Commit with care</b>: Use clear and convention-abiding commit messages, as detailed in our Git Commits and Titles section. This clarity is crucial for maintainers reviewing your contribution.
+
+- <b>Test Thoroughly</b>: Ensure your changes effectively resolve the issue and don't introduce new problems. Proper testing is key to a successful contribution.
+
+- <b>Submit a pull request</b>: Push your changes to your fork and create a pull request against the main Sync repository. Accurately fill out the PR template to describe your changes (please see [PRs](#pull-requests)).
+
+- <b>Participate in the Review</b>: Your PR will be reviewed by maintainers. Stay engaged in the process, respond to feedback, and make necessary adjustments.
+
+- <b>Celebrate your success</b>: Once your PR is merged, take a moment to celebrate your achievement. You've made a valuable contribution to Sync!
+
+Remember, your first contribution is a stepping stone to further involvement in the project. We value your ideas and efforts and look forward to seeing more of your work. Welcome to the Sync community!
 
 ### Pull requests
 
