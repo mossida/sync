@@ -55,7 +55,7 @@ By following these guidelines, you help maintainers and the community effectivel
 
 ### Suggesting features
 
-We are excited for you to contribute to Sync, and we aim to ensure that Sync remains a high-quality project that stays true to its vision and mission. To strike the right balance, we ask that you first open a question on [GitHub discussions][github-discussions] for any ideas you have before creating a GitHub Issue. This approach allows the Sync community to engage in meaningful discussions about the value of the new feature and its alignment with the product's roadmap and vision before a new pull request is introduced.
+We aim to ensure that Sync remains a high-quality project that stays true to its vision and mission. To strike the right balance, we ask that you first open a question on [GitHub discussions][github-discussions] for any ideas you have before creating a GitHub Issue. This approach allows the Sync community to engage in meaningful discussions about the value of the new feature and its alignment with the product's roadmap and vision before a new pull request is introduced.
 
 Engaging in GitHub discussions is also crucial for the Sync lead developers to provide technical input and perspectives on feature design and architecture. This collaborative process helps in shaping features that are well-integrated and beneficial to the project's overall goals. By following this approach, your contributions can be more effectively aligned with the needs and direction of Sync, ensuring that your efforts have the greatest possible impact.
 
@@ -71,7 +71,7 @@ We're excited to guide you through your first contribution to Sync. Your involve
 
 - <b>Implement your changes</b>: Address the issue in your local setup, keeping in mind the project's coding standards and guidelines.
 
-- <b>Commit with care</b>: Use clear and convention-abiding commit messages, as detailed in our Git Commits and Titles section. This clarity is crucial for maintainers reviewing your contribution.
+- <b>Commit with care</b>: Use clear and convention-abiding commit messages, as detailed in our commit messages [section](#git-commit-messages). This clarity is crucial for maintainers reviewing your contribution.
 
 - <b>Test Thoroughly</b>: Ensure your changes effectively resolve the issue and don't introduce new problems. Proper testing is key to a successful contribution.
 
