@@ -85,6 +85,42 @@ Remember, your first contribution is a stepping stone to further involvement in 
 
 ### Pull requests
 
+#### Branch Naming Convention
+
+In Sync, the naming of your branch is the initial step to contextualize your task. Our branch naming follows this convention:
+
+`TYPE/ISSUE_ID-DESCRIPTION`
+
+We encourage combining the relevant GitHub Issue with a concise description that encapsulates the task addressed in the branch. If there isn’t a GitHub issue associated with your PR, you may omit the prefix. However, it's often necessary to create the issue first. For instance:
+
+`fix/3242-polling-not-running`
+
+The "TYPE" should align with those used in conventional commits.
+
+#### Creating a Pull Request
+
+Your pull request title should be clear and descriptive, summarizing your changes succinctly and adhering to conventional commits.
+
+In the description, provide detailed information about your changes. Explain the reasoning, the problem being solved, and the potential impact on the codebase. Remember, the reviewer wasn't part of your task development, so it's essential to explain your code and decisions.
+
+Provide context to the reviewers by linking related GitHub issues, associated PRs, projects, or external documentation. Also, mention any potential drawbacks or trade-offs of your changes.
+
+#### Getting a Better Review
+
+- Use draft pull requests for sharing work-in-progress changes. This is helpful when you want feedback but aren't ready for a full review.
+
+- Respond to feedback in your pull requests. This may involve code revisions, answering questions, or acknowledging the feedback.
+
+- Utilize the re-request review feature to prompt reviewers for further feedback on updated changes.
+
+- The CODEOWNERS file in GitHub helps assign pull requests to appropriate individuals or teams and notifies them when changes occur in specific areas of the repository.
+
+#### Finalizing Your Contribution
+
+In Sync, we use threaded discussions for detailed and focused conversations on specific parts of a pull request. A resolved thread indicates that the conversation is addressed. Reviewers are responsible for resolving the thread, while the author should reply to confirm changes are made or decline a request if necessary.
+
+When your pull request is approved, our team will merge it responsibly, ensuring additional tests and checks are conducted to maintain the functionality of the codebase.
+
 ## Code style and guidlines
 
 ### Git commit messages
