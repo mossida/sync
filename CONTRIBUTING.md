@@ -48,6 +48,12 @@ Help us keep Sync open and inclusive. Please read and follow our [Code of Conduc
 
 ### Reporting bugs
 
+This section aims to guide you through the process of submitting a bug report for Sync. Following these guidelines is important because it helps maintainers and the community understand your report, reproduce the issue, and identify any similar existing reports.
+
+Before you create a bug report for Sync, please take a moment to go through the provided [issues][github-issues]. You might discover that the issue you're experiencing has already been identified and addressed, which could save you the time and effort of creating a new report. If you do find that a new bug report is necessary, please include as many details as possible. Filling out the required template is crucial; the information it asks for is key to helping us resolve issues more efficiently and effectively. Your thoroughness in reporting helps us improve Sync for everyone.
+
+By following these guidelines, you help maintainers and the community effectively understand and address your report, leading to quicker and more efficient resolutions. Your thorough and detailed reporting is invaluable in improving Sync for everyone.
+
 ### Suggesting features
 
 We are excited for you to contribute to Sync, and we aim to ensure that Sync remains a high-quality project that stays true to its vision and mission. To strike the right balance, we ask that you first open a question on [GitHub discussions][github-discussions] for any ideas you have before creating a GitHub Issue. This approach allows the Sync community to engage in meaningful discussions about the value of the new feature and its alignment with the product's roadmap and vision before a new pull request is introduced.
