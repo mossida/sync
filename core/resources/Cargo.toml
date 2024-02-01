@@ -13,6 +13,6 @@ utils = { version = "0.1.0", path = "../utils" }
 once_cell = "1.19.0"
 serde = "1.0.196"
 log = "0.4.20"
-config = "0.13.4"
+config = "0.14.0"
 zeroize = { version = "1.7.0", features = ["derive"] }
 schemars = "0.8.16"
