@@ -12,7 +12,7 @@ surrealdb = "1.1.1"
 surrealdb-migrations = "1.0.1"
 log = { version = "0.4.20", features = [] }
 securestore = "0.100.0"
-reqwest = "0.11.23"
+reqwest = "0.11.24"
 serde = { version = "1.0.196", features = ["derive"] }
 nanoid = "0.4.0"
 serde_json = "1.0.112"
