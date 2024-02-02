@@ -1,5 +1,5 @@
 <h1 align="center">Sync</h1>
-<h3 align="center">Sync is your trusted partner in crafting the home of tomorrow,&nbsp; where comfort meets intelligence</h3>
+<h3 align="center">Sync is your trusted partner in crafting the home of tomorrow,<br>where comfort meets intelligence</h3>
 
 <h2>What is Sync?</h2>
 
