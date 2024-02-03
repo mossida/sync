@@ -20,3 +20,11 @@ Whether you want to manage lighting, fine-tune the temperature, enhance security
 
 The project is still in early stages,
 to know more please view our discussions or roadmap.
+
+<h2>License</h2>
+
+Our material is available under various licenses:
+
+- All libraries and Software Development Kits (SDKs) are distributed under the Apache License 2.0.
+- All final interfaces or services are distributed under the Apache License 2.0.
+- The primary code found in this repository within the core folder is distributed under the Business Source License 1.1.
