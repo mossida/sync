@@ -2,5 +2,5 @@
     "conventionalCommits.scopes": [
         "core",
         "project"
-    ]
+    ],
 }
