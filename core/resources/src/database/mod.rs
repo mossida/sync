@@ -14,7 +14,13 @@ static DB: Lazy<Surreal<Db>> = Lazy::new(Surreal::init);
 
 pub async fn init() -> utils::types::Result<()> {
 	let config = configuration::get();
+
 	DB.connect::<RocksDb>(&config.database.storage).await?;
+
+	// TODO: Temporary namespace and database
+	// until proper migration and versioning is implemented
+	DB.use_ns("default").await?;
+	DB.use_db("default").await?;
 
 	// Run migrations
 	MigrationRunner::new(&DB).up().await.map_err(|e| Error::Migration(e.to_string()))?;

@@ -3,8 +3,4 @@
         "core",
         "project"
     ],
-    "rust-analyzer.linkedProjects": [
-        "./core/resources/Cargo.toml",
-        "./core/resources/Cargo.toml"
-    ]
 }
