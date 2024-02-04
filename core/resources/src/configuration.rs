@@ -16,11 +16,7 @@ pub struct SecretsConfiguration {
 
 #[derive(Deserialize, Zeroize, ZeroizeOnDrop)]
 pub struct DatabaseConfiguration {
-	pub host: String,
-	pub username: String,
-	pub password: String,
-	pub database: String,
-	pub namespace: String,
+	pub storage: String,
 }
 
 // FIXME: Handle errors correctly
