@@ -7,12 +7,12 @@ use uom::si::ratio::percent;
 use uom::si::temperature_interval;
 use uom::si::thermodynamic_temperature::degree_celsius;
 
-use models::attributes::Attributes;
-use models::entities::{Entity, EntityState};
+use models::attribute::Attributes;
+use models::entity::{Entity, EntityState};
 
 use crate::classes::climate::{Attribute, HVACAction, HVACMode};
-use crate::scheduler;
-use crate::scheduler::models::{InterfaceMessage, SchedulerMessage};
+use crate::dispatcher;
+use crate::dispatcher::models::{InterfaceMessage, ServiceRequest};
 use crate::vendors::tado::client::data::capability::CapabilityType;
 use crate::vendors::tado::client::data::states::{Action, Mode};
 use crate::vendors::tado::client::data::zone::Zone;
@@ -71,7 +71,7 @@ impl Actor for ClimateInterface {
 				.await?;
 		}
 
-		scheduler::send(SchedulerMessage::PollInterface(Duration::from_secs(15), myself)).await?;
+		dispatcher::send(ServiceRequest::PollInterface(Duration::from_secs(15), myself)).await?;
 
 		Ok(())
 	}

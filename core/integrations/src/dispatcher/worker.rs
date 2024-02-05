@@ -7,11 +7,12 @@ use ractor::factory::{
 };
 use ractor::{async_trait, Actor, ActorProcessingErr, ActorRef};
 
-use crate::scheduler::models::{InterfaceMessage, SchedulerMessage, WorkerKey};
+use crate::dispatcher::models::{InterfaceMessage, ServiceRequest, WorkerKey};
+
+use super::models::Dispatch;
 
 #[derive(Default)]
 pub(super) struct Worker {
-	#[allow(dead_code)]
 	pub handlers: Arc<DashMap<String, JoinHandle<()>>>,
 }
 
@@ -30,9 +31,9 @@ impl Builder<Worker> for WorkerBuilder {
 
 #[async_trait]
 impl Actor for Worker {
-	type Msg = WorkerMessage<WorkerKey, SchedulerMessage>;
+	type Msg = WorkerMessage<WorkerKey, Dispatch>;
 	type State = Self::Arguments;
-	type Arguments = WorkerStartContext<WorkerKey, SchedulerMessage>;
+	type Arguments = WorkerStartContext<WorkerKey, Dispatch>;
 
 	async fn pre_start(
 		&self,
@@ -53,16 +54,20 @@ impl Actor for Worker {
 				state.factory.cast(FactoryMessage::WorkerPong(state.wid, time.elapsed()))?;
 			}
 			WorkerMessage::Dispatch(job) => match job.msg {
-				SchedulerMessage::Ping(message) => {
+				Dispatch::Ping(message) => {
 					dbg!(message);
 				}
-				SchedulerMessage::PollInterface(interval, interface) => {
-					self.handlers
-						.entry(interface.get_name().unwrap())
-						.insert(interface.send_interval(interval, || InterfaceMessage::Update));
+				Dispatch::ServiceRequest(request) => match request {
+					ServiceRequest::PollInterface(interval, interface) => {
+						self.handlers
+							.entry(interface.get_name().unwrap())
+							.insert(interface.send_interval(interval, || InterfaceMessage::Update));
 
-					state.factory.cast(FactoryMessage::Finished(state.wid, job.key))?;
-				}
+						state.factory.cast(FactoryMessage::Finished(state.wid, job.key))?;
+					}
+					_ => {}
+				},
+				_ => {}
 			},
 		}
 
