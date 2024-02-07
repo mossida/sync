@@ -1,10 +1,12 @@
-use futures::Stream;
+use futures::{Stream, TryStreamExt};
 use resources::database;
 use serde::{Deserialize, Serialize};
 use surrealdb::{
 	sql::{Datetime, Thing},
 	Notification,
 };
+
+use utils::types::Result;
 
 pub const RESOURCE: &str = "event";
 
@@ -27,9 +29,8 @@ pub struct Event {
 }
 
 impl Event {
-	pub async fn live(
-	) -> utils::types::Result<impl Stream<Item = Result<Notification<Event>, surrealdb::Error>>> {
+	pub async fn live() -> Result<impl Stream<Item = Result<Notification<Event>>>> {
 		let client = database::get();
-		Ok(client.select(RESOURCE).live().await?)
+		Ok(client.select(RESOURCE).live().await?.map_err(|err| err.into()))
 	}
 }
