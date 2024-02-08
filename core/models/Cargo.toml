@@ -6,6 +6,7 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+tracing = "0.1.40"
 macros = { path = "../macros" }
 utils = { path = "../utils" }
 resources = { path = "../resources" }
@@ -14,3 +15,4 @@ serde_json = { version = "1.0.113", features = ["raw_value"] }
 surrealdb = "1.1.1"
 log = "0.4.20"
 rayon = "1.8.0"
+futures = "0.3.30"

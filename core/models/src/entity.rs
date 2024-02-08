@@ -3,7 +3,7 @@ use surrealdb::sql::Thing;
 
 use resources::database;
 
-use crate::attributes::Attributes;
+use crate::attribute::Attributes;
 
 pub const RESOURCE: &str = "entity";
 

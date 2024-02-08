@@ -1,6 +1,6 @@
 #![forbid(unsafe_code)]
 
-use integrations::scheduler;
+use integrations::dispatcher;
 use models::component;
 use models::component::Component;
 use resources::{database, secrets};
@@ -17,10 +17,10 @@ async fn main() {
 	secrets::init();
 
 	log(database::init().await);
-	log(scheduler::init().await);
+	log(dispatcher::init().await);
 
 	let components: Vec<Component> = database::get().select(component::RESOURCE).await.unwrap();
-	log(scheduler::register(components).await);
+	log(dispatcher::register(components).await);
 
 	log(net::init().await);
 }
