@@ -3098,9 +3098,9 @@ dependencies = [
 
 [[package]]
 name = "ractor"
-version = "0.9.3"
+version = "0.9.5"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e4c76b29042a5b9819c04190895212b83b66f1f789b8e19270a4e7d18667eedc"
+checksum = "afc5d1e3b3e5dabc5feed5892c89feb86761e45fa30ba6f3d5ae342906884d24"
 dependencies = [
  "async-trait",
  "dashmap",
