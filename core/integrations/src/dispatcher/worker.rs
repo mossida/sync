@@ -65,7 +65,7 @@ impl Actor for Worker {
 
 						state.factory.cast(FactoryMessage::Finished(state.wid, job.key))?;
 					}
-					_ => {}
+					ServiceRequest::RealtimeInterface(..) => {}
 				},
 				_ => {}
 			},
