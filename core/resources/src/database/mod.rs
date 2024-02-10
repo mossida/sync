@@ -1,26 +1,31 @@
 use std::ops::Deref;
 
 use once_cell::sync::Lazy;
-use surrealdb::engine::local::{Db, RocksDb};
+use surrealdb::{engine::any::Any, opt::auth::Root};
 
 use surrealdb::Surreal;
 use surrealdb_migrations::MigrationRunner;
 
 use utils::error::Error;
 
-use crate::configuration;
+use crate::configuration::{self};
 
-static DB: Lazy<Surreal<Db>> = Lazy::new(Surreal::init);
+static DB: Lazy<Surreal<Any>> = Lazy::new(Surreal::init);
 
 pub async fn init() -> utils::types::Result<()> {
-	let config = configuration::get();
+	let config = &configuration::get().database;
 
-	DB.connect::<RocksDb>(&config.database.storage).await?;
+	DB.connect(&config.endpoint).await?;
+	DB.use_ns(&config.namespace).await?;
+	DB.use_db(&config.database).await?;
 
-	// TODO: Temporary namespace and database
-	// until proper migration and versioning is implemented
-	DB.use_ns("default").await?;
-	DB.use_db("default").await?;
+	if let (Some(username), Some(password)) = (&config.username, &config.password) {
+		DB.signin(Root {
+			username,
+			password,
+		})
+		.await?;
+	}
 
 	// Run migrations
 	MigrationRunner::new(&DB).up().await.map_err(|e| Error::Migration(e.to_string()))?;
@@ -28,6 +33,6 @@ pub async fn init() -> utils::types::Result<()> {
 	Ok(())
 }
 
-pub fn get() -> &'static Surreal<Db> {
+pub fn get() -> &'static Surreal<Any> {
 	DB.deref()
 }
