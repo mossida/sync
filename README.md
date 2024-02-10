@@ -1,6 +1,6 @@
 <h2>Backstory</h2>
 
-After building my home, I found myself facing a common dilemma that every tech enthusiast encounters: How do I make my home smart? How do I simplify my life? As I began researching, experimenting, and acquiring various devices, it became apparent that there was no single solution to meet all my needs.
+After constructing my home, I found myself facing a common dilemma that every tech enthusiast encounters: How do I make my home smart? How do I simplify my life? As I began researching, experimenting, and acquiring various devices, it became apparent that there was no single solution to meet all my needs.
 
 I yearned for a modern, reliable, secure, and high-performance system. I needed something easy to set up, capable of self-adaptation, and, at the same time, offering a high degree of customization. Despite the numerous existing solutions, none personally resonated with me. Hence, I decided to create my own system and make it accessible to those who found themselves in a similar situation or were eager to explore something new and innovative.
 
@@ -8,10 +8,9 @@ The core motivation behind this project is to eliminate the hours spent creating
 
 <h2>So basically what is Sync?</h2>
 
-Sync is a pioneering project that aims to revolutionize your home experience. 
-Imagine a world where your home effortlessly caters to your needs, prioritizing top-notch performance, security, and reliability. 
+Sync is a pioneering project that aims to revolutionize your home experience. Imagine a world where your home effortlessly caters to your needs, prioritizing top-notch performance, security, and reliability.
 
-A comprehensive solution for modern home management. By combining advanced technology, extensive customization options, and an intuitive interface, Sync empowers you to take charge of your living space. 
+A comprehensive solution for modern home management, Sync empowers you to take charge of your living space by combining advanced technology, extensive customization options, and an intuitive interface.
 
 Whether you want to manage lighting, fine-tune the temperature, enhance security, or optimize entertainment, we transcend conventional home assistance. We are your steadfast ally in shaping a smarter, more comfortable living environment.
 
@@ -21,7 +20,9 @@ Creating a project of this magnitude requires extensive time dedicated to develo
 
 For this project, we've selected Rust as our programming language of choice, given its reputation as one of the finest languages currently available.
 
-<h2>Local setup</h2>
+Feel free to check out our [wiki]() for a clear explanation of what we're building, how we're doing it, and to get familiar with our development process. It's a great way to make yourself comfortable with our project.
+
+<h2>Developing</h2>
 
 <h3>Requirements</h3>
 
@@ -44,11 +45,13 @@ $ nix develop
 $ setup && run
 ```
 
-You will be asked for a password during the setup process (This is the password that will be used to encrypt all the secrets. You can also use it with [ssclient](https://crates.io/crates/ssclient/)).
+You'll need to set a password during the setup, which will be used to encrypt all secrets. This password can also be utilized with [ssclient](https://crates.io/crates/ssclient/).
 
-Note: Setup time may take some minutes since cargo is building all the dependencies.
+<b>Important</b>: The setup process might take a few minutes as Cargo is building all the dependencies.
 
-We also suggest using [Surrealist](https://surrealist.app) to inspect the database instance.
+---
+
+Keep in mind that the project is in its early development stage, so there's currently no user interface available. To view results, you can inspect the database instance, with [Surrealist](https://surrealist.app) being the recommended tool for this purpose.
 
 <h2>Contributing</h2>
 
