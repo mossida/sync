@@ -51,18 +51,25 @@ You'll need to set a password during the setup, which will be used to encrypt al
 
 ---
 
-Keep in mind that the project is in its early development stage, so there's currently no user interface available. To view results, you can inspect the database instance, with [Surrealist](https://surrealist.app) being the recommended tool for this purpose.
+Keep in mind that the project is in its early development stage, so there's currently no user interface available. To view results, you can inspect the database instance, with [Surrealist][surrealist] being the recommended tool for this purpose.
 
 <h2>Contributing</h2>
 
 We are actively seeking support to develop this ambitious project, currently spearheaded by a solo enthusiast – humorously questioning whether one person constitutes a team. 😊
 
-For guidance on how to begin contributing, please refer to our Contributing Guide.
+For guidance on how to begin contributing, please refer to our [Contributing Guide][contributing-guide].
 
 <h2>License</h2>
 
 Our material is available under various licenses:
 
-- All libraries and Software Development Kits (SDKs) are distributed under the Apache License 2.0.
-- All final interfaces or services are distributed under the Apache License 2.0.
+- All libraries and Software Development Kits (SDKs) are distributed under the Apache License 2.0 or MIT.
+- All final interfaces or services are distributed under the Apache License 2.0 or MIT.
 - The primary code found in this repository within the core folder is distributed under the Business Source License 1.1.
+
+[surrealist]: https://surrealist.app
+[contributing-guide]: CONTRIBUTING.md
+
+<h2>Statistics</h2>
+
+![Alt](https://repobeats.axiom.co/api/embed/8ae8b959850dd11b7d3a6279c76c094bdf8fa339.svg "Repobeats analytics image")
