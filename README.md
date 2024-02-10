@@ -20,7 +20,7 @@ Creating a project of this magnitude requires extensive time dedicated to develo
 
 For this project, we've selected Rust as our programming language of choice, given its reputation as one of the finest languages currently available.
 
-Feel free to check out our [wiki]() for a clear explanation of what we're building, how we're doing it, and to get familiar with our development process. It's a great way to make yourself comfortable with our project.
+Feel free to check out our [wiki][wiki] for a clear explanation of what we're building, how we're doing it, and to get familiar with our development process. It's a great way to make yourself comfortable with our project.
 
 <h2>Developing</h2>
 
@@ -67,6 +67,7 @@ Our material is available under various licenses:
 - All final interfaces or services are distributed under the Apache License 2.0 or MIT.
 - The primary code found in this repository within the core folder is distributed under the Business Source License 1.1.
 
+[wiki]: https://github.com/mossida/sync/wiki
 [surrealist]: https://surrealist.app
 [contributing-guide]: CONTRIBUTING.md
 
