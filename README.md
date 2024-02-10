@@ -25,10 +25,30 @@ For this project, we've selected Rust as our programming language of choice, giv
 
 <h3>Requirements</h3>
 
-- SurrealDB (>1.1.0)
 - Rust Toolchain (>1.70.0)
 
-After cloning the repo, you can either use nix to enter a custom shell or use basic cargo commands
+After cloning the repo, you can either use nix to enter a custom shell or use cargo make commands
+
+```sh
+$ cd sync
+$ cargo install --force cargo-make
+$ cargo make setup
+$ cargo run
+```
+
+with nix
+
+```sh
+$ cd sync
+$ nix develop
+$ setup && run
+```
+
+You will be asked for a password during the setup process (This is the password that will be used to encrypt all the secrets. You can also use it with [ssclient](https://crates.io/crates/ssclient/)).
+
+Note: Setup time may take some minutes since cargo is building all the dependencies.
+
+We also suggest using [Surrealist](https://surrealist.app) to inspect the database instance.
 
 <h2>Contributing</h2>
 
