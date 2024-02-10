@@ -3,8 +3,8 @@ use surrealdb::sql::Thing;
 
 use resources::database;
 
-use crate::entities;
-use crate::entities::Entity;
+use crate::entity;
+use crate::entity::Entity;
 
 pub const RESOURCE: &str = "device";
 
@@ -36,7 +36,7 @@ impl Device {
 		let client = database::get();
 
 		if !entity.exists().await? {
-			let _: Vec<Entity> = client.create(entities::RESOURCE).content(entity).await?;
+			let _: Vec<Entity> = client.create(entity::RESOURCE).content(entity).await?;
 		}
 
 		client

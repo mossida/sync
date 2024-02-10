@@ -14,13 +14,13 @@ pub struct SecretsConfiguration {
 	pub path: String,
 }
 
-#[derive(Deserialize, Zeroize, ZeroizeOnDrop)]
+#[derive(Deserialize, Clone, Zeroize, ZeroizeOnDrop)]
 pub struct DatabaseConfiguration {
-	pub host: String,
-	pub username: String,
-	pub password: String,
-	pub database: String,
+	pub endpoint: String,
 	pub namespace: String,
+	pub database: String,
+	pub username: Option<String>,
+	pub password: Option<String>,
 }
 
 // FIXME: Handle errors correctly

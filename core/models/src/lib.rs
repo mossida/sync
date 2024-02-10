@@ -1,4 +1,5 @@
-pub mod attributes;
+pub mod attribute;
 pub mod component;
 pub mod device;
-pub mod entities;
+pub mod entity;
+pub mod event;

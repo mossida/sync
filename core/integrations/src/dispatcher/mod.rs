@@ -15,7 +15,7 @@ pub async fn init() -> utils::types::Result<()> {
 	factory::init().await
 }
 
-pub async fn send(message: models::SchedulerMessage) -> utils::types::Result<()> {
+pub async fn send(message: models::ServiceRequest) -> utils::types::Result<()> {
 	factory::send(message).await
 }
 

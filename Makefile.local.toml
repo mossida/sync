@@ -9,23 +9,35 @@ command = "cargo"
 args = ["update"]
 
 [tasks.cargo-fmt]
-category = "Local commands"
 command = "cargo"
 args = ["fmt", "--all", "--check"]
 
 [tasks.cargo-audit]
-category = "Local commands"
 command = "cargo"
 args = ["audit"]
 
 [tasks.cargo-clippy]
-category = "Local commands"
 command = "cargo"
 args = ["clippy", "--all-targets", "--all-features", "--", "-D", "warnings"]
 
+[tasks.generate-secrets]
+install_crate = { crate_name = "ssclient", force = true }
+command = "ssclient"
+args = ["--no-vcs", "create", "secrets.json", "--export-key", "secrets.key"]
+
+[tasks.generate-config]
+command = "cp"
+args = ["config.example.json5", "config.json5"]
+
 [tasks.setup]
 category = "Local commands"
-dependencies = ["cargo-upgrade", "cargo-update"]
+dependencies = [
+    "cargo-upgrade",
+    "cargo-update",
+    "generate-config",
+    "generate-secrets",
+    "check",
+]
 
 [tasks.clean]
 category = "Local commands"

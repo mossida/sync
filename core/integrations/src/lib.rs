@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 use macros::VendorBuilder;
 
 pub mod classes;
-pub mod scheduler;
+pub mod dispatcher;
 pub mod vendors;
 
 #[derive(VendorBuilder, Serialize, Deserialize)]
