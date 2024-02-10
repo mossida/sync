@@ -1,7 +1,12 @@
-<h1 align="center">Sync</h1>
-<h3 align="center">Sync is your trusted partner in crafting the home of tomorrow,<br>where comfort meets intelligence</h3>
+<h2>Backstory</h2>
 
-<h2>What is Sync?</h2>
+After building my home, I found myself facing a common dilemma that every tech enthusiast encounters: How do I make my home smart? How do I simplify my life? As I began researching, experimenting, and acquiring various devices, it became apparent that there was no single solution to meet all my needs.
+
+I yearned for a modern, reliable, secure, and high-performance system. I needed something easy to set up, capable of self-adaptation, and, at the same time, offering a high degree of customization. Despite the numerous existing solutions, none personally resonated with me. Hence, I decided to create my own system and make it accessible to those who found themselves in a similar situation or were eager to explore something new and innovative.
+
+The core motivation behind this project is to eliminate the hours spent creating a functional setup, especially when adding a new device. Imagine having a system that automatically recognizes patterns and assists you during the configuration process—how cool would that be? This open-source project aims to provide a comprehensive solution for individuals seeking a smart home experience that seamlessly combines modern technology, reliability, security, and personalization. Feel free to join the community and contribute to building the future of smart home automation.
+
+<h2>So basically what is Sync?</h2>
 
 Sync is a pioneering project that aims to revolutionize your home experience. 
 Imagine a world where your home effortlessly caters to your needs, prioritizing top-notch performance, security, and reliability. 
@@ -10,50 +15,20 @@ A comprehensive solution for modern home management. By combining advanced techn
 
 Whether you want to manage lighting, fine-tune the temperature, enhance security, or optimize entertainment, we transcend conventional home assistance. We are your steadfast ally in shaping a smarter, more comfortable living environment.
 
-**Sync's Aspirations**:
-
-- **Data privacy**: Your home is your sanctuary, and safeguarding it is our utmost priority. We're committed to minimizing data transmission, prioritizing local storage.
-- **Performance and reliability**: We're dedicated to ensuring swift response times for your commands, so you won't be left waiting to control your home.
-- **Universal integration**: Why spend extra when you can seamlessly integrate your existing devices? Sync strives to support a wide range of integrations to save you both time and money.
-- **Tailored customization**: We understand that personalization matters. Sync empowers you to fine-tune your settings to suit your unique preferences.
-- **Intelligent AI enhancements**: Harnessing the power of AI, Sync predicts energy consumption, temperature adjustments, and daily routines to enhance your everyday life.
-
-The project is still in early stages,
-to know more please view our discussions or roadmap.
-
 <h2>How are we building it?</h2>
 
 Creating a project of this magnitude requires extensive time dedicated to developing the architectural framework and meticulous planning. It's essential that everything functions as intended, ensuring optimal performance and stability.
 
 For this project, we've selected Rust as our programming language of choice, given its reputation as one of the finest languages currently available.
 
-#### Runtime Environment
+<h2>Local setup</h2>
 
-Our architecture leverages the Actor model (currently utilizing a library, with plans to transition to a bespoke runtime). You can discover more about the Actor model [here](https://en.wikipedia.org/wiki/Actor_model).
+<h3>Requirements</h3>
 
-Utilizing the Actor model built on the Tokio Runtime allows us to operate thousands of actors without compromising performance. To illustrate, imagine managing 200 devices in your home, each device typically necessitates 2 to 3 actors for monitoring and control. This scenario would result in 600 actors actively running in your core system to manage 200 devices, and we're still well below the system's actual capacity (We've successfully operated ~12,000 active actors on a MacBook M1 without any difficulties).
+- SurrealDB (>1.1.0)
+- Rust Toolchain (>1.70.0)
 
-Our system employs a priority-based mechanism, ensuring that critical actors are initiated first to immediately allocate the necessary resources.
-
-Additionally, actors facilitate cluster formation, enabling the deployment of multiple Sync instances to create a high-availability system. For instance, two Sync instances could be configured to work in tandem, achieving 99% uptime for critical resources.
-
-#### Integration with External Vendors
-
-Integrations enable the addition of data to your Sync instances through external vendors. For instance, if you own 2 Samsung TVs, a Tado HVAC system, and a Philips Hue lighting system, you would have 3 integrations (Samsung, Tado, and Philips Hue) managing numerous components (the total number of your devices), with each integration, like Samsung, controlling its respective components. The choice of communication protocol by an integration, such as Zigbee, is seamlessly supported.
-
-#### Data Management Strategy
-
-We're enthusiasts of the SurrealDB project and have integrated its embedded version into our system. SurrealDB stands out with its impressive performance—crucial for managing and updating vast amounts of data. It also supports live updates, meaning every interface connected to the Sync core receives data updates instantaneously.
-
-To manage the potential voluminous data generated by devices, we've decided to store only the latest update while producing valuable analytics data. Those requiring comprehensive data storage can activate an integration for direct data saving in various formats.
-
-#### Automation
-
-Our runtime and efficient data management systems significantly simplify automation processes. This streamlined system reduces the workload by facilitating the automatic control and management of devices, making automation effortlessly achievable.
-
-#### AI Model Development
-
-The development of AI models is currently ongoing, and the architecture for this component is yet to be determined.
+After cloning the repo, you can either use nix to enter a custom shell or use basic cargo commands
 
 <h2>Contributing</h2>
 

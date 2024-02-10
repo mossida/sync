@@ -1,0 +1,10 @@
+{
+    "database": {
+        "endpoint": "rocksdb://storage",
+        "namespace": "default",
+        "database": "default"
+    },
+    "secrets": {
+        "path": "secrets.json"
+    }
+}
