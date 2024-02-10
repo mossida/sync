@@ -14,5 +14,5 @@ serde = { version = "1.0.196", features = ["derive"] }
 serde_json = { version = "1.0.113", features = ["raw_value"] }
 surrealdb = "1.1.1"
 log = "0.4.20"
-rayon = "1.8.0"
+rayon = "1.8.1"
 futures = "0.3.30"

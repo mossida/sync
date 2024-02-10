@@ -13,3 +13,9 @@ name = "run"
 help = "Starts the project"
 category = "project"
 command = "cargo run"
+
+[[commands]]
+name = "setup"
+help = "Prepares the project for development"
+category = "project"
+command = "cargo make setup"
