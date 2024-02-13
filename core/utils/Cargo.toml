@@ -9,7 +9,7 @@ edition = "2021"
 futures = "*"
 ractor = "0.9.5"
 thiserror = "1.0.57"
-surrealdb = "1.1.1"
+surrealdb = "1.2.0"
 surrealdb-migrations = "1.0.1"
 log = { version = "0.4.20", features = [] }
 securestore = "0.100.0"
