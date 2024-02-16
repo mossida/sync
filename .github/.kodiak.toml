@@ -10,6 +10,11 @@ method = "squash"
 automerge_label = "automerge"
 blocking_labels = ["blocking"]
 
+[merge.message]
+title = "pull_request_title"
+body = "empty"
+include_pr_number = true
+
 [merge.automerge_dependencies]
 versions = ["minor", "patch"]
 usernames = ["dependabot"]
