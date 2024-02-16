@@ -10,7 +10,6 @@ updates:
     schedule:
       interval: "daily"
     labels:
-      - "cargo"
       - "dependencies"
       - "automerge"
 
