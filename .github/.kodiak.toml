@@ -1,0 +1,18 @@
+version = 1
+
+[update]
+always = true # default: false
+require_automerge_label = false # default: true
+ignored_usernames = ["dependabot"]
+
+[merge]
+method = "squash"
+automerge_label = "automerge"
+blocking_labels = ["blocking"]
+
+[merge.automerge_dependencies]
+versions = ["minor", "patch"]
+usernames = ["dependabot"]
+
+[approve]
+auto_approve_usernames = ["dependabot", "marcocondrache"]
