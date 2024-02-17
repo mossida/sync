@@ -21,6 +21,6 @@ pub enum Error {
 pub fn log<T>(result: types::Result<T>) {
 	match result {
 		Ok(_) => (),
-		Err(e) => log::error!("{}", e),
+		Err(e) => tracing::error!("{}", e),
 	}
 }

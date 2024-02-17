@@ -8,3 +8,23 @@ members = [
     "core/resources",
     "core/models",
 ]
+
+default-members = ["core/sync"]
+
+[workspace.package]
+version = "0.1.0"
+authors = ["mossida"]
+edition = "2021"
+license = "Business License"
+
+[workspace.dependencies]
+surrealdb = { version = "1.2.0", default-features = true, features = [
+    "kv-rocksdb",
+] }
+
+serde = { version = "1.0.196", features = ["derive"] }
+tracing = { version = "0.1.40" }
+async-trait = { version = "0.1.77" }
+futures = { version = "0.3.30" }
+ractor = { version = "0.9.5" }
+serde_json = { version = "1.0.113" }
