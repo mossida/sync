@@ -1,5 +1,5 @@
+use async_trait::async_trait;
 use futures::{future, Stream, StreamExt};
-use ractor::async_trait;
 use tokio::{
 	sync::broadcast::{self, Receiver},
 	task::JoinHandle,
