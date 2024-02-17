@@ -1,3 +1,12 @@
+<h1>sync</h1>
+
+> Redefining Home Automation with Ease and Innovation.
+
+[![CI](https://img.shields.io/github/actions/workflow/status/mossida/sync/ci.yml?branch=main)](https://github.com/mossida/sync/actions/workflows/ci.yml?query=branch%3Amain)
+[![Roadmap](https://img.shields.io/badge/Rodmap-Stable-informational)](https://github.com/orgs/mossida/projects/3)
+
+> Please be aware that this project is currently in the development phase, with several features either missing or not fully stabilized.
+
 <h2>Backstory</h2>
 
 After constructing my home, I found myself facing a common dilemma that every tech enthusiast encounters: How do I make my home smart? How do I simplify my life? As I began researching, experimenting, and acquiring various devices, it became apparent that there was no single solution to meet all my needs.
