@@ -11,7 +11,7 @@ pub const PKG_NAME: &str = "sync";
 
 pub const CONFIG_FILE: &str = PKG_NAME;
 
-pub const CONFIG: Lazy<Configuration> = Lazy::new(|| {
+pub static CONFIG: Lazy<Configuration> = Lazy::new(|| {
 	Config::builder()
 		.add_source(File::with_name(CONFIG_FILE).required(false))
 		.add_source(Environment::with_prefix(PKG_NAME))
