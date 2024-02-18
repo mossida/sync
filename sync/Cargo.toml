@@ -31,7 +31,7 @@ tracing = { workspace = true }
 surrealdb = { workspace = true }
 serde = { workspace = true }
 
-models = { path = "../models" }
-utils = { path = "../utils" }
-resources = { path = "../resources" }
-integrations = { path = "../integrations" }
+models = { path = "../core/models" }
+utils = { path = "../core/utils" }
+resources = { path = "../core/resources" }
+integrations = { path = "../core/integrations" }

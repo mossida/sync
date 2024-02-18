@@ -20,3 +20,4 @@ schemars = "0.8.16"
 surrealdb = { workspace = true }
 
 utils = { path = "../utils" }
+cnf = { path = "../cnf" }

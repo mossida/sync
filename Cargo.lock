@@ -875,6 +875,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "cnf"
+version = "0.1.0"
+dependencies = [
+ "config",
+ "once_cell",
+ "serde",
+]
+
+[[package]]
 name = "color-eyre"
 version = "0.6.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3304,6 +3313,7 @@ dependencies = [
 name = "resources"
 version = "0.1.0"
 dependencies = [
+ "cnf",
  "config",
  "log",
  "once_cell",

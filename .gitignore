@@ -5,5 +5,5 @@
 /**/dev.db
 /**/secrets.key
 /**/secrets.json
-/**/config.json5
+/**/sync.toml
 /**/storage

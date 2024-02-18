@@ -1,15 +1,16 @@
 [workspace]
 resolver = "2"
 members = [
-    "core/sync",
+    "sync",
     "core/integrations",
     "core/macros",
     "core/utils",
     "core/resources",
     "core/models",
+    "core/cnf",
 ]
 
-default-members = ["core/sync"]
+default-members = ["sync"]
 
 [workspace.package]
 version = "0.1.0"
