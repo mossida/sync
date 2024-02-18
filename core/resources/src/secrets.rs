@@ -1,6 +1,7 @@
 use std::path::Path;
 use std::sync::OnceLock;
 
+use cnf::CONFIG;
 use log::warn;
 use schemars::gen::SchemaGenerator;
 use schemars::schema::{Schema, SchemaObject};
@@ -9,14 +10,12 @@ use securestore::{KeySource, SecretsManager};
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
 use zeroize::{Zeroize, ZeroizeOnDrop};
 
-use crate::configuration;
-
 static SECRETS: OnceLock<SecretsManager> = OnceLock::new();
 
 pub fn create() -> SecretsManager {
-	let configuration = configuration::get();
+	let configuration = &CONFIG.secrets;
 
-	SecretsManager::load(&configuration.secrets.path, KeySource::Path(Path::new("secrets.key")))
+	SecretsManager::load(&configuration.path, KeySource::Path(Path::new(&configuration.key)))
 		.unwrap()
 }
 
