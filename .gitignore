@@ -7,3 +7,5 @@
 /**/secrets.json
 /**/sync.toml
 /**/storage
+
+.DS_Store

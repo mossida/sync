@@ -1,3 +1,4 @@
+use rumqttd::Config as Mqtt;
 use serde::Deserialize;
 
 use crate::{database::Database, secrets::Secrets};
@@ -6,4 +7,5 @@ use crate::{database::Database, secrets::Secrets};
 pub struct Configuration {
 	pub database: Database,
 	pub secrets: Secrets,
+	pub mqtt: Mqtt,
 }

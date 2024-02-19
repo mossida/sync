@@ -1,5 +1,5 @@
 [package]
-name = "sync"
+name = "mqtt"
 version.workspace = true
 authors.workspace = true
 edition.workspace = true
@@ -8,9 +8,9 @@ license.workspace = true
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-tracing-subscriber = "0.3.18"
-miette = { version = "7.1.0", features = ["fancy"] }
+rumqttd = "0.19.0"
 
 tokio = { workspace = true }
+tokio-util = { workspace = true }
 
-cli = { path = "../core/cli" }
+cnf = { path = "../cnf" }

@@ -1,5 +1,5 @@
 [package]
-name = "sync"
+name = "cli"
 version.workspace = true
 authors.workspace = true
 edition.workspace = true
@@ -8,9 +8,12 @@ license.workspace = true
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-tracing-subscriber = "0.3.18"
+clap = "4.5.1"
 miette = { version = "7.1.0", features = ["fancy"] }
 
-tokio = { workspace = true }
+tracing = { workspace = true }
 
-cli = { path = "../core/cli" }
+cnf = { path = "../cnf" }
+err = { path = "../err" }
+net = { path = "../net" }
+dbm = { path = "../dbm" }
