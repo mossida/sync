@@ -7,6 +7,10 @@ use tower_http::request_id::RequestId;
 
 use crate::rpc::client::Client;
 
+mod client;
+mod request;
+mod worker;
+
 pub(super) fn router<S>() -> Router<S>
 where
 	S: Clone + Send + Sync + 'static,

@@ -1,6 +1,5 @@
 use std::ops::Deref;
 
-use cnf::CONFIG;
 use once_cell::sync::Lazy;
 use surrealdb::{engine::any::Any, opt::auth::Root};
 
@@ -12,7 +11,7 @@ use utils::error::Error;
 static DB: Lazy<Surreal<Any>> = Lazy::new(Surreal::init);
 
 pub async fn init() -> utils::types::Result<()> {
-	let config = &CONFIG.database;
+	let config = &cnf::get().database;
 
 	DB.connect(&config.endpoint).await?;
 	DB.use_ns(&config.namespace).await?;
