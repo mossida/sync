@@ -13,6 +13,8 @@ members = [
     "core/cli",
     "core/err",
     "core/net",
+    "core/cls",
+    "core/bus",
 ]
 
 default-members = ["sync"]
