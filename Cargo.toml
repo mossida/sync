@@ -28,7 +28,7 @@ surrealdb = { version = "1.2.0", default-features = true, features = [
     "kv-rocksdb",
 ] }
 
-serde = { version = "1.0.196", features = ["derive"] }
+serde = { version = "1.0.197", features = ["derive"] }
 tracing = { version = "0.1.40" }
 async-trait = { version = "0.1.77" }
 futures = { version = "0.3.30" }
