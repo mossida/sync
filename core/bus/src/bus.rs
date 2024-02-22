@@ -69,6 +69,7 @@ impl Bus {
 
 		let _ = tokio::spawn(async move {
 			select! {
+				biased;
 				_ = inner_token.cancelled() => {},
 				Ok(event) = receiver.recv() => {
 					let result = cell.send_message(event.into());

@@ -15,3 +15,5 @@ serde_json = { workspace = true }
 
 err = { path = "../err" }
 bus = { path = "../bus" }
+dbm = { path = "../dbm" }
+cls = { path = "../cls" }

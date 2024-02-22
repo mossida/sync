@@ -1,9 +1,11 @@
 use bus::Event;
 use ractor::{async_trait, Actor, ActorProcessingErr, ActorRef};
 
-use crate::{Class, Vendor, VendorMessage};
+use crate::{Component, Vendor, VendorMessage};
 
-pub type Tado = Vendor<TadoClass>;
+use super::Vendors;
+
+pub type Tado = Component<TadoClass>;
 
 #[derive(Clone)]
 pub struct TadoClass {
@@ -28,11 +30,12 @@ impl Actor for TadoClass {
 	}
 }
 
-impl Class for TadoClass {
+impl Vendor for TadoClass {
 	type Configuration = ();
 	type Message = TadoMessage;
 
 	const NAME: &'static str = "tado";
+	const VENDOR: Vendors = Vendors::Tado;
 
 	fn new(config: Self::Configuration) -> Self {
 		Self {

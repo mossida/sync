@@ -1,13 +1,8 @@
 use err::{Error, Result};
-use futures::Future;
 use serde::{de::DeserializeOwned, Serialize};
-use std::pin::Pin;
 use surrealdb::sql::Id;
 
-use crate::DB;
-
-/// Internal type to indicate an async method
-type IntoFuture<'r, T> = Pin<Box<dyn Future<Output = T> + Send + Sync + 'r>>;
+use crate::{IntoFuture, DB};
 
 pub trait Base: Sized + Serialize + DeserializeOwned + Send + Sync {
 	const RESOURCE: &'static str;
@@ -17,6 +12,27 @@ pub trait Base: Sized + Serialize + DeserializeOwned + Send + Sync {
 
 pub trait Resource: Base {
 	fn id(&self) -> &Id;
+
+	fn exists(&self) -> IntoFuture<'_, Result<bool, Error>> {
+		let db = &DB;
+		let id = self.id().to_owned();
+
+		let future = db
+			.query("SELECT count(*) FROM $resource WHERE id = $id")
+			.bind(("resource", Self::RESOURCE))
+			.bind(("id", id));
+
+		Box::pin(async move {
+			let mut response = future.await?;
+			let count: Option<i8> = response.take(0)?;
+
+			if let Some(count) = count {
+				Ok(count == 1)
+			} else {
+				Ok(false)
+			}
+		})
+	}
 
 	fn create(&self) -> IntoFuture<'_, Result<Vec<Self>, Error>> {
 		let db = &DB;
