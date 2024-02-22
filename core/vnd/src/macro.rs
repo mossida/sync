@@ -16,7 +16,7 @@ macro_rules! implement {
             match v {
                 $(
                     Vendors::$enum => {
-                        crate::vendors::$module::$enum::new(config)?.build().await?;
+                        $crate::vendors::$module::$enum::new(config)?.build().await?;
                     }
                 ),*
             };

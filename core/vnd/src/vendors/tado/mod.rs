@@ -44,7 +44,7 @@ impl Vendor for TadoClass {
 	}
 
 	fn configuration(&self) -> Self::Configuration {
-		self.config.clone()
+		self.config
 	}
 }
 
