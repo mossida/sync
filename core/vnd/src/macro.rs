@@ -4,10 +4,8 @@ macro_rules! implement {
         use serde::{Deserialize, Serialize};
         use err::{Result, Error};
 
-        // Generate use statements for each module and enum
-
         // Define the enum
-        #[derive(Serialize, Deserialize)]
+        #[derive(Serialize, Deserialize, Debug)]
         #[serde(rename_all = "snake_case")]
         pub enum Vendors {
             $($enum),*
@@ -18,7 +16,7 @@ macro_rules! implement {
             match v {
                 $(
                     Vendors::$enum => {
-                        crate::vendors::$module::$enum::build(config).await?;
+                        $crate::vendors::$module::$enum::new(config)?.build().await?;
                     }
                 ),*
             };

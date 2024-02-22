@@ -11,6 +11,12 @@ pub struct Bus {
 	receiver: broadcast::Receiver<Event>,
 }
 
+impl Default for Bus {
+	fn default() -> Self {
+		Self::new()
+	}
+}
+
 impl Bus {
 	pub fn new() -> Self {
 		let (sender, receiver) = broadcast::channel::<Event>(1000);
@@ -41,9 +47,8 @@ impl Bus {
 		let inner_token = token.child_token();
 		let sender = self.sender.clone();
 
-		let _ = tokio::spawn(async move {
+		tokio::spawn(async move {
 			select! {
-				biased;
 				_ = inner_token.cancelled() => {},
 				_ = stream.for_each(|e| {
 					let _ = sender.send(e);
@@ -67,7 +72,7 @@ impl Bus {
 		let token = CancellationToken::new();
 		let inner_token = token.child_token();
 
-		let _ = tokio::spawn(async move {
+		tokio::spawn(async move {
 			select! {
 				_ = inner_token.cancelled() => {},
 				Ok(event) = receiver.recv() => {

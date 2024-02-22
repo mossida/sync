@@ -9,10 +9,14 @@ use dbm::{
 };
 
 pub mod attribute;
+pub mod device;
+
 pub mod class;
 
 /// This trait represents the class of an entity.
-pub trait Class: Send + Sync {}
+pub trait Class: Send + Sync {
+	const NAME: &'static str;
+}
 
 /// This trait represents the state of an entity.
 /// Must implement serialization and deserialization in order to be
@@ -29,20 +33,15 @@ pub trait State: Default + Serialize + DeserializeOwned + Send + Sync {
 	}
 }
 
-/// Represents an object with a specific class and state.
+/// Represents an entity with a specific class and state.
 #[derive(Serialize, Deserialize)]
-pub struct Entity<C, S>
-where
-	C: Class,
-	S: State,
-{
+pub struct Entity<C, S> {
 	id: Id,
+	r#type: String,
 
-	class: PhantomData<C>,
-
-	#[serde(bound(deserialize = ""))]
 	state: S,
-
+	#[serde(skip)]
+	class: PhantomData<C>,
 	extra: Attributes,
 }
 
@@ -55,7 +54,9 @@ where
 	pub fn new(id: Option<Id>) -> Self {
 		Entity {
 			id: id.unwrap_or(Id::rand()),
-			class: PhantomData,
+			r#type: C::NAME.to_string(),
+
+			class: Default::default(),
 			state: Default::default(),
 			extra: Default::default(),
 		}

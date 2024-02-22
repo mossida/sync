@@ -4596,6 +4596,7 @@ dependencies = [
  "err",
  "tokio",
  "tracing-subscriber",
+ "vnd",
 ]
 
 [[package]]
@@ -5314,6 +5315,8 @@ name = "vnd"
 version = "0.1.0"
 dependencies = [
  "bus",
+ "cls",
+ "dbm",
  "err",
  "futures",
  "ractor",
