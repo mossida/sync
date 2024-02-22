@@ -8,3 +8,11 @@ license.workspace = true
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+dashmap = { version = "5.5.3", features = ["serde"] }
+uom = { version = "0.35.0", features = ["default", "use_serde"] }
+serde_with = { version = "3.6.1" }
+
+serde = { workspace = true }
+serde_json = { workspace = true }
+
+dbm = { path = "../dbm" }

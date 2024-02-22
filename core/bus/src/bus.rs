@@ -1,6 +1,7 @@
 use futures::{future, Stream, StreamExt};
 use tokio::{select, sync::broadcast};
 use tokio_util::sync::CancellationToken;
+use tracing::error;
 
 use crate::Event;
 
@@ -16,6 +17,16 @@ impl Bus {
 		Bus {
 			sender,
 			receiver,
+		}
+	}
+
+	pub fn send(&self, event: Event) -> usize {
+		match self.sender.send(event) {
+			Ok(items) => items,
+			Err(_) => {
+				error!("Bus failed to send event");
+				0
+			}
 		}
 	}
 

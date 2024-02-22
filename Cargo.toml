@@ -14,7 +14,7 @@ members = [
     "core/err",
     "core/net",
     "core/cls",
-    "core/bus",
+    "core/bus", "core/vnd",
 ]
 
 default-members = ["sync"]

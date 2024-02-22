@@ -13,3 +13,6 @@ tokio-util = { version = "0.7.10" }
 
 tokio = { workspace = true }
 futures = { workspace = true }
+tracing = { workspace = true }
+
+err = { path = "../err" }

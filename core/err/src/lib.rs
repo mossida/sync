@@ -1,6 +1,8 @@
 use miette::Diagnostic;
 use thiserror::Error;
 
+pub use miette::Result;
+
 #[derive(Debug, Diagnostic, Error)]
 #[diagnostic(help("https:://docs.mossida.com/sync"))]
 pub enum Error {
