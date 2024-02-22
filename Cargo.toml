@@ -1,22 +1,18 @@
 [workspace]
-resolver = "2"
 members = [
     "sync",
-    "core/integrations",
-    "core/macros",
-    "core/utils",
-    "core/resources",
-    "core/models",
     "core/cnf",
     "core/dbm",
     "core/mqtt",
     "core/cli",
     "core/err",
-    "core/net",
     "core/cls",
     "core/bus",
     "core/vnd",
+    "core/net",
 ]
+
+resolver = "2"
 
 default-members = ["sync"]
 
