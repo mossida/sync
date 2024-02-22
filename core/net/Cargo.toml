@@ -33,3 +33,4 @@ surrealdb = { workspace = true }
 serde = { workspace = true }
 
 mqtt = { path = "../mqtt" }
+err = { path = "../err" }

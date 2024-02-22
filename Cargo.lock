@@ -2724,6 +2724,7 @@ dependencies = [
  "axum 0.7.4",
  "axum-server",
  "config 0.14.0",
+ "err",
  "futures-util",
  "mqtt",
  "once_cell",
