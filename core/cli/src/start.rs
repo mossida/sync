@@ -1,11 +1,10 @@
 use clap::Args;
-use err::Error;
 
 #[derive(Args, Debug)]
 pub struct StartCommandArgs {}
 
 #[tracing::instrument]
-pub async fn init(_: StartCommandArgs) -> Result<(), Error> {
+pub async fn init(_: StartCommandArgs) -> err::Result<()> {
 	dbm::init().await?;
 	let _ = net::init().await;
 

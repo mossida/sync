@@ -22,7 +22,7 @@ enum Commands {
 	Start(StartCommandArgs),
 }
 
-pub async fn init() -> miette::Result<()> {
+pub async fn init() -> err::Result<()> {
 	let args = Cli::parse();
 	cnf::init(args.config)?;
 

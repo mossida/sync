@@ -701,6 +701,19 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7f30e7476521f6f8af1a1c4c0b8cc94f0bee37d91763d0ca2665f299b6cd8aec"
 
 [[package]]
+name = "bus"
+version = "0.1.0"
+dependencies = [
+ "err",
+ "futures",
+ "once_cell",
+ "ractor",
+ "tokio",
+ "tokio-util",
+ "tracing",
+]
+
+[[package]]
 name = "bytecheck"
 version = "0.6.12"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -974,7 +987,6 @@ dependencies = [
  "cnf",
  "dbm",
  "err",
- "miette 7.1.0",
  "net",
  "tracing",
 ]
@@ -1000,6 +1012,18 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 1.0.109",
+]
+
+[[package]]
+name = "cls"
+version = "0.1.0"
+dependencies = [
+ "dashmap",
+ "dbm",
+ "serde",
+ "serde_json",
+ "serde_with",
+ "uom",
 ]
 
 [[package]]
@@ -1282,6 +1306,7 @@ dependencies = [
  "lock_api",
  "once_cell",
  "parking_lot_core",
+ "serde",
 ]
 
 [[package]]
@@ -1296,7 +1321,9 @@ version = "0.1.0"
 dependencies = [
  "cnf",
  "err",
+ "futures",
  "once_cell",
+ "serde",
  "surrealdb",
  "surrealdb-migrations",
  "thiserror",
@@ -1513,6 +1540,7 @@ version = "0.1.0"
 dependencies = [
  "config 0.14.0",
  "miette 7.1.0",
+ "serde_json",
  "surrealdb",
  "thiserror",
 ]
@@ -4844,7 +4872,9 @@ name = "sync"
 version = "0.1.0"
 dependencies = [
  "cli",
- "miette 7.1.0",
+ "cls",
+ "dbm",
+ "err",
  "tokio",
  "tracing-subscriber",
 ]
@@ -5597,6 +5627,18 @@ name = "version_check"
 version = "0.9.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "49874b5167b65d7193b8aba1567f5c7d93d001cafc34600cee003eda787e483f"
+
+[[package]]
+name = "vnd"
+version = "0.1.0"
+dependencies = [
+ "bus",
+ "err",
+ "futures",
+ "ractor",
+ "serde",
+ "serde_json",
+]
 
 [[package]]
 name = "walkdir"

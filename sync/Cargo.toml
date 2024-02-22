@@ -9,8 +9,10 @@ license.workspace = true
 
 [dependencies]
 tracing-subscriber = "0.3.18"
-miette = { version = "7.1.0", features = ["fancy"] }
 
 tokio = { workspace = true }
 
 cli = { path = "../core/cli" }
+err = { path = "../core/err" }
+cls = { path = "../core/cls" }
+dbm = { path = "../core/dbm" }

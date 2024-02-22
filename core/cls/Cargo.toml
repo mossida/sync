@@ -1,5 +1,5 @@
 [package]
-name = "err"
+name = "cls"
 version.workspace = true
 authors.workspace = true
 edition.workspace = true
@@ -8,9 +8,11 @@ license.workspace = true
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-thiserror = { version = "1.0.57" }
-miette = { version = "7.1.0", features = ["fancy"] }
-config = "0.14.0"
+dashmap = { version = "5.5.3", features = ["serde"] }
+uom = { version = "0.35.0", features = ["default", "use_serde"] }
+serde_with = { version = "3.6.1" }
 
-surrealdb = { workspace = true }
+serde = { workspace = true }
 serde_json = { workspace = true }
+
+dbm = { path = "../dbm" }

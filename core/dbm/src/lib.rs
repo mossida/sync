@@ -4,6 +4,11 @@ use surrealdb::{engine::any::Any, opt::auth::Root, Surreal};
 use surrealdb_migrations::MigrationRunner;
 use tracing::{info, instrument, trace};
 
+pub use surrealdb::sql::Id;
+
+mod relation;
+pub mod resource;
+
 pub static DB: Lazy<Surreal<Any>> = Lazy::new(Surreal::init);
 
 #[instrument]
