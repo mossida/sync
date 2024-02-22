@@ -18,6 +18,9 @@ pub enum Error {
 	#[error("Something went wrong during the interface")]
 	#[diagnostic(code(sync::interface_error))]
 	InterfaceError(#[from] serde_json::Error),
+	#[error("Something went wrong during the IO")]
+	#[diagnostic(code(sync::io_error))]
+	IoError(#[from] std::io::Error),
 }
 
 #[derive(Debug, Diagnostic, Error)]

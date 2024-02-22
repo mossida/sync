@@ -1,5 +1,6 @@
 use axum::routing::get;
 use axum::Router;
+use err::Error;
 use tower::ServiceBuilder;
 use tower_http::request_id::MakeRequestUuid;
 use tower_http::trace::TraceLayer;
@@ -8,7 +9,7 @@ use tower_http::ServiceBuilderExt;
 mod rpc;
 mod tracer;
 
-pub async fn init() -> utils::types::Result<()> {
+pub async fn init() -> err::Result<(), Error> {
 	let service = ServiceBuilder::new()
 		.catch_panic()
 		.set_x_request_id(MakeRequestUuid)
