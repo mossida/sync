@@ -707,6 +707,7 @@ dependencies = [
  "err",
  "futures",
  "once_cell",
+ "ractor",
  "tokio",
  "tokio-util",
  "tracing",
@@ -1539,6 +1540,7 @@ version = "0.1.0"
 dependencies = [
  "config 0.14.0",
  "miette 7.1.0",
+ "serde_json",
  "surrealdb",
  "thiserror",
 ]
@@ -5629,6 +5631,14 @@ checksum = "49874b5167b65d7193b8aba1567f5c7d93d001cafc34600cee003eda787e483f"
 [[package]]
 name = "vnd"
 version = "0.1.0"
+dependencies = [
+ "bus",
+ "err",
+ "futures",
+ "ractor",
+ "serde",
+ "serde_json",
+]
 
 [[package]]
 name = "walkdir"
