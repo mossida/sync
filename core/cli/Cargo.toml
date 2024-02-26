@@ -11,8 +11,11 @@ license.workspace = true
 clap = "4.5.1"
 
 tracing = { workspace = true }
+tokio = { workspace = true }
+tokio-util = { workspace = true }
 
 cnf = { path = "../cnf" }
 err = { path = "../err" }
 net = { path = "../net" }
 dbm = { path = "../dbm" }
+mqtt = { path = "../mqtt" }
