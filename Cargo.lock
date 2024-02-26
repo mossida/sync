@@ -987,7 +987,10 @@ dependencies = [
  "cnf",
  "dbm",
  "err",
+ "mqtt",
  "net",
+ "tokio",
+ "tokio-util",
  "tracing",
 ]
 
