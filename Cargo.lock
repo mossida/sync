@@ -992,6 +992,7 @@ dependencies = [
  "tokio",
  "tokio-util",
  "tracing",
+ "vnd",
 ]
 
 [[package]]

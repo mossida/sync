@@ -1,7 +1,7 @@
 use bus::Event;
 use ractor::{async_trait, Actor, ActorProcessingErr, ActorRef};
 
-use crate::{Component, Vendor, VendorMessage};
+use crate::{component::Component, Vendor, VendorMessage};
 
 use super::Vendors;
 

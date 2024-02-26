@@ -19,3 +19,4 @@ err = { path = "../err" }
 net = { path = "../net" }
 dbm = { path = "../dbm" }
 mqtt = { path = "../mqtt" }
+vnd = { path = "../vnd" }

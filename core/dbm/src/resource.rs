@@ -7,6 +7,12 @@ use crate::{IntoFuture, DB};
 pub trait Base: Sized + Serialize + DeserializeOwned + Send + Sync {
 	const RESOURCE: &'static str;
 
+	fn fetch_all<'r>() -> IntoFuture<'r, Result<Vec<Self>, Error>> {
+		let db = &DB;
+
+		Box::pin(async move { Ok(db.select(Self::RESOURCE).await?) })
+	}
+
 	// TODO: implement method that subscribe changes to main BUS
 }
 
