@@ -8,8 +8,21 @@ license.workspace = true
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+axum = { version = "0.7.4", features = ["ws"] }
+dashmap = { version = "5.5.3", features = ["serde"] }
+uuid = { version = "1.7.0", features = ["v4"] }
+tower-http = { version = "0.5.2", features = ["full"] }
+futures-util = { version = "0.3.30" }
+tokio-stream = { version = "0.1.14" }
+thiserror = { version = "1.0.57" }
+
 serde = { workspace = true }
 serde_json = { workspace = true }
 futures = { workspace = true }
+tokio = { workspace = true }
+tokio-util = { workspace = true }
+ractor = { workspace = true }
+tracing = { workspace = true }
 
 err = { path = "../err" }
+dbm = { path = "../dbm" }

@@ -1,4 +1,5 @@
 use miette::Diagnostic;
+
 use thiserror::Error;
 
 pub use miette::Result;
@@ -21,6 +22,9 @@ pub enum Error {
 	#[error("Something went wrong during the IO")]
 	#[diagnostic(code(sync::io_error))]
 	IoError(#[from] std::io::Error),
+	#[error("Something went wrong during an actor spawn")]
+	#[diagnostic(code(sync::actor_error))]
+	ActorError(#[from] ractor::SpawnErr),
 }
 
 #[derive(Debug, Diagnostic, Error)]

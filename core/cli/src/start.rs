@@ -1,5 +1,4 @@
 use clap::Args;
-use tokio_util::sync::CancellationToken;
 
 use vnd::spawner;
 
@@ -8,7 +7,7 @@ pub struct StartCommandArgs {}
 
 #[tracing::instrument]
 pub async fn init(_: StartCommandArgs) -> err::Result<()> {
-	let token = CancellationToken::new();
+	//let token = CancellationToken::new();
 
 	// Critical components
 	bus::init();
@@ -19,7 +18,7 @@ pub async fn init(_: StartCommandArgs) -> err::Result<()> {
 	spawner::init().await?;
 
 	// TODO: refactor serve method
-	let _ = mqtt::serve(token.child_token()).await;
+	//let _ = mqtt::serve(token.child_token()).await;
 
 	// Interface components
 	net::serve().await?;

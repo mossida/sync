@@ -1,30 +1,31 @@
 mod get_entities;
 
+use dashmap::DashMap;
 use serde::Deserialize;
 use serde_json::Value;
 use std::future::IntoFuture;
 
-use crate::{IntoFuture as Future, Output};
+use crate::{IntoFuture as Future, Output, RpcError};
 
 use self::get_entities::GetEntities;
 
-fn resolve(method: &str, params: Option<Value>) -> Future<Output> {
+fn resolve(method: &str, params: Params) -> Future<Output> {
 	match method {
 		"get_entities" => GetEntities::into_method(params),
-		_ => {
-			unreachable!()
-		}
+		_ => Box::pin(async move { Err(RpcError::MethodNotFound) }),
 	}
 }
 
 pub trait IntoMethod {
-	fn into_method(params: Option<Value>) -> Future<Output>;
+	fn into_method(params: Params) -> Future<Output>;
 }
+
+pub type Params = DashMap<String, Value>;
 
 #[derive(Debug, Deserialize)]
 pub struct Method {
 	pub method: String,
-	pub params: Option<Value>,
+	pub params: Params,
 }
 
 impl IntoFuture for Method {

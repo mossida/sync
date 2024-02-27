@@ -1516,6 +1516,7 @@ version = "0.1.0"
 dependencies = [
  "config 0.14.0",
  "miette 7.1.0",
+ "ractor",
  "serde_json",
  "surrealdb",
  "thiserror",
@@ -2735,6 +2736,7 @@ dependencies = [
  "once_cell",
  "ractor",
  "revision",
+ "rpc",
  "schemars",
  "serde",
  "serde_json",
@@ -3705,10 +3707,22 @@ dependencies = [
 name = "rpc"
 version = "0.1.0"
 dependencies = [
+ "axum 0.7.4",
+ "dashmap",
+ "dbm",
  "err",
  "futures",
+ "futures-util",
+ "ractor",
  "serde",
  "serde_json",
+ "thiserror",
+ "tokio",
+ "tokio-stream",
+ "tokio-util",
+ "tower-http",
+ "tracing",
+ "uuid",
 ]
 
 [[package]]

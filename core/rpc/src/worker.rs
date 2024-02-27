@@ -1,45 +1,40 @@
+use std::sync::Arc;
+
 use axum::async_trait;
 use axum::extract::ws::Message;
+
 use ractor::factory::{
 	FactoryMessage, WorkerBuilder as Builder, WorkerId, WorkerMessage, WorkerStartContext,
 };
 use ractor::{Actor, ActorProcessingErr, ActorRef};
 use tokio::sync::mpsc::Sender;
-use tokio_util::sync::CancellationToken;
-use uuid::Uuid;
+use tracing::trace;
 
-pub type WorkerKey = Uuid;
+use crate::request::Request;
+use crate::response::IntoResponse;
+
+pub type WorkerKey = u64;
 
 #[derive(Clone)]
 pub struct Worker {
-	pub sender: Sender<Message>,
-	pub canceller: CancellationToken,
+	pub sender: Arc<Sender<Message>>,
 }
 
-pub struct WorkerBuilder {
-	pub sender: Sender<Message>,
-	pub canceller: CancellationToken,
-}
-
-impl Builder<Worker> for WorkerBuilder {
+impl Builder<Worker> for Worker {
 	fn build(&self, _: WorkerId) -> Worker {
-		Worker {
-			sender: self.sender.clone(),
-			canceller: self.canceller.clone(),
-		}
+		self.clone()
 	}
 }
 
 pub struct WorkerState<T> {
-	pub sender: Sender<Message>,
 	pub context: T,
 }
 
 #[async_trait]
 impl Actor for Worker {
-	type Msg = WorkerMessage<WorkerKey, Message>;
+	type Msg = WorkerMessage<WorkerKey, Request>;
 	type State = WorkerState<Self::Arguments>;
-	type Arguments = WorkerStartContext<WorkerKey, Message>;
+	type Arguments = WorkerStartContext<WorkerKey, Request>;
 
 	async fn pre_start(
 		&self,
@@ -47,7 +42,6 @@ impl Actor for Worker {
 		args: Self::Arguments,
 	) -> Result<Self::State, ActorProcessingErr> {
 		Ok(WorkerState {
-			sender: self.sender.clone(),
 			context: args,
 		})
 	}
@@ -60,29 +54,28 @@ impl Actor for Worker {
 	) -> Result<(), ActorProcessingErr> {
 		match message {
 			WorkerMessage::FactoryPing(time) => {
+				// Pong back to factory
 				state
 					.context
 					.factory
 					.send_message(FactoryMessage::WorkerPong(state.context.wid, time.elapsed()))?;
 			}
-			WorkerMessage::Dispatch(job) => match job.msg {
-				Message::Text(_) => {
-					state
-						.sender
-						.send(Message::Text(format!("Hello from worker: {}", state.context.wid)))
-						.await?;
+			WorkerMessage::Dispatch(job) => {
+				trace!("Dispatching job {:?} with actor {:?}", job.key, state.context.wid);
 
-					state
-						.context
-						.factory
-						.send_message(FactoryMessage::Finished(state.context.wid, job.key))?;
-				}
-				Message::Binary(_) => {}
-				Message::Close(_) => {
-					self.canceller.cancel();
-				}
-				_ => {}
-			},
+				// Process request
+				let data = job.msg.await;
+				let response = data.into_response(job.key);
+
+				// Send back to client
+				self.sender.send(response.try_into()?).await?;
+
+				// Notify factory the job is done so this worker is free again
+				state
+					.context
+					.factory
+					.send_message(FactoryMessage::Finished(state.context.wid, job.key))?;
+			}
 		}
 
 		Ok(())
