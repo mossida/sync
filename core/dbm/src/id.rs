@@ -47,8 +47,8 @@ impl Serialize for Id {
 		S: serde::Serializer,
 	{
 		match &self.0 {
-			RecordId::Number(n) => serializer.serialize_i64(*n),
-			RecordId::String(s) => serializer.serialize_str(&s),
+			RecordId::Number(n) => n.serialize(serializer),
+			RecordId::String(s) => s.serialize(serializer),
 			RecordId::Array(a) => a.serialize(serializer),
 			RecordId::Object(o) => o.serialize(serializer),
 			RecordId::Generate(g) => g.serialize(serializer),
