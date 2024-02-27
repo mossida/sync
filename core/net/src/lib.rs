@@ -9,7 +9,7 @@ use tower_http::ServiceBuilderExt;
 mod rpc;
 mod tracer;
 
-pub async fn init() -> err::Result<(), Error> {
+pub async fn serve() -> err::Result<(), Error> {
 	let service = ServiceBuilder::new()
 		.catch_panic()
 		.set_x_request_id(MakeRequestUuid)
@@ -23,18 +23,9 @@ pub async fn init() -> err::Result<(), Error> {
 			.on_failure(tracer::HttpTraceLayerHooks),
 	);
 
-	/*let service = service
-	.layer(HandleErrorLayer::new(|err: BoxError| async move {
-		(
-			StatusCode::INTERNAL_SERVER_ERROR,
-			format!("Unhandled error: {}", err),
-		)
-	}))
-	.layer(BufferLayer::new(1024))
-	.layer(RateLimitLayer::new(5, Duration::from_secs(1)));*/
-
 	let app = Router::new().route("/status", get(|| async {})).merge(rpc::router()).layer(service);
 
+	// TODO: add shutdown signal
 	let listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await?;
 	axum::serve(listener, app).await?;
 

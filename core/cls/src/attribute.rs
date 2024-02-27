@@ -3,6 +3,7 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use std::hash::{Hash, Hasher};
 
+// TODO: Understand if this is the correct way to implement attributes
 pub type Attributes = DashSet<Attribute>;
 
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Clone)]
