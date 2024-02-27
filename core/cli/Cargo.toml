@@ -14,8 +14,10 @@ tracing = { workspace = true }
 tokio = { workspace = true }
 tokio-util = { workspace = true }
 
+bus = { path = "../bus" }
 cnf = { path = "../cnf" }
 err = { path = "../err" }
 net = { path = "../net" }
 dbm = { path = "../dbm" }
 mqtt = { path = "../mqtt" }
+vnd = { path = "../vnd" }

@@ -7,7 +7,7 @@ use serde::{Deserialize, Serialize};
 
 use crate::{Class, Entity, State};
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize, Deserialize, Default)]
 pub struct Device {
 	id: dbm::Id,
 	name: String,
@@ -18,24 +18,10 @@ pub struct Device {
 	hw_version: Option<String>,
 }
 
-impl Default for Device {
-	fn default() -> Self {
-		Self {
-			id: Id::rand(),
-			name: Default::default(),
-			serial: Default::default(),
-			model: Default::default(),
-			manufacturer: Default::default(),
-			sw_version: Default::default(),
-			hw_version: Default::default(),
-		}
-	}
-}
-
 impl Device {
 	pub fn new(id: Option<Id>) -> Self {
 		Self {
-			id: id.unwrap_or(Id::rand()),
+			id: id.unwrap_or_default(),
 			..Default::default()
 		}
 	}
@@ -51,7 +37,6 @@ impl Resource for Device {
 	}
 }
 
-//
 impl<C, S> Relation<Entity<C, S>> for Device
 where
 	C: Class,

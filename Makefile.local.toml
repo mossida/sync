@@ -27,7 +27,7 @@ args = ["--no-vcs", "create", "secrets.json", "--export-key", "secrets.key"]
 
 [tasks.generate-config]
 command = "cp"
-args = ["config.example.json5", "config.json5"]
+args = ["config.example.toml", "sync.toml"]
 
 [tasks.setup]
 category = "Local commands"

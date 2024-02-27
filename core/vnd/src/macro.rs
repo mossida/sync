@@ -1,24 +1,23 @@
 #[macro_export]
 macro_rules! implement {
     ($($module:ident => $enum:ident),*) => {
-        use serde::{Deserialize, Serialize};
-        use err::{Result, Error};
-
         // Define the enum
-        #[derive(Serialize, Deserialize, Debug)]
+        #[derive(serde::Serialize, serde::Deserialize, Debug)]
         #[serde(rename_all = "snake_case")]
         pub enum Vendors {
+            Any,
             $($enum),*
         }
 
         // Define the implementation function
-        pub async fn implement(v: Vendors, config: serde_json::Value) -> Result<(), Error> {
+        pub async fn implement(v: &Vendors, config: serde_json::Value) -> err::Result<(), err::Error> {
             match v {
                 $(
                     Vendors::$enum => {
                         $crate::vendors::$module::$enum::new(config)?.build().await?;
                     }
                 ),*
+                _ => {}
             };
 
             Ok(())

@@ -12,6 +12,7 @@ ractor = { workspace = true }
 futures = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
+tracing = { workspace = true }
 
 err = { path = "../err" }
 bus = { path = "../bus" }
