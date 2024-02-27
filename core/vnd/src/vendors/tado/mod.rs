@@ -1,19 +1,24 @@
 use bus::Event;
 use ractor::{async_trait, Actor, ActorProcessingErr, ActorRef};
+use serde::{Deserialize, Serialize};
+use tracing::info;
 
 use crate::{component::Component, Vendor, VendorMessage};
 
 use super::Vendors;
 
-pub type Tado = Component<TadoClass>;
+pub type Tado = Component<TadoVendor>;
+
+#[derive(Clone, Hash, Deserialize, Serialize)]
+pub struct TadoConfig {}
 
 #[derive(Clone)]
-pub struct TadoClass {
-	config: (),
+pub struct TadoVendor {
+	config: TadoConfig,
 }
 
 #[async_trait]
-impl Actor for TadoClass {
+impl Actor for TadoVendor {
 	type Msg = TadoMessage;
 	type Arguments = ();
 	type State = ();
@@ -26,12 +31,14 @@ impl Actor for TadoClass {
 		let bus = bus::get();
 		bus.subscribe_actor(myself);
 
+		info!("Tado actor started");
+
 		Ok(())
 	}
 }
 
-impl Vendor for TadoClass {
-	type Configuration = ();
+impl Vendor for TadoVendor {
+	type Configuration = TadoConfig;
 	type Message = TadoMessage;
 
 	const NAME: &'static str = "tado";
@@ -44,7 +51,7 @@ impl Vendor for TadoClass {
 	}
 
 	fn configuration(&self) -> Self::Configuration {
-		self.config
+		self.config.clone()
 	}
 }
 

@@ -7,7 +7,9 @@ use surrealdb::{engine::any::Any, opt::auth::Root, Surreal};
 use surrealdb_migrations::MigrationRunner;
 use tracing::{info, instrument, trace};
 
-pub use surrealdb::sql::Id;
+pub use id::Id;
+
+mod id;
 
 pub mod relation;
 pub mod resource;

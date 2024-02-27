@@ -5,6 +5,7 @@ macro_rules! implement {
         #[derive(serde::Serialize, serde::Deserialize, Debug)]
         #[serde(rename_all = "snake_case")]
         pub enum Vendors {
+            Any,
             $($enum),*
         }
 
@@ -16,6 +17,7 @@ macro_rules! implement {
                         $crate::vendors::$module::$enum::new(config)?.build().await?;
                     }
                 ),*
+                _ => {}
             };
 
             Ok(())

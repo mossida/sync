@@ -19,7 +19,6 @@ pub trait Relation<W: Resource>: Resource {
 		Box::pin(async move { Ok(future.await?) })
 	}
 
-	// Find a way to get relationships for W that implements generic
 	fn relationships(&self) -> IntoFuture<'_, Result<Vec<W>, Error>> {
 		let db = &DB;
 
