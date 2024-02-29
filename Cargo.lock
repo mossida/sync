@@ -4329,9 +4329,9 @@ dependencies = [
 
 [[package]]
 name = "sqlparser"
-version = "0.40.0"
+version = "0.43.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "7c80afe31cdb649e56c0d9bb5503be9166600d68a852c38dd445636d126858e5"
+checksum = "f95c4bae5aba7cd30bd506f7140026ade63cff5afd778af8854026f9606bf5d4"
 dependencies = [
  "log",
 ]
@@ -4559,9 +4559,9 @@ dependencies = [
 
 [[package]]
 name = "surrealdb-migrations"
-version = "1.1.0"
+version = "1.2.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "21a2635ec693173e754183937e96d0856cc75185b5349f72de366300d5389ad7"
+checksum = "6e8e1d67251653ee9b8c754b0c1adc6fab85168d28cb3ded07aec4364898bfd2"
 dependencies = [
  "chrono",
  "chrono-human-duration",
