@@ -25,6 +25,8 @@ pub type Params = DashMap<String, Value>;
 #[derive(Debug, Deserialize)]
 pub struct Method {
 	pub method: String,
+
+	#[serde(default)]
 	pub params: Params,
 }
 

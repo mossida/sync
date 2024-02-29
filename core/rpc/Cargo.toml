@@ -26,3 +26,4 @@ tracing = { workspace = true }
 
 err = { path = "../err" }
 dbm = { path = "../dbm" }
+cls = { path = "../cls" }

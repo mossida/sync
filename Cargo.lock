@@ -1517,6 +1517,7 @@ dependencies = [
  "config 0.14.0",
  "miette 7.1.0",
  "ractor",
+ "serde",
  "serde_json",
  "surrealdb",
  "thiserror",
@@ -3708,6 +3709,7 @@ name = "rpc"
 version = "0.1.0"
 dependencies = [
  "axum 0.7.4",
+ "cls",
  "dashmap",
  "dbm",
  "err",
