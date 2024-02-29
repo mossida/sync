@@ -3,13 +3,8 @@ use axum::extract::WebSocketUpgrade;
 use axum::response::IntoResponse;
 use axum::routing::get;
 use axum::{Extension, Router};
+use rpc::client::Client;
 use tower_http::request_id::RequestId;
-
-use crate::rpc::client::Client;
-
-mod client;
-mod request;
-mod worker;
 
 pub(super) fn router<S>() -> Router<S>
 where
@@ -31,6 +26,6 @@ async fn handler(ws: WebSocketUpgrade, Extension(id): Extension<RequestId>) -> i
 }
 
 async fn handle_socket(ws: WebSocket, id: RequestId) {
-	let rpc = Client::new(id);
-	Client::serve(&rpc, ws).await;
+	let client = Client::new(id);
+	let _ = client.serve(ws).await;
 }

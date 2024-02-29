@@ -9,6 +9,8 @@ use tower_http::{
 };
 use tracing::{field, Level, Span};
 
+/// From https://github.com/surrealdb/surrealdb/blob/main/src/net/tracer.rs
+
 #[derive(Default, Clone)]
 pub(crate) struct HttpTraceLayerHooks;
 
