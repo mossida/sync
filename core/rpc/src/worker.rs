@@ -3,21 +3,24 @@ use std::sync::Arc;
 use axum::async_trait;
 use axum::extract::ws::Message;
 
+use dashmap::DashSet;
 use ractor::factory::{
 	FactoryMessage, WorkerBuilder as Builder, WorkerId, WorkerMessage, WorkerStartContext,
 };
 use ractor::{Actor, ActorProcessingErr, ActorRef};
 use tokio::sync::mpsc::Sender;
-use tracing::trace;
+use tracing::debug;
 
 use crate::request::Request;
 use crate::response::IntoResponse;
+use crate::RpcError;
 
 pub type WorkerKey = u64;
 
 #[derive(Clone)]
 pub struct Worker {
 	pub sender: Arc<Sender<Message>>,
+	pub used_ids: Arc<DashSet<u64>>,
 }
 
 impl Builder<Worker> for Worker {
@@ -61,14 +64,24 @@ impl Actor for Worker {
 					.send_message(FactoryMessage::WorkerPong(state.context.wid, time.elapsed()))?;
 			}
 			WorkerMessage::Dispatch(job) => {
-				trace!("Dispatching job {:?} with actor {:?}", job.key, state.context.wid);
+				debug!("Dispatching job {:?} with actor {:?}", job.key, state.context.wid);
 
-				// Process request
-				let data = job.msg.await;
-				let response = data.into_response(job.key);
+				if self.used_ids.contains(&job.key) {
+					let data = Err(RpcError::InvalidId);
+					let response = data.into_response(job.key);
 
-				// Send back to client
-				self.sender.send(response.try_into()?).await?;
+					self.sender.send(response.try_into()?).await?;
+				} else {
+					// Mark the id as used
+					self.used_ids.insert(job.key);
+
+					// Process request
+					let data = job.msg.await;
+					let response = data.into_response(job.key);
+
+					// Send back to client
+					self.sender.send(response.try_into()?).await?;
+				}
 
 				// Notify factory the job is done so this worker is free again
 				state

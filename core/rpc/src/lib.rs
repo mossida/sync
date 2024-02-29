@@ -19,4 +19,6 @@ type IntoFuture<T> = Pin<Box<dyn Future<Output = T> + Send + Sync>>;
 pub enum RpcError {
 	#[error("Method not found")]
 	MethodNotFound,
+	#[error("Invalid ID provided")]
+	InvalidId,
 }

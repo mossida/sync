@@ -1,6 +1,7 @@
 use std::sync::Arc;
 
 use axum::extract::ws::{Message, WebSocket};
+use dashmap::DashSet;
 use dbm::Id;
 use futures::StreamExt;
 use ractor::{
@@ -74,7 +75,7 @@ impl Client {
 		let (factory, handle) = Actor::spawn(
 			Some(client_id.to_string()),
 			Factory {
-				worker_count: 6,
+				worker_count: 3,
 				worker_parallel_capacity: 1,
 				routing_mode: RoutingMode::<WorkerKey>::Queuer, // First worker available
 				discard_threshold: Some(50),                    // Maximum queue size
@@ -86,6 +87,7 @@ impl Client {
 			},
 			Box::new(Worker {
 				sender: Arc::new(internal_sender),
+				used_ids: Arc::new(DashSet::new()),
 			}),
 		)
 		.await?;
