@@ -5347,12 +5347,15 @@ version = "0.1.0"
 dependencies = [
  "bus",
  "cls",
+ "dashmap",
  "dbm",
  "err",
  "futures",
+ "mqtt",
  "ractor",
  "serde",
  "serde_json",
+ "tokio",
  "tracing",
 ]
 

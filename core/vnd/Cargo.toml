@@ -13,8 +13,11 @@ futures = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
 tracing = { workspace = true }
+dashmap = { workspace = true }
+tokio = { workspace = true }
 
 err = { path = "../err" }
 bus = { path = "../bus" }
 dbm = { path = "../dbm" }
 cls = { path = "../cls" }
+mqtt = { path = "../mqtt" }
