@@ -7,12 +7,12 @@ pub use event::*;
 mod bus;
 mod event;
 
-pub static BUS: OnceLock<Bus> = OnceLock::new();
+pub static BUS: OnceLock<Bus<Event>> = OnceLock::new();
 
 pub fn init() {
 	let _ = BUS.set(Bus::new());
 }
 
-pub fn get() -> &'static Bus {
+pub fn get() -> &'static Bus<Event> {
 	BUS.get().unwrap()
 }
