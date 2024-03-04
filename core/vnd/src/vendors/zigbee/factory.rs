@@ -1,9 +1,10 @@
-use mqtt::rumqttd::protocol::Publish;
 use ractor::{
 	async_trait,
 	factory::{FactoryMessage, WorkerBuilder as Builder, WorkerMessage, WorkerStartContext},
 	Actor, ActorProcessingErr, ActorRef,
 };
+
+use super::payload::Topic;
 
 #[derive(Clone)]
 pub struct Worker {}
@@ -20,9 +21,9 @@ pub struct WorkerState<T> {
 
 #[async_trait]
 impl Actor for Worker {
-	type Msg = WorkerMessage<u64, Publish>;
+	type Msg = WorkerMessage<String, String>;
 	type State = WorkerState<Self::Arguments>;
-	type Arguments = WorkerStartContext<u64, Publish>;
+	type Arguments = WorkerStartContext<String, String>;
 
 	async fn pre_start(
 		&self,
@@ -48,11 +49,10 @@ impl Actor for Worker {
 					.send_message(FactoryMessage::WorkerPong(state.context.wid, time.elapsed()))?;
 			}
 			WorkerMessage::Dispatch(job) => {
-				let json = String::from_utf8(job.msg.payload.to_vec())?;
-				println!("Received message: {}", json);
-
 				// Deserialize the message
 				// Parse it and load the state
+				//let topic = Topic::from_str("zigbee", job.key.as_str());
+				//dbg!(topic);
 
 				state
 					.context
