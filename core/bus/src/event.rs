@@ -5,4 +5,7 @@ pub enum Event {
 	VendorStart {
 		name: String,
 	},
+
+	// System events
+	Time,
 }

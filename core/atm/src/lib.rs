@@ -1,5 +1,7 @@
-pub struct Automation {}
+mod service;
+
+pub struct Engine {}
 
 pub fn init() {
-	let bus = bus::get();
+	let _ = bus::get();
 }

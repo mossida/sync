@@ -10,6 +10,7 @@ license.workspace = true
 [dependencies]
 once_cell = { version = "1.18.0" }
 tokio-util = { version = "0.7.10" }
+tokio-stream = { version = "0.1.14", features = ["sync"] }
 
 tokio = { workspace = true }
 futures = { workspace = true }

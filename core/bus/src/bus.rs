@@ -1,16 +1,15 @@
 use std::marker::PhantomData;
 
 use futures::{future, Stream, StreamExt};
-use ractor::ActorRef;
-use tokio::{select, sync::broadcast};
+use tokio::sync::broadcast;
+use tokio_stream::wrappers::BroadcastStream;
 use tokio_util::sync::CancellationToken;
 use tracing::error;
 
 /// A generic message bus that allows emitting, publishing, and subscribing to events of type `T`.
 pub struct Bus<T> {
-	sender: broadcast::Sender<T>,
-	receiver: broadcast::Receiver<T>,
-	_marker: PhantomData<T>,
+	state: broadcast::Sender<T>,
+	marker: PhantomData<T>,
 }
 
 impl<T> Default for Bus<T>
@@ -33,12 +32,12 @@ where
 	///
 	/// A new `Bus` instance.
 	pub fn new() -> Self {
-		let (sender, receiver) = broadcast::channel::<T>(1000);
+		// TODO: Understand how much capacity is needed
+		let (sender, _) = broadcast::channel::<T>(1000);
 
 		Bus {
-			sender,
-			receiver,
-			_marker: PhantomData,
+			state: sender,
+			marker: PhantomData,
 		}
 	}
 
@@ -61,7 +60,7 @@ where
 	/// println!("Event emitted to {} subscribers", num_subscribers);
 	/// ```
 	pub fn emit(&self, event: T) -> usize {
-		match self.sender.send(event) {
+		match self.state.send(event) {
 			Ok(items) => items,
 			Err(_) => {
 				error!("Bus failed to emit event");
@@ -95,14 +94,14 @@ where
 	where
 		S: Stream<Item = T> + Send + 'static,
 	{
-		let stream = Box::pin(stream);
-
 		let token = CancellationToken::new();
 		let inner_token = token.child_token();
-		let sender = self.sender.clone();
+		let sender = self.state.clone();
 
 		tokio::spawn(async move {
-			select! {
+			tokio::pin!(stream);
+
+			tokio::select! {
 				_ = inner_token.cancelled() => {},
 				_ = stream.for_each(|e| {
 					let _ = sender.send(e);
@@ -114,66 +113,14 @@ where
 		token
 	}
 
-	/// Subscribes to the `Bus` and returns a receiver for receiving events.
+	/// Subscribes to the `Bus` and returns a `BroadcastStream` that receives events.
 	///
 	/// # Returns
 	///
-	/// A `broadcast::Receiver` that can be used to receive events from the `Bus`.
-	///
-	/// # Examples
-	///
-	/// ```
-	/// let bus = Bus::new();
-	/// let receiver = bus.subscribe();
-	/// // ... receive events from the receiver ...
-	/// ```
-	pub fn subscribe(&self) -> broadcast::Receiver<T> {
-		self.sender.subscribe()
-	}
-
-	/// Subscribes an actor to the `Bus` and returns a `CancellationToken` that can be used to cancel the subscription.
-	///
-	/// # Arguments
-	///
-	/// * `cell` - The `ActorRef` of the actor to subscribe.
-	///
-	/// # Returns
-	///
-	/// A `CancellationToken` that can be used to cancel the subscription.
-	///
-	/// # Examples
-	///
-	/// ```
-	/// use ractor::ActorRef;
-	///
-	/// let bus = Bus::new();
-	/// let actor = MyActor::new();
-	/// let cell = actor.cell();
-	/// let token = bus.subscribe_actor(cell);
-	/// // ... do some work ...
-	/// token.cancel();
-	/// ```
-	pub fn subscribe_actor<M>(&self, cell: ActorRef<M>) -> CancellationToken
-	where
-		M: From<T> + Send + Sync + 'static,
-	{
-		let mut receiver = self.receiver.resubscribe();
-		let token = CancellationToken::new();
-		let inner_token = token.child_token();
-
-		tokio::spawn(async move {
-			select! {
-				_ = inner_token.cancelled() => {},
-				Ok(event) = receiver.recv() => {
-					let result = cell.send_message(event.into());
-					if result.is_err() {
-						error!("Failed to send message to actor");
-						inner_token.cancel();
-					}
-				}
-			}
-		});
-
-		token
+	/// A `BroadcastStream` that receives events emitted to the `Bus`.
+	pub fn subscribe(&self) -> impl Stream<Item = T> {
+		BroadcastStream::new(self.state.subscribe())
+			.filter(|r| future::ready(r.is_ok()))
+			.map(|r| r.unwrap())
 	}
 }
