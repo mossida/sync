@@ -1,5 +1,7 @@
 use err::{Error, Result};
+
 use serde::{de::DeserializeOwned, Serialize};
+use surrealdb::{engine::any::Any, method::Stream};
 
 use crate::{IntoFuture, DB};
 
@@ -57,5 +59,11 @@ pub trait Resource: Base {
 		let id = self.id().to_owned();
 
 		Box::pin(async move { Ok(db.update((Self::RESOURCE, id.to_raw())).merge(self).await?) })
+	}
+
+	fn stream() -> IntoFuture<'static, Result<Stream<'static, Any, Vec<Self>>, Error>> {
+		let db = &DB;
+
+		Box::pin(async move { Ok(db.select(Self::RESOURCE).live().await?) })
 	}
 }

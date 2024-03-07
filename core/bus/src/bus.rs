@@ -1,34 +1,66 @@
+use std::marker::PhantomData;
+
 use futures::{future, Stream, StreamExt};
-use ractor::ActorRef;
-use tokio::{select, sync::broadcast};
+use tokio::sync::broadcast;
+use tokio_stream::wrappers::BroadcastStream;
 use tokio_util::sync::CancellationToken;
 use tracing::error;
 
-use crate::Event;
-
-pub struct Bus {
-	sender: broadcast::Sender<Event>,
-	receiver: broadcast::Receiver<Event>,
+/// A generic message bus that allows emitting, publishing, and subscribing to events of type `T`.
+pub struct Bus<T> {
+	state: broadcast::Sender<T>,
+	marker: PhantomData<T>,
 }
 
-impl Default for Bus {
+impl<T> Default for Bus<T>
+where
+	T: Clone + Send + Sync + 'static,
+{
+	/// Creates a new `Bus` with the default settings.
 	fn default() -> Self {
 		Self::new()
 	}
 }
 
-impl Bus {
+impl<T> Bus<T>
+where
+	T: Clone + Send + Sync + 'static,
+{
+	/// Creates a new `Bus` with the specified capacity.
+	///
+	/// # Returns
+	///
+	/// A new `Bus` instance.
 	pub fn new() -> Self {
-		let (sender, receiver) = broadcast::channel::<Event>(1000);
+		// TODO: Understand how much capacity is needed
+		let (sender, _) = broadcast::channel::<T>(1000);
 
 		Bus {
-			sender,
-			receiver,
+			state: sender,
+			marker: PhantomData,
 		}
 	}
 
-	pub fn emit(&self, event: Event) -> usize {
-		match self.sender.send(event) {
+	/// Emits an event to all subscribers of the `Bus`.
+	///
+	/// # Arguments
+	///
+	/// * `event` - The event to emit.
+	///
+	/// # Returns
+	///
+	/// The number of subscribers that received the event.
+	///
+	/// # Examples
+	///
+	/// ```
+	/// let bus = Bus::new();
+	/// let event = "Hello, world!";
+	/// let num_subscribers = bus.emit(event);
+	/// println!("Event emitted to {} subscribers", num_subscribers);
+	/// ```
+	pub fn emit(&self, event: T) -> usize {
+		match self.state.send(event) {
 			Ok(items) => items,
 			Err(_) => {
 				error!("Bus failed to emit event");
@@ -37,18 +69,39 @@ impl Bus {
 		}
 	}
 
+	/// Publishes a stream of events to the `Bus`.
+	///
+	/// # Arguments
+	///
+	/// * `stream` - The stream of events to publish.
+	///
+	/// # Returns
+	///
+	/// A `CancellationToken` that can be used to cancel the publishing operation.
+	///
+	/// # Examples
+	///
+	/// ```
+	/// use futures::stream::StreamExt;
+	///
+	/// let bus = Bus::new();
+	/// let stream = futures::stream::iter(vec![1, 2, 3]);
+	/// let token = bus.publish(stream);
+	/// // ... do some work ...
+	/// token.cancel();
+	/// ```
 	pub fn publish<S>(&self, stream: S) -> CancellationToken
 	where
-		S: Stream<Item = Event> + Send + 'static,
+		S: Stream<Item = T> + Send + 'static,
 	{
-		let stream = Box::pin(stream);
-
 		let token = CancellationToken::new();
 		let inner_token = token.child_token();
-		let sender = self.sender.clone();
+		let sender = self.state.clone();
 
 		tokio::spawn(async move {
-			select! {
+			tokio::pin!(stream);
+
+			tokio::select! {
 				_ = inner_token.cancelled() => {},
 				_ = stream.for_each(|e| {
 					let _ = sender.send(e);
@@ -60,31 +113,14 @@ impl Bus {
 		token
 	}
 
-	pub fn subscribe(&self) -> broadcast::Receiver<Event> {
-		self.sender.subscribe()
-	}
-
-	pub fn subscribe_actor<T>(&self, cell: ActorRef<T>) -> CancellationToken
-	where
-		T: From<Event> + Send + Sync + 'static,
-	{
-		let mut receiver = self.receiver.resubscribe();
-		let token = CancellationToken::new();
-		let inner_token = token.child_token();
-
-		tokio::spawn(async move {
-			select! {
-				_ = inner_token.cancelled() => {},
-				Ok(event) = receiver.recv() => {
-					let result = cell.send_message(event.into());
-					if result.is_err() {
-						error!("Failed to send message to actor");
-						inner_token.cancel();
-					}
-				}
-			}
-		});
-
-		token
+	/// Subscribes to the `Bus` and returns a `BroadcastStream` that receives events.
+	///
+	/// # Returns
+	///
+	/// A `BroadcastStream` that receives events emitted to the `Bus`.
+	pub fn subscribe(&self) -> impl Stream<Item = T> {
+		BroadcastStream::new(self.state.subscribe())
+			.filter(|r| future::ready(r.is_ok()))
+			.map(|r| r.unwrap())
 	}
 }

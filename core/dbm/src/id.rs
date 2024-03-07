@@ -24,6 +24,13 @@ impl Id {
 	pub fn to_raw(&self) -> String {
 		self.0.to_raw()
 	}
+
+	pub fn to_thing(&self, resource: &str) -> Thing {
+		Thing {
+			tb: resource.to_owned(),
+			id: self.0.to_owned(),
+		}
+	}
 }
 
 impl Default for Id {
@@ -38,6 +45,12 @@ impl From<Kind> for Id {
 			Kind::Record(id) => Self(id),
 			Kind::Thing(thing) => Self(thing.id),
 		}
+	}
+}
+
+impl From<Id> for RecordId {
+	fn from(value: Id) -> Self {
+		value.0
 	}
 }
 

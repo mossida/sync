@@ -337,6 +337,21 @@ dependencies = [
 ]
 
 [[package]]
+name = "atm"
+version = "0.1.0"
+dependencies = [
+ "bus",
+ "cls",
+ "dbm",
+ "ractor",
+ "serde",
+ "serde_json",
+ "surrealdb",
+ "svc",
+ "trg",
+]
+
+[[package]]
 name = "atomic"
 version = "0.5.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -709,6 +724,7 @@ dependencies = [
  "once_cell",
  "ractor",
  "tokio",
+ "tokio-stream",
  "tokio-util",
  "tracing",
 ]
@@ -4555,6 +4571,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "svc"
+version = "0.1.0"
+dependencies = [
+ "dbm",
+ "ractor",
+ "serde",
+]
+
+[[package]]
 name = "syn"
 version = "1.0.109"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4822,6 +4847,7 @@ dependencies = [
  "futures-core",
  "pin-project-lite",
  "tokio",
+ "tokio-util",
 ]
 
 [[package]]
@@ -5054,6 +5080,15 @@ dependencies = [
  "tracing",
  "tracing-core",
  "tracing-log",
+]
+
+[[package]]
+name = "trg"
+version = "0.1.0"
+dependencies = [
+ "dbm",
+ "ractor",
+ "serde",
 ]
 
 [[package]]

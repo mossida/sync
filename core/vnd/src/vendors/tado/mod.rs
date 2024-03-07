@@ -1,4 +1,4 @@
-use bus::Event;
+use bus::{Consumer, Event};
 use ractor::{async_trait, Actor, ActorProcessingErr, ActorRef};
 use serde::{Deserialize, Serialize};
 use tracing::info;
@@ -29,7 +29,7 @@ impl Actor for TadoVendor {
 		_: Self::Arguments,
 	) -> Result<Self::State, ActorProcessingErr> {
 		let bus = bus::get();
-		bus.subscribe_actor(myself);
+		let _ = bus.subscribe().to_actor(myself);
 
 		info!("Tado actor started");
 

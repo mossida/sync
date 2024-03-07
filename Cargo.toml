@@ -1,16 +1,19 @@
 [workspace]
 members = [
     "sync",
+    "core/atm",
+    "core/bus",
+    "core/cli",
+    "core/cls",
     "core/cnf",
     "core/dbm",
-    "core/mqtt",
-    "core/cli",
     "core/err",
-    "core/cls",
-    "core/bus",
-    "core/vnd",
+    "core/mqtt",
     "core/net",
     "core/rpc",
+    "core/vnd",
+    "core/svc",
+    "core/trg",
 ]
 
 resolver = "2"
