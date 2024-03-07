@@ -346,6 +346,9 @@ dependencies = [
  "ractor",
  "serde",
  "serde_json",
+ "surrealdb",
+ "svc",
+ "trg",
 ]
 
 [[package]]
@@ -4568,6 +4571,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "svc"
+version = "0.1.0"
+dependencies = [
+ "dbm",
+ "ractor",
+ "serde",
+]
+
+[[package]]
 name = "syn"
 version = "1.0.109"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -5068,6 +5080,15 @@ dependencies = [
  "tracing",
  "tracing-core",
  "tracing-log",
+]
+
+[[package]]
+name = "trg"
+version = "0.1.0"
+dependencies = [
+ "dbm",
+ "ractor",
+ "serde",
 ]
 
 [[package]]

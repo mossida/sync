@@ -12,6 +12,8 @@ members = [
     "core/net",
     "core/rpc",
     "core/vnd",
+    "core/svc",
+    "core/trg",
 ]
 
 resolver = "2"

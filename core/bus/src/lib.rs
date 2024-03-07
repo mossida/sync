@@ -1,6 +1,6 @@
 use std::{sync::OnceLock, time::Duration};
 
-use bus::Bus;
+pub use bus::Bus;
 
 pub use event::*;
 use futures::StreamExt;
