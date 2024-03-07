@@ -48,9 +48,9 @@ impl From<Kind> for Id {
 	}
 }
 
-impl Into<RecordId> for Id {
-	fn into(self) -> RecordId {
-		self.0
+impl From<Id> for RecordId {
+	fn from(value: Id) -> Self {
+		value.0
 	}
 }
 
