@@ -1,21 +1,25 @@
-use dbm::resource::{Base, Resource};
+use bus::Event;
+use dbm::{
+	relation::Relation,
+	resource::{Base, Resource},
+};
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Serialize, Deserialize, Default, PartialEq)]
+#[derive(Debug, Serialize, Deserialize, Default, PartialEq, Eq, Hash, Clone)]
 pub enum TriggerType {
-	Event,
+	Event(Event),
 
 	#[default]
 	Manual,
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Hash, Clone)]
 pub enum TriggerOrigin {
 	System,
 	Component(dbm::Id),
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Hash, PartialEq, Eq, Clone)]
 pub struct Trigger {
 	id: dbm::Id,
 	name: String,

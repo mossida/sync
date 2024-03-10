@@ -1,6 +1,7 @@
 use std::marker::PhantomData;
 
 use futures::{future, Stream, StreamExt};
+
 use tokio::sync::broadcast;
 use tokio_stream::wrappers::BroadcastStream;
 use tokio_util::sync::CancellationToken;
@@ -26,6 +27,8 @@ impl<T> Bus<T>
 where
 	T: Clone + Send + Sync + 'static,
 {
+	// TODO: Understand if any better channel exists
+
 	/// Creates a new `Bus` with the specified capacity.
 	///
 	/// # Returns
@@ -119,8 +122,6 @@ where
 	///
 	/// A `BroadcastStream` that receives events emitted to the `Bus`.
 	pub fn subscribe(&self) -> impl Stream<Item = T> {
-		BroadcastStream::new(self.state.subscribe())
-			.filter(|r| future::ready(r.is_ok()))
-			.map(|r| r.unwrap())
+		BroadcastStream::new(self.state.subscribe()).filter_map(|r| async move { r.ok() })
 	}
 }

@@ -342,7 +342,10 @@ version = "0.1.0"
 dependencies = [
  "bus",
  "cls",
+ "dashmap",
  "dbm",
+ "err",
+ "futures",
  "ractor",
  "serde",
  "serde_json",
@@ -720,9 +723,11 @@ name = "bus"
 version = "0.1.0"
 dependencies = [
  "err",
+ "flume",
  "futures",
  "once_cell",
  "ractor",
+ "serde",
  "tokio",
  "tokio-stream",
  "tokio-util",
@@ -999,6 +1004,7 @@ checksum = "98cc8fbded0c607b7ba9dd60cd98df59af97e84d24e49c8557331cfc26d301ce"
 name = "cli"
 version = "0.1.0"
 dependencies = [
+ "atm",
  "bus",
  "clap 4.5.2",
  "cnf",
@@ -5086,6 +5092,7 @@ dependencies = [
 name = "trg"
 version = "0.1.0"
 dependencies = [
+ "bus",
  "dbm",
  "ractor",
  "serde",
@@ -5359,6 +5366,7 @@ dependencies = [
  "ractor",
  "serde",
  "serde_json",
+ "tokio",
  "tracing",
 ]
 

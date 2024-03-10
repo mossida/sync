@@ -8,7 +8,7 @@ enum Kind {
 	Thing(Thing),
 }
 
-#[derive(Debug, Deserialize, Clone)]
+#[derive(Debug, Deserialize, Clone, PartialEq, Eq, Hash)]
 #[serde(from = "Kind")]
 pub struct Id(RecordId);
 

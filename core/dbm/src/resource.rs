@@ -1,12 +1,19 @@
 use err::{Error, Result};
 
+use futures::{Stream, StreamExt};
 use serde::{de::DeserializeOwned, Serialize};
-use surrealdb::{engine::any::Any, method::Stream};
+use surrealdb::{engine::any::Any, method::Stream as DBStream, Notification};
 
 use crate::{IntoFuture, DB};
 
 pub trait Base: Sized + Serialize + DeserializeOwned + Send + Sync {
 	const RESOURCE: &'static str;
+
+	fn fetch(id: crate::Id) -> IntoFuture<'static, Result<Option<Self>, Error>> {
+		let db = &DB;
+
+		Box::pin(async move { Ok(db.select((Self::RESOURCE, id.to_raw())).await?) })
+	}
 
 	fn fetch_all<'r>() -> IntoFuture<'r, Result<Vec<Self>, Error>> {
 		let db = &DB;
@@ -14,7 +21,19 @@ pub trait Base: Sized + Serialize + DeserializeOwned + Send + Sync {
 		Box::pin(async move { Ok(db.select(Self::RESOURCE).await?) })
 	}
 
-	// TODO: implement method that subscribe changes to main BUS
+	fn stream() -> IntoFuture<'static, Result<impl Stream<Item = Notification<Self>>, Error>>
+	where
+		Self: Unpin,
+	{
+		let db = &DB;
+
+		Box::pin(async move {
+			let stream: DBStream<'static, Any, Vec<Self>> =
+				db.select(Self::RESOURCE).live().await?;
+
+			Ok(stream.filter_map(|n| async move { n.ok() }))
+		})
+	}
 }
 
 pub trait Resource: Base {
@@ -59,11 +78,5 @@ pub trait Resource: Base {
 		let id = self.id().to_owned();
 
 		Box::pin(async move { Ok(db.update((Self::RESOURCE, id.to_raw())).merge(self).await?) })
-	}
-
-	fn stream() -> IntoFuture<'static, Result<Stream<'static, Any, Vec<Self>>, Error>> {
-		let db = &DB;
-
-		Box::pin(async move { Ok(db.select(Self::RESOURCE).live().await?) })
 	}
 }

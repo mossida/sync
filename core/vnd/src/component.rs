@@ -74,9 +74,7 @@ where
 		}
 
 		let bus = bus::get();
-		bus.emit(bus::Event::VendorStart {
-			name: class.name(),
-		});
+		bus.emit(bus::Event::VendorStart(class.name()));
 
 		Ok(())
 	}

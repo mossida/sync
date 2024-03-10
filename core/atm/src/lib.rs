@@ -1,11 +1,23 @@
-use bus::Bus;
+use std::sync::Arc;
+
+use bus::Consumer;
+use dashmap::DashSet;
 use dbm::{
 	relation::Relation,
 	resource::{Base, Resource},
 };
+
+use err::Result;
+use ractor::{factory::Factory, Actor};
 use serde::{Deserialize, Serialize};
+use surrealdb::Action;
 use svc::Service;
 use trg::Trigger;
+use worker::Worker;
+
+mod worker;
+
+const FACTORY: &str = "automator";
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 pub struct Automation {
@@ -27,11 +39,50 @@ impl Relation<Trigger> for Automation {
 	const RELATION: &'static str = "upon";
 }
 
+impl Relation<Automation> for Trigger {
+	const RELATION: &'static str = "upon";
+	const INVERTED: bool = true;
+}
+
 impl Relation<Service> for Automation {
 	const RELATION: &'static str = "executes";
 }
 
-pub async fn init() {
-	let _ = bus::get();
-	let _: Bus<Automation> = Bus::new();
+pub async fn init() -> Result<(), err::Error> {
+	// Get bus and fetch triggers
+	let bus = bus::get();
+	let triggers = Trigger::fetch_all().await?;
+	let set = Arc::new(DashSet::from_iter(triggers));
+
+	let (factory, _) = Actor::spawn(
+		Some(FACTORY.to_string()),
+		Factory {
+			worker_count: 24,
+			..Default::default()
+		},
+		// TODO: Add correct triggers data structure
+		Box::new(Worker {
+			triggers: set.clone(),
+		}),
+	)
+	.await?;
+
+	let stream = Trigger::stream().await?;
+	stream.consume(move |n| {
+		let vector = set.clone();
+		async move {
+			let trigger = n.data;
+
+			match n.action {
+				Action::Create | Action::Update => vector.insert(trigger),
+				Action::Delete => vector.remove(&trigger).is_some(),
+				_ => false,
+			};
+		}
+	});
+
+	let subcription = bus.subscribe();
+	subcription.to_factory(factory, |_| 0);
+
+	Ok(())
 }

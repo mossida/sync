@@ -16,6 +16,7 @@ pub async fn init(_: StartCommandArgs) -> err::Result<()> {
 	// Non-critical components
 	// TODO: capture errors as logs instead of panicking
 	spawner::init().await?;
+	atm::init().await?;
 
 	// TODO: refactor serve method
 	//let _ = mqtt::serve(token.child_token()).await;
