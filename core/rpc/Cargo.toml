@@ -14,7 +14,7 @@ uuid = { version = "1.7.0", features = ["v4"] }
 tower-http = { version = "0.5.2", features = ["full"] }
 futures-util = { version = "0.3.30" }
 tokio-stream = { version = "0.1.14" }
-thiserror = { version = "1.0.57" }
+thiserror = { version = "1.0.58" }
 
 serde = { workspace = true }
 serde_json = { workspace = true }
