@@ -11,7 +11,7 @@ license.workspace = true
 flume = { version = "0.11.0", features = ["async"] }
 once_cell = { version = "1.18.0" }
 tokio-util = { version = "0.7.10" }
-tokio-stream = { version = "0.1.14", features = ["sync"] }
+tokio-stream = { version = "0.1.15", features = ["sync"] }
 
 serde = { workspace = true }
 tokio = { workspace = true }
