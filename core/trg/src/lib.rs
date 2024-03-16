@@ -1,17 +1,6 @@
 use bus::Event;
-use dbm::{
-	relation::Relation,
-	resource::{Base, Resource},
-};
+use dbm::resource::{Base, Resource};
 use serde::{Deserialize, Serialize};
-
-#[derive(Debug, Serialize, Deserialize, Default, PartialEq, Eq, Hash, Clone)]
-pub enum TriggerType {
-	Event(Event),
-
-	#[default]
-	Manual,
-}
 
 #[derive(Debug, Serialize, Deserialize, PartialEq, Eq, Hash, Clone)]
 pub enum TriggerOrigin {
@@ -23,7 +12,7 @@ pub enum TriggerOrigin {
 pub struct Trigger {
 	id: dbm::Id,
 	name: String,
-	r#type: TriggerType,
+	r#type: Event,
 	origin: TriggerOrigin,
 }
 
@@ -34,5 +23,15 @@ impl Base for Trigger {
 impl Resource for Trigger {
 	fn id(&self) -> &dbm::Id {
 		&self.id
+	}
+}
+
+impl Trigger {
+	pub fn trigger(&self, event: Event) -> Result<(), ()> {
+		if event == self.r#type {
+			Ok(())
+		} else {
+			Err(())
+		}
 	}
 }

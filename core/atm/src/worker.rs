@@ -59,7 +59,17 @@ impl Actor for Worker {
 					.factory
 					.send_message(FactoryMessage::WorkerPong(state.context.wid, time.elapsed()))?;
 			}
-			WorkerMessage::Dispatch(event) => {}
+			WorkerMessage::Dispatch(event) => {
+				let executions: Vec<Trigger> = self
+					.triggers
+					.iter()
+					.filter_map(|trigger| {
+						trigger.trigger(event.msg.clone()).ok().map(|_| trigger.to_owned())
+					})
+					.collect();
+
+				dbg!(executions);
+			}
 		};
 
 		Ok(())

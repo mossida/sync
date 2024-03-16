@@ -20,3 +20,4 @@ tracing = { workspace = true }
 ractor = { workspace = true }
 
 err = { path = "../err" }
+dbm = { path = "../dbm" }
