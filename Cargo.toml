@@ -33,7 +33,7 @@ serde = { version = "1.0.197", features = ["derive"] }
 tracing = { version = "0.1.40" }
 async-trait = { version = "0.1.77" }
 futures = { version = "0.3.30" }
-ractor = { version = "0.9.6" }
+ractor = { version = "0.9.7" }
 serde_json = { version = "1.0.114" }
 
 tokio = { version = "1.36.0", features = ["full"] }
