@@ -1,5 +1,6 @@
 use bus::Event;
 use ractor::{async_trait, Actor, ActorProcessingErr, ActorRef};
+use serde::{Deserialize, Serialize};
 
 use crate::{component::Component, Vendor, VendorMessage};
 
@@ -7,9 +8,12 @@ use super::Vendors;
 
 pub type Zigbee = Component<ZigbeeClass>;
 
+#[derive(Clone, Hash, Serialize, Deserialize)]
+pub struct ZigbeeConfiguration {}
+
 #[derive(Clone)]
 pub struct ZigbeeClass {
-	config: (),
+	config: ZigbeeConfiguration,
 }
 
 #[async_trait]
@@ -28,7 +32,7 @@ impl Actor for ZigbeeClass {
 }
 
 impl Vendor for ZigbeeClass {
-	type Configuration = ();
+	type Configuration = ZigbeeConfiguration;
 	type Message = ZigbeeMessage;
 
 	const NAME: &'static str = "zigbee";
@@ -41,7 +45,7 @@ impl Vendor for ZigbeeClass {
 	}
 
 	fn configuration(&self) -> Self::Configuration {
-		self.config
+		self.config.clone()
 	}
 }
 

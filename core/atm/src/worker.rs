@@ -2,6 +2,7 @@ use std::sync::Arc;
 
 use bus::Event;
 use dashmap::DashSet;
+use tracing::trace;
 use trg::Trigger;
 
 use ractor::{
@@ -60,7 +61,9 @@ impl Actor for Worker {
 					.send_message(FactoryMessage::WorkerPong(state.context.wid, time.elapsed()))?;
 			}
 			WorkerMessage::Dispatch(event) => {
-				let executions: Vec<Trigger> = self
+				trace!("Received event to process in engine: ${:?}", event.msg);
+
+				let _: Vec<Trigger> = self
 					.triggers
 					.iter()
 					.filter_map(|trigger| {
@@ -68,7 +71,10 @@ impl Actor for Worker {
 					})
 					.collect();
 
-				dbg!(executions);
+				state
+					.context
+					.factory
+					.send_message(FactoryMessage::Finished(state.context.wid, event.key))?;
 			}
 		};
 
