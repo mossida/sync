@@ -27,15 +27,13 @@ edition = "2021"
 license = "Business License"
 
 [workspace.dependencies]
-surrealdb = { version = "1.2.2", default-features = true, features = [
-    "kv-rocksdb",
-] }
+surrealdb = { version = "1.3.1" }
 
 serde = { version = "1.0.197", features = ["derive"] }
 tracing = { version = "0.1.40" }
-async-trait = { version = "0.1.77" }
+async-trait = { version = "0.1.78" }
 futures = { version = "0.3.30" }
-ractor = { version = "0.9.6" }
+ractor = { version = "0.9.7" }
 serde_json = { version = "1.0.114" }
 
 tokio = { version = "1.36.0", features = ["full"] }
