@@ -4405,8 +4405,10 @@ name = "svc"
 version = "0.1.0"
 dependencies = [
  "dbm",
+ "err",
  "ractor",
  "serde",
+ "surrealdb",
 ]
 
 [[package]]
@@ -5184,6 +5186,7 @@ dependencies = [
  "ractor",
  "serde",
  "serde_json",
+ "svc",
  "tokio",
  "tracing",
 ]

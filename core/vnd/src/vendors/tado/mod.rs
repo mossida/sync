@@ -1,7 +1,5 @@
-use bus::{Consumer, Event};
-use ractor::{async_trait, Actor, ActorProcessingErr, ActorRef};
+use bus::Event;
 use serde::{Deserialize, Serialize};
-use tracing::info;
 
 use crate::{component::Component, Vendor, VendorMessage};
 
@@ -12,30 +10,8 @@ pub type Tado = Component<TadoVendor>;
 #[derive(Clone, Hash, Deserialize, Serialize)]
 pub struct TadoConfig {}
 
-#[derive(Clone)]
-pub struct TadoVendor {
-	config: TadoConfig,
-}
-
-#[async_trait]
-impl Actor for TadoVendor {
-	type Msg = TadoMessage;
-	type Arguments = ();
-	type State = ();
-
-	async fn pre_start(
-		&self,
-		myself: ActorRef<Self::Msg>,
-		_: Self::Arguments,
-	) -> Result<Self::State, ActorProcessingErr> {
-		let bus = bus::get();
-		let _ = bus.subscribe().to_actor(myself);
-
-		info!("Tado actor started");
-
-		Ok(())
-	}
-}
+#[derive(Clone, Default)]
+pub struct TadoVendor {}
 
 impl Vendor for TadoVendor {
 	type Configuration = TadoConfig;
@@ -43,16 +19,7 @@ impl Vendor for TadoVendor {
 
 	const NAME: &'static str = "tado";
 	const VENDOR: Vendors = Vendors::Tado;
-
-	fn new(config: Self::Configuration) -> Self {
-		Self {
-			config,
-		}
-	}
-
-	fn configuration(&self) -> Self::Configuration {
-		self.config.clone()
-	}
+	const SUBSCRIBE_BUS: bool = false;
 }
 
 pub enum TadoMessage {

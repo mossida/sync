@@ -1,18 +1,18 @@
-use dbm::resource::{Base, Resource};
+use dbm::{
+	link::Link,
+	resource::{Base, Resource},
+};
+use r#type::ServiceType;
 use ractor::Message;
 use serde::{Deserialize, Serialize};
+
+mod r#type;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Service {
 	id: dbm::Id,
 	component: dbm::Id,
 	service_type: dbm::Id,
-}
-
-#[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct ServiceType {
-	pub id: dbm::Id,
-	pub name: String,
 }
 
 impl Service {
@@ -34,5 +34,11 @@ impl Base for Service {
 impl Resource for Service {
 	fn id(&self) -> &dbm::Id {
 		&self.id
+	}
+}
+
+impl Link<ServiceType> for Service {
+	fn id(&self) -> dbm::Id {
+		self.service_type.to_owned()
 	}
 }

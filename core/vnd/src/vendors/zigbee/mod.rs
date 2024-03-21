@@ -1,5 +1,4 @@
 use bus::Event;
-use ractor::{async_trait, Actor, ActorProcessingErr, ActorRef};
 use serde::{Deserialize, Serialize};
 
 use crate::{component::Component, Vendor, VendorMessage};
@@ -11,25 +10,8 @@ pub type Zigbee = Component<ZigbeeClass>;
 #[derive(Clone, Hash, Serialize, Deserialize)]
 pub struct ZigbeeConfiguration {}
 
-#[derive(Clone)]
-pub struct ZigbeeClass {
-	config: ZigbeeConfiguration,
-}
-
-#[async_trait]
-impl Actor for ZigbeeClass {
-	type Msg = ZigbeeMessage;
-	type Arguments = ();
-	type State = ();
-
-	async fn pre_start(
-		&self,
-		_: ActorRef<Self::Msg>,
-		_: Self::Arguments,
-	) -> Result<Self::State, ActorProcessingErr> {
-		Ok(())
-	}
-}
+#[derive(Clone, Default)]
+pub struct ZigbeeClass {}
 
 impl Vendor for ZigbeeClass {
 	type Configuration = ZigbeeConfiguration;
@@ -37,16 +19,7 @@ impl Vendor for ZigbeeClass {
 
 	const NAME: &'static str = "zigbee";
 	const VENDOR: Vendors = Vendors::Zigbee;
-
-	fn new(config: Self::Configuration) -> Self {
-		Self {
-			config,
-		}
-	}
-
-	fn configuration(&self) -> Self::Configuration {
-		self.config.clone()
-	}
+	const SUBSCRIBE_BUS: bool = false;
 }
 
 pub enum ZigbeeMessage {}

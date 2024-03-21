@@ -7,9 +7,11 @@ use surrealdb::{engine::any::Any, opt::auth::Root, Surreal};
 use tracing::{info, instrument, trace};
 
 pub use id::Id;
+pub use id::IdKind;
 
 mod id;
 
+pub mod link;
 pub mod relation;
 pub mod resource;
 

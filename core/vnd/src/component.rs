@@ -1,4 +1,8 @@
-use std::{any::TypeId, marker::PhantomData};
+use std::{
+	any::TypeId,
+	hash::{DefaultHasher, Hash, Hasher},
+	marker::PhantomData,
+};
 
 use cls::device::Device;
 use dbm::{
@@ -6,11 +10,13 @@ use dbm::{
 	resource::{Base, Resource},
 };
 use err::Error;
+use ractor::Actor;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use tracing::{error, info};
 
 use crate::{
+	sandbox::Sandbox,
 	vendors::{any::AnyVendor, implement, Vendors},
 	Vendor,
 };
@@ -64,9 +70,16 @@ where
 			unreachable!();
 		}
 
-		let class = V::new(serde_json::from_value(self.config.clone())?);
-		let name = class.name();
-		let spawn = V::spawn(Some(name.clone()), class.clone(), ()).await;
+		let configuration: V::Configuration = serde_json::from_value(self.config.clone())?;
+		let mut hasher = DefaultHasher::new();
+		configuration.hash(&mut hasher);
+
+		let name = format!("{}-{}", V::NAME, hasher.finish());
+
+		let vendor: V = Default::default();
+		let sandbox = Sandbox::new(vendor);
+		let spawn = Actor::spawn(Some(name.clone()), sandbox, configuration).await;
+
 		if let Err(e) = spawn {
 			error!("Couldn't spawn for {} because {}", name, e);
 		} else {

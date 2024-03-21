@@ -10,5 +10,7 @@ license.workspace = true
 [dependencies]
 ractor = { workspace = true }
 serde = { workspace = true }
+surrealdb = { workspace = true }
 
 dbm = { path = "../dbm" }
+err = { path = "../err" }
