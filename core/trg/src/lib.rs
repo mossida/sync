@@ -27,11 +27,7 @@ impl Resource for Trigger {
 }
 
 impl Trigger {
-	pub fn check(&self, event: Event) -> Result<(), ()> {
-		if event == self.r#type {
-			Ok(())
-		} else {
-			Err(())
-		}
+	pub fn check(&self, event: Event) -> bool {
+		return event == self.r#type;
 	}
 }

@@ -56,7 +56,7 @@ impl Automation {
 		let services: Vec<Service> = self.relationships().await?;
 
 		let triggered: Vec<&Trigger> =
-			triggers.par_iter().filter(|t| t.check(event.clone()).is_ok()).collect();
+			triggers.par_iter().filter(|t| t.check(event.clone())).collect();
 
 		if triggered.len() > 0 {
 			services.par_iter().for_each(|s| s.run());
