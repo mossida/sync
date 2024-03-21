@@ -65,16 +65,16 @@ where
 		}
 
 		let class = V::new(serde_json::from_value(self.config.clone())?);
-		let spawn = V::spawn(Some(class.name()), class.clone(), ()).await;
-
+		let name = class.name();
+		let spawn = V::spawn(Some(name.clone()), class.clone(), ()).await;
 		if let Err(e) = spawn {
-			error!("Couldn't spawn for {} because {}", class.name(), e);
+			error!("Couldn't spawn for {} because {}", name, e);
 		} else {
-			info!("Spawned actor for {}", class.name());
+			info!("Spawned actor for {}", name);
 		}
 
 		let bus = bus::get();
-		bus.emit(bus::Event::VendorStart(class.name()));
+		bus.emit(bus::Event::VendorStart(name));
 
 		Ok(())
 	}

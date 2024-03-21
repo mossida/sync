@@ -1,18 +1,29 @@
 use dbm::resource::{Base, Resource};
-use ractor::{ActorRef, Message};
+use ractor::Message;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Service {
 	id: dbm::Id,
+	component: dbm::Id,
+	service_type: dbm::Id,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ServiceType {
+	pub id: dbm::Id,
+	pub name: String,
 }
 
 impl Service {
-	pub fn execute<T>(&self, cell: ActorRef<T>)
+	pub fn execute<T>(&self)
 	where
 		T: From<Service> + Message,
 	{
-		let _ = cell.send_message(self.clone().into());
+	}
+
+	pub fn run(&self) {
+		dbg!("Running service");
 	}
 }
 

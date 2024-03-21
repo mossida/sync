@@ -3,7 +3,6 @@ use std::sync::Arc;
 use bus::Event;
 use dashmap::DashSet;
 use tracing::trace;
-use trg::Trigger;
 
 use ractor::{
 	async_trait,
@@ -13,11 +12,13 @@ use ractor::{
 	Actor, ActorProcessingErr, ActorRef,
 };
 
+use crate::Automation;
+
 pub type WorkerKey = u64;
 
 #[derive(Clone)]
 pub struct Worker {
-	pub triggers: Arc<DashSet<Trigger>>,
+	pub automations: Arc<DashSet<Automation>>,
 }
 
 impl Builder<Worker> for Worker {
@@ -63,13 +64,9 @@ impl Actor for Worker {
 			WorkerMessage::Dispatch(event) => {
 				trace!("Received event to process in engine: ${:?}", event.msg);
 
-				let _: Vec<Trigger> = self
-					.triggers
-					.iter()
-					.filter_map(|trigger| {
-						trigger.trigger(event.msg.clone()).ok().map(|_| trigger.to_owned())
-					})
-					.collect();
+				self.automations.iter().for_each(|a| {
+					let _ = a.trigger(event.msg.clone());
+				});
 
 				state
 					.context

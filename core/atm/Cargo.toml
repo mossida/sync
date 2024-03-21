@@ -9,6 +9,7 @@ license.workspace = true
 
 [dependencies]
 dashmap = { version = "5.5.3", features = ["serde"] }
+rayon = { version = "1.9.0" }
 
 ractor = { workspace = true }
 serde = { workspace = true }
