@@ -9,7 +9,7 @@ license.workspace = true
 
 [dependencies]
 dashmap = { version = "5.5.3", features = ["serde"] }
-uom = { version = "0.35.0", features = ["default", "use_serde"] }
+uom = { version = "0.36.0", features = ["default", "use_serde"] }
 serde_with = { version = "3.7.0" }
 
 serde = { workspace = true }
