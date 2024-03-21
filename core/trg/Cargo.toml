@@ -12,3 +12,4 @@ ractor = { workspace = true }
 serde = { workspace = true }
 
 dbm = { path = "../dbm" }
+bus = { path = "../bus" }

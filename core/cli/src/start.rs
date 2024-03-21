@@ -15,6 +15,7 @@ pub async fn init(_: StartCommandArgs) -> err::Result<()> {
 
 	// Non-critical components
 	// TODO: capture errors as logs instead of panicking
+	atm::init().await?;
 	spawner::init().await?;
 
 	// TODO: refactor serve method

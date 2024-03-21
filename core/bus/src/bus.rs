@@ -1,6 +1,5 @@
-use std::marker::PhantomData;
-
 use futures::{future, Stream, StreamExt};
+
 use tokio::sync::broadcast;
 use tokio_stream::wrappers::BroadcastStream;
 use tokio_util::sync::CancellationToken;
@@ -9,7 +8,6 @@ use tracing::error;
 /// A generic message bus that allows emitting, publishing, and subscribing to events of type `T`.
 pub struct Bus<T> {
 	state: broadcast::Sender<T>,
-	marker: PhantomData<T>,
 }
 
 impl<T> Default for Bus<T>
@@ -26,6 +24,8 @@ impl<T> Bus<T>
 where
 	T: Clone + Send + Sync + 'static,
 {
+	// TODO: Understand if any better channel exists
+
 	/// Creates a new `Bus` with the specified capacity.
 	///
 	/// # Returns
@@ -37,7 +37,6 @@ where
 
 		Bus {
 			state: sender,
-			marker: PhantomData,
 		}
 	}
 
@@ -62,8 +61,9 @@ where
 	pub fn emit(&self, event: T) -> usize {
 		match self.state.send(event) {
 			Ok(items) => items,
-			Err(_) => {
-				error!("Bus failed to emit event");
+			Err(e) => {
+				// Happens if there is no body to receive the message
+				error!("Bus failed to emit event: ${}", e);
 				0
 			}
 		}
@@ -119,8 +119,6 @@ where
 	///
 	/// A `BroadcastStream` that receives events emitted to the `Bus`.
 	pub fn subscribe(&self) -> impl Stream<Item = T> {
-		BroadcastStream::new(self.state.subscribe())
-			.filter(|r| future::ready(r.is_ok()))
-			.map(|r| r.unwrap())
+		BroadcastStream::new(self.state.subscribe()).filter_map(|r| async move { r.ok() })
 	}
 }

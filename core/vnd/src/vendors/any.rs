@@ -1,30 +1,13 @@
-use ractor::{async_trait, Actor};
-
 use crate::{component::Component, Vendor, VendorMessage};
 
 use super::Vendors;
 
 pub type Any = Component<AnyVendor>;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 pub struct AnyVendor {}
 
 pub enum AnyMessage {}
-
-#[async_trait]
-impl Actor for AnyVendor {
-	type Msg = AnyMessage;
-	type Arguments = ();
-	type State = ();
-
-	async fn pre_start(
-		&self,
-		_: ractor::ActorRef<Self::Msg>,
-		_: Self::Arguments,
-	) -> Result<Self::State, ractor::ActorProcessingErr> {
-		unreachable!()
-	}
-}
 
 impl Vendor for AnyVendor {
 	type Configuration = ();
@@ -32,14 +15,7 @@ impl Vendor for AnyVendor {
 
 	const NAME: &'static str = "any";
 	const VENDOR: Vendors = Vendors::Any;
-
-	fn new(_: Self::Configuration) -> Self {
-		unreachable!()
-	}
-
-	fn configuration(&self) -> Self::Configuration {
-		unreachable!()
-	}
+	const SUBSCRIBE_BUS: bool = false;
 }
 
 impl From<VendorMessage> for AnyMessage {
