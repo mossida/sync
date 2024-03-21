@@ -50,7 +50,7 @@ impl Relation<Service> for Automation {
 }
 
 impl Automation {
-	pub async fn trigger(&self, event: bus::Event) -> Result<()> {
+	pub async fn trigger(self, event: bus::Event) -> Result<()> {
 		// TODO: Optimize using advanced graphing queries
 		let triggers: Vec<Trigger> = self.relationships().await?;
 		let services: Vec<Service> = self.relationships().await?;
@@ -58,7 +58,7 @@ impl Automation {
 		let triggered: Vec<&Trigger> =
 			triggers.par_iter().filter(|t| t.check(event.clone())).collect();
 
-		if triggered.len() > 0 {
+		if !triggered.is_empty() {
 			services.par_iter().for_each(|s| s.run());
 		}
 

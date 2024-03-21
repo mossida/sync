@@ -2,12 +2,13 @@ use std::sync::Arc;
 
 use bus::Event;
 use dashmap::DashSet;
+use futures::future::join_all;
 use tracing::trace;
 
 use ractor::{
 	async_trait,
 	factory::{
-		FactoryMessage, WorkerBuilder as Builder, WorkerId, WorkerMessage, WorkerStartContext,
+		FactoryMessage, Job, WorkerBuilder as Builder, WorkerId, WorkerMessage, WorkerStartContext,
 	},
 	Actor, ActorProcessingErr, ActorRef,
 };
@@ -61,17 +62,28 @@ impl Actor for Worker {
 					.factory
 					.send_message(FactoryMessage::WorkerPong(state.context.wid, time.elapsed()))?;
 			}
-			WorkerMessage::Dispatch(event) => {
-				trace!("Received event to process in engine: ${:?}", event.msg);
+			WorkerMessage::Dispatch(Job {
+				key,
+				msg,
+				options: _,
+			}) => {
+				trace!("Received event to process in engine: ${:?}", msg);
 
-				self.automations.iter().for_each(|a| {
-					let _ = a.trigger(event.msg.clone());
-				});
+				let futures: Vec<_> = self
+					.automations
+					.iter()
+					.map(|a| {
+						let automation = a.to_owned();
+						automation.trigger(msg.clone())
+					})
+					.collect();
+
+				join_all(futures).await;
 
 				state
 					.context
 					.factory
-					.send_message(FactoryMessage::Finished(state.context.wid, event.key))?;
+					.send_message(FactoryMessage::Finished(state.context.wid, key))?;
 			}
 		};
 
