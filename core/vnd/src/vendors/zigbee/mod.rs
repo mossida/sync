@@ -19,7 +19,9 @@ impl Vendor for ZigbeeClass {
 
 	const NAME: &'static str = "zigbee";
 	const VENDOR: Vendors = Vendors::Zigbee;
+
 	const SUBSCRIBE_BUS: bool = false;
+	const POLLING_INTERVAL: usize = 0;
 }
 
 pub enum ZigbeeMessage {}

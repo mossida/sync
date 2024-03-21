@@ -9,6 +9,7 @@ license.workspace = true
 
 [dependencies]
 tokio = { workspace = true }
+tokio-util = { workspace = true }
 ractor = { workspace = true }
 futures = { workspace = true }
 serde = { workspace = true }
@@ -20,3 +21,4 @@ bus = { path = "../bus" }
 dbm = { path = "../dbm" }
 cls = { path = "../cls" }
 svc = { path = "../svc" }
+trg = { path = "../trg" }

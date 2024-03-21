@@ -10,3 +10,9 @@ pub enum Event {
 	// System events
 	Time,
 }
+
+impl Event {
+	pub fn is_time(&self) -> bool {
+		matches!(self, Event::Time)
+	}
+}

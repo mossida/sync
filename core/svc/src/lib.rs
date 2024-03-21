@@ -6,7 +6,7 @@ use r#type::ServiceType;
 use ractor::Message;
 use serde::{Deserialize, Serialize};
 
-mod r#type;
+pub mod r#type;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Service {
