@@ -28,6 +28,6 @@ impl Resource for Trigger {
 
 impl Trigger {
 	pub fn check(&self, event: Event) -> bool {
-		return event == self.r#type;
+		event == self.r#type
 	}
 }
