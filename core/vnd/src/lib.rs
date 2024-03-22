@@ -1,8 +1,11 @@
 use bus::Event;
 use ractor::async_trait;
+
+use sandbox::context::Context;
 use serde::{de::DeserializeOwned, Serialize};
-use std::hash::Hash;
-use svc::r#type::ServiceType;
+use std::{error::Error, hash::Hash};
+use svc::{r#type::ServiceType, Service};
+use tracing::info;
 use vendors::Vendors;
 
 mod r#macro;
@@ -15,6 +18,7 @@ pub mod vendors;
 pub enum VendorMessage {}
 
 #[async_trait]
+#[allow(unused_variables)]
 pub trait Vendor: 'static + Send + Sync + Clone + Default {
 	type Configuration: Serialize + DeserializeOwned + Hash + Clone + Send + Sync;
 	type Message: From<VendorMessage> + From<Event> + Send + Sync;
@@ -36,12 +40,16 @@ pub trait Vendor: 'static + Send + Sync + Clone + Default {
 		vec![]
 	}
 
-	async fn setup(&self) {}
+	async fn setup(&self, config: Self::Configuration) {
+		info!("{} setup", Self::NAME);
+	}
 
-	#[allow(unused_variables)]
-	async fn on_message(&self, msg: Self::Message) {}
+	async fn on_message(&self, ctx: &Context, msg: Self::Message) {}
 
-	#[allow(unused_variables)]
+	async fn on_service_call(&self, service: Service) -> Result<(), Box<dyn Error>> {
+		Ok(())
+	}
+
 	async fn on_event(&self, event: Event) {}
 
 	async fn stop(&self) {}

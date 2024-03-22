@@ -25,6 +25,10 @@ impl Service {
 	pub fn run(&self) {
 		dbg!("Running service");
 	}
+
+	pub fn is(&self, service_type: &ServiceType) -> bool {
+		self.service_type == service_type.id
+	}
 }
 
 impl Base for Service {

@@ -1,40 +1,15 @@
-use bus::{Consumer, Event};
-use futures::{future, StreamExt};
+use std::future;
+
+use bus::Consumer;
+use futures::StreamExt;
 use ractor::{async_trait, Actor, ActorProcessingErr, ActorRef};
+use svc::r#type::ServiceType;
 use tokio_util::sync::CancellationToken;
 use tracing::trace;
 
 use crate::Vendor;
 
-pub struct Sandbox<V>
-where
-	V: Vendor,
-{
-	vendor: V,
-}
-
-impl<V> Sandbox<V>
-where
-	V: Vendor,
-{
-	pub fn new(vendor: V) -> Self {
-		Self {
-			vendor,
-		}
-	}
-}
-
-pub enum SandboxMessage<Message> {
-	Event(Event),
-	VendorMessage(Message),
-	PollingInstant,
-}
-
-impl<Message> From<Event> for SandboxMessage<Message> {
-	fn from(event: Event) -> Self {
-		Self::Event(event)
-	}
-}
+use super::{context::Context, Request, Response, Sandbox, SandboxMessage};
 
 pub struct State<Component>
 where
@@ -43,6 +18,7 @@ where
 	#[allow(dead_code)]
 	configuration: Component::Configuration,
 	tokens: Vec<CancellationToken>,
+	services: Vec<ServiceType>,
 }
 
 #[async_trait]
@@ -59,6 +35,9 @@ where
 		myself: ActorRef<Self::Msg>,
 		configuration: Self::Arguments,
 	) -> Result<Self::State, ActorProcessingErr> {
+		// Setup vendor before listening to events
+		self.vendor.setup(configuration.clone()).await;
+
 		let bus = bus::get();
 		let mut tokens = Vec::new();
 
@@ -68,18 +47,22 @@ where
 
 		if Component::POLLING_INTERVAL > 0 {
 			// Filter time events and chunk them into polling intervals
-			tokens.push(
-				bus.subscribe()
-					.filter(|e| future::ready(e.is_time()))
-					.chunks(Component::POLLING_INTERVAL)
-					.map(|_| SandboxMessage::PollingInstant)
-					.to_actor(myself.clone()),
-			);
+			let token = bus
+				.subscribe()
+				.filter(|e| future::ready(e.is_time()))
+				.chunks(Component::POLLING_INTERVAL)
+				.map(|_| SandboxMessage::PollingInstant)
+				.to_actor(myself.clone());
+
+			tokens.push(token);
 		}
+
+		let services = self.vendor.services().await;
 
 		Ok(State {
 			tokens,
 			configuration,
+			services,
 		})
 	}
 
@@ -88,8 +71,7 @@ where
 		_: ActorRef<Self::Msg>,
 		_: &mut Self::State,
 	) -> Result<(), ActorProcessingErr> {
-		let _ = self.vendor.services().await;
-		let _ = self.vendor.triggers().await;
+		// TODO: Register services
 
 		Ok(())
 	}
@@ -98,18 +80,29 @@ where
 		&self,
 		_: ActorRef<Self::Msg>,
 		message: Self::Msg,
-		_: &mut Self::State,
+		state: &mut Self::State,
 	) -> Result<(), ActorProcessingErr> {
 		match message {
 			SandboxMessage::PollingInstant => {
 				trace!("Polling event received");
 			}
-			SandboxMessage::Event(event) => {
-				if Component::SUBSCRIBE_BUS {
-					self.vendor.on_event(event).await;
+			SandboxMessage::Event(event) => self.vendor.on_event(event).await,
+			SandboxMessage::VendorMessage(msg) => __self.vendor.on_message(&Context {}, msg).await,
+			SandboxMessage::Request(rq, rpc) => match rq {
+				Request::Call(service) => {
+					let is_registered = state.services.iter().any(|s| service.is(s));
+
+					match is_registered {
+						true => {
+							let call_result = self.vendor.on_service_call(service).await;
+							let _ = rpc.send(call_result.into());
+						}
+						false => {
+							let _ = rpc.send(Response::NotHandled);
+						}
+					};
 				}
-			}
-			SandboxMessage::VendorMessage(msg) => self.vendor.on_message(msg).await,
+			},
 		};
 
 		Ok(())
