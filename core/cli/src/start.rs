@@ -19,6 +19,7 @@ pub async fn init(_: StartCommandArgs) -> err::Result<()> {
 	spawner::init().await?;
 
 	// TODO: refactor serve method
+	// TODO: use a custom thread pool
 	//let _ = mqtt::serve(token.child_token()).await;
 
 	// Interface components

@@ -1,11 +1,9 @@
-use std::future;
-
 use bus::Consumer;
-use futures::StreamExt;
-use ractor::{async_trait, Actor, ActorProcessingErr, ActorRef};
+use ractor::{async_trait, Actor, ActorProcessingErr, ActorRef, SupervisionEvent};
 use svc::r#type::ServiceType;
+
 use tokio_util::sync::CancellationToken;
-use tracing::trace;
+use tracing::warn;
 
 use crate::Vendor;
 
@@ -19,6 +17,8 @@ where
 	configuration: Component::Configuration,
 	tokens: Vec<CancellationToken>,
 	services: Vec<ServiceType>,
+	worker: ActorRef<()>,
+	panics: u8,
 }
 
 #[async_trait]
@@ -45,24 +45,15 @@ where
 			tokens.push(bus.subscribe().to_actor(myself.clone()));
 		}
 
-		if Component::POLLING_INTERVAL > 0 {
-			// Filter time events and chunk them into polling intervals
-			let token = bus
-				.subscribe()
-				.filter(|e| future::ready(e.is_time()))
-				.chunks(Component::POLLING_INTERVAL)
-				.map(|_| SandboxMessage::PollingInstant)
-				.to_actor(myself.clone());
-
-			tokens.push(token);
-		}
-
+		let worker = self.spawn_worker(myself.get_cell()).await?;
 		let services = self.vendor.services().await;
 
 		Ok(State {
 			tokens,
 			configuration,
 			services,
+			worker,
+			panics: 0,
 		})
 	}
 
@@ -83,9 +74,6 @@ where
 		state: &mut Self::State,
 	) -> Result<(), ActorProcessingErr> {
 		match message {
-			SandboxMessage::PollingInstant => {
-				trace!("Polling event received");
-			}
 			SandboxMessage::Event(event) => self.vendor.on_event(event).await,
 			SandboxMessage::VendorMessage(msg) => __self.vendor.on_message(&Context {}, msg).await,
 			SandboxMessage::Request(rq, rpc) => match rq {
@@ -108,11 +96,36 @@ where
 		Ok(())
 	}
 
+	#[allow(unused_variables)]
+	async fn handle_supervisor_evt(
+		&self,
+		myself: ActorRef<Self::Msg>,
+		message: SupervisionEvent,
+		state: &mut Self::State,
+	) -> Result<(), ActorProcessingErr> {
+		match message {
+			SupervisionEvent::ActorPanicked(who, _) => {
+				if state.panics >= Component::RETRIES {
+					warn!("Worker actor panicked {} times, giving up...", state.panics);
+					return Ok(());
+				}
+
+				warn!("Worker actor panicked! This should not happen, restarting...");
+				// Restart worker
+				state.panics += 1;
+				state.worker = self.spawn_worker(myself.get_cell()).await?;
+			}
+			_ => {}
+		}
+		Ok(())
+	}
+
 	async fn post_stop(
 		&self,
 		_: ActorRef<Self::Msg>,
 		state: &mut Self::State,
 	) -> Result<(), ActorProcessingErr> {
+		state.worker.kill();
 		state.tokens.iter().for_each(|t| t.cancel());
 
 		Ok(())

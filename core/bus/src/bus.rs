@@ -1,7 +1,7 @@
-use futures::{future, Stream, StreamExt};
+use futures::Stream;
 
 use tokio::sync::broadcast;
-use tokio_stream::wrappers::BroadcastStream;
+use tokio_stream::{wrappers::BroadcastStream, StreamExt};
 use tokio_util::sync::CancellationToken;
 use tracing::error;
 
@@ -98,15 +98,19 @@ where
 		let inner_token = token.child_token();
 		let sender = self.state.clone();
 
+		// TODO: Understand if needs to continue to publish after an error
+		// TODO: Understand if a task is efficient to publish
 		tokio::spawn(async move {
 			tokio::pin!(stream);
 
 			tokio::select! {
 				_ = inner_token.cancelled() => {},
-				_ = stream.for_each(|e| {
-					let _ = sender.send(e);
-					future::ready(())
-				}) => {}
+				has_error = stream.all(|item| sender.send(item).is_ok()) => {
+					if has_error {
+						error!("Stream will not be consumed anymore due to an error");
+						inner_token.cancel();
+					}
+				}
 			}
 		});
 
@@ -119,6 +123,6 @@ where
 	///
 	/// A `BroadcastStream` that receives events emitted to the `Bus`.
 	pub fn subscribe(&self) -> impl Stream<Item = T> {
-		BroadcastStream::new(self.state.subscribe()).filter_map(|r| async move { r.ok() })
+		BroadcastStream::new(self.state.subscribe()).filter_map(Result::ok)
 	}
 }

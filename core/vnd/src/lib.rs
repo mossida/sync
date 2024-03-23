@@ -29,7 +29,10 @@ pub trait Vendor: 'static + Send + Sync + Clone + Default {
 
 	/* CONFIGURATION */
 	const SUBSCRIBE_BUS: bool = false;
-	const POLLING_INTERVAL: usize = 0; // 0 means no polling, in seconds
+	const USES_IO: bool = false;
+
+	const RETRIES: u8 = 3;
+	const POLLING_INTERVAL: u64 = 0; // 0 means no polling, in seconds
 
 	/* REGISTER FUNCTIONS */
 	async fn services(&self) -> Vec<ServiceType> {
@@ -42,6 +45,14 @@ pub trait Vendor: 'static + Send + Sync + Clone + Default {
 
 	async fn setup(&self, config: Self::Configuration) {
 		info!("{} setup", Self::NAME);
+	}
+
+	// Will be called every interval if
+	// polling is enabled
+	// Otherwise, it will be called once to completion
+	// after the vendor is initialized
+	async fn run(&self) {
+		info!("{} run", Self::NAME);
 	}
 
 	async fn on_message(&self, ctx: &Context, msg: Self::Message) {}
