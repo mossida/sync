@@ -36,12 +36,12 @@ where
 		configuration: Self::Arguments,
 	) -> Result<Self::State, ActorProcessingErr> {
 		// Setup vendor before listening to events
-		self.vendor.setup(configuration.clone()).await;
+		self.vendor.initialize(configuration.clone()).await;
 
-		let bus = bus::get();
 		let mut tokens = Vec::new();
 
 		if Component::SUBSCRIBE_BUS {
+			let bus = bus::get();
 			tokens.push(bus.subscribe().to_actor(myself.clone()));
 		}
 
@@ -96,7 +96,6 @@ where
 		Ok(())
 	}
 
-	#[allow(unused_variables)]
 	async fn handle_supervisor_evt(
 		&self,
 		myself: ActorRef<Self::Msg>,
@@ -104,7 +103,7 @@ where
 		state: &mut Self::State,
 	) -> Result<(), ActorProcessingErr> {
 		match message {
-			SupervisionEvent::ActorPanicked(who, _) => {
+			SupervisionEvent::ActorPanicked(_, _) => {
 				if state.panics >= Component::RETRIES {
 					warn!("Worker actor panicked {} times, giving up...", state.panics);
 					return Ok(());
@@ -127,6 +126,8 @@ where
 	) -> Result<(), ActorProcessingErr> {
 		state.worker.kill();
 		state.tokens.iter().for_each(|t| t.cancel());
+
+		self.vendor.stop().await;
 
 		Ok(())
 	}

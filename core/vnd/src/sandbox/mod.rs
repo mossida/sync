@@ -1,5 +1,3 @@
-use std::time::Duration;
-
 use crate::Vendor;
 use bus::Event;
 use ractor::{Actor, ActorCell, ActorProcessingErr, ActorRef, RpcReplyPort};
@@ -10,6 +8,8 @@ use self::worker::Worker;
 pub mod actor;
 pub mod context;
 pub mod worker;
+
+pub type SandboxError = ActorProcessingErr;
 
 pub enum Request {
 	Call(Service),
@@ -69,11 +69,10 @@ where
 		)
 		.await?;
 
-		if V::POLLING_INTERVAL > 0 {
-			worker.send_interval(Duration::from_secs(V::POLLING_INTERVAL), || ());
-		} else {
-			// Run once
+		if V::POLLING_INTERVAL.is_zero() {
 			let _ = worker.send_message(());
+		} else {
+			worker.send_interval(V::POLLING_INTERVAL, || ());
 		}
 
 		Ok(worker)

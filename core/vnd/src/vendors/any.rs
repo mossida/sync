@@ -15,7 +15,6 @@ impl Vendor for AnyVendor {
 
 	const NAME: &'static str = "any";
 	const VENDOR: Vendors = Vendors::Any;
-	const SUBSCRIBE_BUS: bool = false;
 }
 
 impl From<VendorMessage> for AnyMessage {

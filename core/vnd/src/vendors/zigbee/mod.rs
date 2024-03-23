@@ -5,7 +5,7 @@ use ractor::async_trait;
 use serde::{Deserialize, Serialize};
 use tracing::debug;
 
-use crate::{component::Component, Vendor, VendorMessage};
+use crate::{component::Component, sandbox::SandboxError, Vendor, VendorMessage};
 
 use super::Vendors;
 
@@ -26,12 +26,14 @@ impl Vendor for ZigbeeClass {
 	const VENDOR: Vendors = Vendors::Zigbee;
 
 	const SUBSCRIBE_BUS: bool = false;
-	const POLLING_INTERVAL: u64 = 1;
+	const POLLING_INTERVAL: Duration = Duration::from_secs(3);
 
-	async fn run(&self) {
+	async fn poll(&self) -> Result<(), SandboxError> {
 		debug!("Run called");
 		tokio::time::sleep(Duration::from_secs(4)).await;
 		debug!("After 4 seconds");
+
+		Ok(())
 	}
 }
 

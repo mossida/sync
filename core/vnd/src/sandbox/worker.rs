@@ -30,7 +30,8 @@ where
 		_: Self::Msg,
 		_: &mut Self::State,
 	) -> Result<(), ActorProcessingErr> {
-		self.vendor.run().await;
+		self.vendor.poll().await?;
+
 		Ok(())
 	}
 }
