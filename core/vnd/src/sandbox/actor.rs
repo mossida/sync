@@ -102,20 +102,18 @@ where
 		message: SupervisionEvent,
 		state: &mut Self::State,
 	) -> Result<(), ActorProcessingErr> {
-		match message {
-			SupervisionEvent::ActorPanicked(_, _) => {
-				if state.panics >= Component::RETRIES {
-					warn!("Worker actor panicked {} times, giving up...", state.panics);
-					return Ok(());
-				}
-
-				warn!("Worker actor panicked! This should not happen, restarting...");
-				// Restart worker
-				state.panics += 1;
-				state.worker = self.spawn_worker(myself.get_cell()).await?;
+		if let SupervisionEvent::ActorPanicked(_, _) = message {
+			if state.panics >= Component::RETRIES {
+				warn!("Worker actor panicked {} times, giving up...", state.panics);
+				return Ok(());
 			}
-			_ => {}
+
+			warn!("Worker actor panicked! This should not happen, restarting...");
+			// Restart worker
+			state.panics += 1;
+			state.worker = self.spawn_worker(myself.get_cell()).await?;
 		}
+
 		Ok(())
 	}
 
