@@ -8,7 +8,11 @@ use dbm::{
 };
 
 use err::Result;
-use ractor::{factory::Factory, Actor};
+use ractor::{
+	concurrency::Duration,
+	factory::{Factory, FactoryMessage, Job},
+	Actor,
+};
 use rayon::iter::{IntoParallelRefIterator, ParallelIterator};
 use serde::{Deserialize, Serialize};
 use surrealdb::Action;
@@ -97,6 +101,15 @@ pub async fn init() -> Result<(), err::Error> {
 				_ => false,
 			};
 		}
+	});
+
+	// Subscribe factory to time events
+	factory.send_interval(Duration::from_secs(1), || {
+		FactoryMessage::Dispatch(Job {
+			key: 0,
+			msg: bus::Event::Time,
+			options: Default::default(),
+		})
 	});
 
 	let subcription = bus.subscribe();

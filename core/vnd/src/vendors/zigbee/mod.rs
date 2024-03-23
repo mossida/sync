@@ -1,7 +1,11 @@
-use bus::Event;
-use serde::{Deserialize, Serialize};
+use std::time::Duration;
 
-use crate::{component::Component, Vendor, VendorMessage};
+use bus::Event;
+use ractor::async_trait;
+use serde::{Deserialize, Serialize};
+use tracing::debug;
+
+use crate::{component::Component, sandbox::SandboxError, Vendor, VendorMessage};
 
 use super::Vendors;
 
@@ -13,13 +17,24 @@ pub struct ZigbeeConfiguration {}
 #[derive(Clone, Default)]
 pub struct ZigbeeClass {}
 
+#[async_trait]
 impl Vendor for ZigbeeClass {
 	type Configuration = ZigbeeConfiguration;
 	type Message = ZigbeeMessage;
 
 	const NAME: &'static str = "zigbee";
 	const VENDOR: Vendors = Vendors::Zigbee;
+
 	const SUBSCRIBE_BUS: bool = false;
+	const POLLING_INTERVAL: Duration = Duration::from_secs(3);
+
+	async fn poll(&self) -> Result<(), SandboxError> {
+		debug!("Run called");
+		tokio::time::sleep(Duration::from_secs(4)).await;
+		debug!("After 4 seconds");
+
+		Ok(())
+	}
 }
 
 pub enum ZigbeeMessage {}

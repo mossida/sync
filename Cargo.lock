@@ -5208,13 +5208,15 @@ dependencies = [
  "cls",
  "dbm",
  "err",
- "futures",
  "ractor",
  "serde",
  "serde_json",
  "svc",
  "tokio",
+ "tokio-stream",
+ "tokio-util",
  "tracing",
+ "trg",
 ]
 
 [[package]]

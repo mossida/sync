@@ -6,7 +6,7 @@ use r#type::ServiceType;
 use ractor::Message;
 use serde::{Deserialize, Serialize};
 
-mod r#type;
+pub mod r#type;
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Service {
@@ -24,6 +24,10 @@ impl Service {
 
 	pub fn run(&self) {
 		dbg!("Running service");
+	}
+
+	pub fn is(&self, service_type: &ServiceType) -> bool {
+		self.service_type == service_type.id
 	}
 }
 
