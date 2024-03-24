@@ -1,18 +1,22 @@
 use std::sync::OnceLock;
 
-use bus::Bus;
+pub use bus::Bus;
 
 pub use event::*;
 
 mod bus;
+mod consumer;
 mod event;
 
-pub static BUS: OnceLock<Bus> = OnceLock::new();
+pub use consumer::Consumer;
+
+pub static BUS: OnceLock<Bus<Event>> = OnceLock::new();
 
 pub fn init() {
-	let _ = BUS.set(Bus::new());
+	let bus = Bus::new();
+	let _ = BUS.set(bus);
 }
 
-pub fn get() -> &'static Bus {
+pub fn get() -> &'static Bus<Event> {
 	BUS.get().unwrap()
 }

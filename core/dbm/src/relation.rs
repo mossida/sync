@@ -6,12 +6,19 @@ use crate::{resource::Resource, IntoFuture, DB};
 pub trait Relation<W: Resource>: Resource {
 	/// indicates relation name
 	const RELATION: &'static str;
+	/// indicates if the relation is inverted
+	const INVERTED: bool = false;
 
 	fn relate(&self, with: &W) -> IntoFuture<'_, Result<Response, Error>> {
 		let db = &DB;
+		let query = if Self::INVERTED {
+			"RELATE $with->$relation->$me"
+		} else {
+			"RELATE $me->$relation->$with"
+		};
 
 		let future = db
-			.query("RELATE $me->$relation->$with")
+			.query(query)
 			.bind(("me", (Self::RESOURCE, self.id())))
 			.bind(("relation", Self::RELATION))
 			.bind(("with", (W::RESOURCE, with.id())));
@@ -21,9 +28,14 @@ pub trait Relation<W: Resource>: Resource {
 
 	fn relationships(&self) -> IntoFuture<'_, Result<Vec<W>, Error>> {
 		let db = &DB;
+		let query = if Self::INVERTED {
+			"SELECT ->$relation->$me FROM $with"
+		} else {
+			"SELECT ->$relation->$with FROM $me"
+		};
 
 		let future = db
-			.query("SELECT ->$relation->$with FROM $me")
+			.query(query)
 			.bind(("me", (Self::RESOURCE, self.id())))
 			.bind(("relation", Self::RELATION))
 			.bind(("with", W::RESOURCE));

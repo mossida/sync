@@ -6,11 +6,13 @@ use dbm::{
 	resource::{Base, Resource},
 };
 use err::Error;
+use ractor::Actor;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use tracing::{error, info};
 
 use crate::{
+	sandbox::{actor::SandboxArguments, Sandbox},
 	vendors::{any::AnyVendor, implement, Vendors},
 	Vendor,
 };
@@ -59,24 +61,32 @@ where
 	/// Creates an instance of the provided class and spawns its actor.
 	/// It requires a configuration as every instance is different from another
 	/// based on its configuration.
-	pub async fn build(&self) -> Result<(), Error> {
+	pub async fn build(self) -> Result<(), Error> {
 		if TypeId::of::<V>() == TypeId::of::<AnyVendor>() {
 			unreachable!();
 		}
 
-		let class = V::new(serde_json::from_value(self.config.clone())?);
-		let spawn = V::spawn(Some(class.name()), class.clone(), ()).await;
+		let name = self.id.to_raw();
+		let configuration: V::Configuration = serde_json::from_value(self.config.clone())?;
+		let vendor: V = Default::default();
+		let sandbox = Sandbox::new(vendor);
+		let spawn = Actor::spawn(
+			Some(name.clone()),
+			sandbox,
+			SandboxArguments {
+				component: self,
+				configuration,
+			},
+		)
+		.await;
 
-		if let Err(e) = spawn {
-			error!("Couldn't spawn for {} because {}", class.name(), e);
-		} else {
-			info!("Spawned actor for {}", class.name());
+		match spawn {
+			Err(e) => error!("Couldn't spawn for {} because {}", name, e),
+			Ok(_) => info!("Spawned actor for {}", name),
 		}
 
 		let bus = bus::get();
-		bus.emit(bus::Event::VendorStart {
-			name: class.name(),
-		});
+		bus.emit(bus::Event::VendorStart(name));
 
 		Ok(())
 	}

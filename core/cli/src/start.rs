@@ -7,8 +7,6 @@ pub struct StartCommandArgs {}
 
 #[tracing::instrument]
 pub async fn init(_: StartCommandArgs) -> err::Result<()> {
-	//let token = CancellationToken::new();
-
 	// Critical components
 	bus::init();
 	mqtt::init();
@@ -16,11 +14,11 @@ pub async fn init(_: StartCommandArgs) -> err::Result<()> {
 	dbm::init().await?;
 
 	// Non-critical components
-	// TODO: capture errors as logs instead of panicking
+	atm::init().await?;
 	spawner::init().await?;
 
 	// Interface components
-	mqtt::serve().await;
+	mqtt::init();
 	net::serve().await?;
 
 	Ok(())

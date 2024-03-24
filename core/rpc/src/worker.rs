@@ -5,7 +5,7 @@ use axum::extract::ws::Message;
 
 use dashmap::DashSet;
 use ractor::factory::{
-	FactoryMessage, WorkerBuilder as Builder, WorkerId, WorkerMessage, WorkerStartContext,
+	FactoryMessage, Job, WorkerBuilder as Builder, WorkerId, WorkerMessage, WorkerStartContext,
 };
 use ractor::{Actor, ActorProcessingErr, ActorRef};
 use tokio::sync::mpsc::Sender;
@@ -66,18 +66,24 @@ impl Actor for Worker {
 			WorkerMessage::Dispatch(job) => {
 				debug!("Dispatching job {:?} with actor {:?}", job.key, state.context.wid);
 
-				if self.used_ids.contains(&job.key) {
+				let Job {
+					key: id,
+					msg: request,
+					..
+				} = job;
+
+				if self.used_ids.contains(&id) {
 					let data = Err(RpcError::InvalidId);
-					let response = data.into_response(job.key);
+					let response = data.into_response(id);
 
 					self.sender.send(response.try_into()?).await?;
 				} else {
 					// Mark the id as used
-					self.used_ids.insert(job.key);
+					self.used_ids.insert(id);
 
 					// Process request
-					let data = job.msg.await;
-					let response = data.into_response(job.key);
+					let data = request.await;
+					let response = data.into_response(id);
 
 					// Send back to client
 					self.sender.send(response.try_into()?).await?;

@@ -1,5 +1,5 @@
 [package]
-name = "vnd"
+name = "atm"
 version.workspace = true
 authors.workspace = true
 edition.workspace = true
@@ -8,20 +8,20 @@ license.workspace = true
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-tokio = { workspace = true }
-tokio-util = { workspace = true }
-tokio-stream = { workspace = true }
+dashmap = { version = "5.5.3", features = ["serde"] }
+rayon = { version = "1.9.0" }
+
 ractor = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
-tracing = { workspace = true }
+surrealdb = { workspace = true }
 futures = { workspace = true }
-dashmap = { workspace = true }
+tracing = { workspace = true }
 
-err = { path = "../err" }
 bus = { path = "../bus" }
 dbm = { path = "../dbm" }
 cls = { path = "../cls" }
 svc = { path = "../svc" }
 trg = { path = "../trg" }
-mqtt = { path = "../mqtt" }
+err = { path = "../err" }
+vnd = { path = "../vnd" }

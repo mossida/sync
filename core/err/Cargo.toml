@@ -8,8 +8,8 @@ license.workspace = true
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-thiserror = { version = "1.0.57" }
-miette = { version = "7.1.0", features = ["fancy"] }
+thiserror = { version = "1.0.58" }
+miette = { version = "7.2.0", features = ["fancy"] }
 config = "0.14.0"
 
 surrealdb = { workspace = true }

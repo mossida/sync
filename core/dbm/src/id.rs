@@ -3,13 +3,13 @@ use surrealdb::sql::{Id as RecordId, Thing};
 
 #[derive(Debug, Deserialize)]
 #[serde(untagged)]
-enum Kind {
+pub enum IdKind {
 	Record(RecordId),
 	Thing(Thing),
 }
 
-#[derive(Debug, Deserialize, Clone)]
-#[serde(from = "Kind")]
+#[derive(Debug, Deserialize, Clone, PartialEq, Eq, Hash)]
+#[serde(from = "IdKind")]
 pub struct Id(RecordId);
 
 impl Id {
@@ -24,6 +24,13 @@ impl Id {
 	pub fn to_raw(&self) -> String {
 		self.0.to_raw()
 	}
+
+	pub fn to_thing(&self, resource: &str) -> Thing {
+		Thing {
+			tb: resource.to_owned(),
+			id: self.0.to_owned(),
+		}
+	}
 }
 
 impl Default for Id {
@@ -32,12 +39,18 @@ impl Default for Id {
 	}
 }
 
-impl From<Kind> for Id {
-	fn from(value: Kind) -> Self {
+impl From<IdKind> for Id {
+	fn from(value: IdKind) -> Self {
 		match value {
-			Kind::Record(id) => Self(id),
-			Kind::Thing(thing) => Self(thing.id),
+			IdKind::Record(id) => Self(id),
+			IdKind::Thing(thing) => Self(thing.id),
 		}
+	}
+}
+
+impl From<Id> for RecordId {
+	fn from(value: Id) -> Self {
+		value.0
 	}
 }
 

@@ -1,36 +1,104 @@
 use bus::Event;
-use ractor::Actor;
+use component::Component;
+use ractor::async_trait;
+
+use sandbox::SandboxError;
 use serde::{de::DeserializeOwned, Serialize};
-use std::hash::{DefaultHasher, Hash, Hasher};
+use std::{collections::HashSet, hash::Hash, time::Duration};
+use svc::{r#type::ServiceType, Service};
+use tracing::{info, warn};
+use trg::Trigger;
 use vendors::Vendors;
 
 mod r#macro;
 
 pub mod component;
+pub mod sandbox;
 pub mod spawner;
 pub mod vendors;
 
+pub static SCOPE: &str = "vendors";
+pub static SANDBOX_GROUP: &str = "sandboxes";
+
 pub enum VendorMessage {}
 
-pub trait Vendor: Actor<Msg = Self::Message, Arguments = ()> + Clone {
+#[async_trait]
+#[allow(unused_variables)]
+/// A trait representing a vendor.
+pub trait Vendor: 'static + Send + Sync + Clone + Default {
+	/// The configuration type associated with the vendor.
 	type Configuration: Serialize + DeserializeOwned + Hash + Clone + Send + Sync;
-	type Message: From<VendorMessage> + From<Event>;
+	/// The message type associated with the vendor.
+	type Message: From<VendorMessage> + From<Event> + Send + Sync;
 
+	/* CONSTANTS */
+
+	/// The name of the vendor.
 	const NAME: &'static str;
+	/// The vendor type.
 	const VENDOR: Vendors;
 
-	fn new(config: Self::Configuration) -> Self;
+	/* CONFIGURATION */
 
-	fn configuration(&self) -> Self::Configuration;
+	/// The number of retries after poll function
+	/// fails to execute.
+	const RETRIES: u8 = 3;
+	/// Whether to subscribe to the bus.
+	const SUBSCRIBE_BUS: bool = false;
+	/// The polling interval for the poll function.
+	/// If set to 0, the run function will be called
+	/// once to completion after the vendor is initialized
+	const POLLING_INTERVAL: Duration = Duration::from_secs(0);
 
-	/// Generates the name of the class based on its static name
-	/// and the hash of its configuration.
-	/// So that every unique configuration will spawn into a different actor.
-	fn name(&self) -> String {
-		let mut hasher = DefaultHasher::new();
-		let config = self.configuration();
-		config.hash(&mut hasher);
+	/* REGISTER FUNCTIONS */
 
-		format!("{}-{}", Self::NAME, hasher.finish())
+	/// Get the services provided by the vendor.
+	async fn services(&self) -> HashSet<ServiceType> {
+		Default::default()
 	}
+
+	/// Get the triggers for the vendor.
+	async fn triggers(&self, instance: &Component<Self>) -> HashSet<Trigger> {
+		Default::default()
+	}
+
+	/// Perform setup operations for the vendor.
+	async fn initialize(&self, config: Self::Configuration) {
+		info!("{} setup", Self::NAME);
+	}
+
+	/// Main function where the vendor logic is executed.
+	/// This function should not create any resources.
+	/// It should only fetch data and update states
+	///
+	/// If polling interval is set to 0, this function
+	/// will be called once to completion after the vendor
+	/// is initialized.
+	///
+	/// If polling interval is set to a non-zero value,
+	/// this function will be called repeatedly at the
+	/// specified interval. If the function takes more
+	/// time to execute than the polling interval, the
+	/// function will be called again after the previous
+	/// execution completes.
+	///
+	/// If the function fails to execute, it will be
+	/// retried RETRIES number of times.
+	async fn poll(&self) -> Result<(), SandboxError> {
+		info!("{} run", Self::NAME);
+		Ok(())
+	}
+
+	/// Handle a service call.
+	async fn on_service_call(&self, service: Service) -> Result<(), SandboxError> {
+		warn!("A service got called, but the vendor {} is not handling services", Self::NAME);
+
+		Ok(())
+	}
+
+	/// Handle an event.
+	async fn on_event(&self, event: Event) {}
+
+	/// Stop the vendor.
+	async fn stop(&self) {}
 }

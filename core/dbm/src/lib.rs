@@ -1,16 +1,17 @@
 use std::pin::Pin;
 
-use err::{Error, MigrationError};
+use err::Error;
 use futures::Future;
 use once_cell::sync::Lazy;
 use surrealdb::{engine::any::Any, opt::auth::Root, Surreal};
-use surrealdb_migrations::MigrationRunner;
 use tracing::{info, instrument, trace};
 
 pub use id::Id;
+pub use id::IdKind;
 
 mod id;
 
+pub mod link;
 pub mod relation;
 pub mod resource;
 
@@ -39,11 +40,12 @@ pub async fn init() -> Result<(), Error> {
 		.await?;
 	}
 
-	MigrationRunner::new(&DB).up().await.map_err(|e| {
+	// TODO: Understand why runner fails parse
+	/*MigrationRunner::new(&DB).up().await.map_err(|e| {
 		Error::MigrationError(MigrationError {
 			message: e.to_string(),
 		})
-	})?;
+	})?;*/
 
 	info!("Database ready");
 

@@ -1,5 +1,5 @@
 [package]
-name = "cls"
+name = "svc"
 version.workspace = true
 authors.workspace = true
 edition.workspace = true
@@ -8,11 +8,9 @@ license.workspace = true
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-dashmap = { version = "5.5.3", features = ["serde"] }
-uom = { version = "0.36.0", features = ["default", "use_serde"] }
-serde_with = { version = "3.7.0" }
-
+ractor = { workspace = true }
 serde = { workspace = true }
-serde_json = { workspace = true }
+surrealdb = { workspace = true }
 
 dbm = { path = "../dbm" }
+err = { path = "../err" }

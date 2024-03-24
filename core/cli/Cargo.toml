@@ -8,7 +8,7 @@ license.workspace = true
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-clap = "4.5.1"
+clap = "4.5.3"
 
 tracing = { workspace = true }
 tokio = { workspace = true }
@@ -21,3 +21,4 @@ net = { path = "../net" }
 dbm = { path = "../dbm" }
 mqtt = { path = "../mqtt" }
 vnd = { path = "../vnd" }
+atm = { path = "../atm" }
