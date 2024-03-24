@@ -1,11 +1,13 @@
 use bus::Event;
+use component::Component;
 use ractor::async_trait;
 
-use sandbox::{context::Context, SandboxError};
+use sandbox::SandboxError;
 use serde::{de::DeserializeOwned, Serialize};
-use std::{error::Error, hash::Hash, time::Duration};
+use std::{collections::HashSet, hash::Hash, time::Duration};
 use svc::{r#type::ServiceType, Service};
-use tracing::info;
+use tracing::{info, warn};
+use trg::Trigger;
 use vendors::Vendors;
 
 mod r#macro;
@@ -14,6 +16,9 @@ pub mod component;
 pub mod sandbox;
 pub mod spawner;
 pub mod vendors;
+
+pub static SCOPE: &str = "vendors";
+pub static SANDBOX_GROUP: &str = "sandboxes";
 
 pub enum VendorMessage {}
 
@@ -48,13 +53,13 @@ pub trait Vendor: 'static + Send + Sync + Clone + Default {
 	/* REGISTER FUNCTIONS */
 
 	/// Get the services provided by the vendor.
-	async fn services(&self) -> Vec<ServiceType> {
-		vec![]
+	async fn services(&self) -> HashSet<ServiceType> {
+		Default::default()
 	}
 
 	/// Get the triggers for the vendor.
-	async fn triggers(&self) -> Vec<ServiceType> {
-		vec![]
+	async fn triggers(&self, instance: &Component<Self>) -> HashSet<Trigger> {
+		Default::default()
 	}
 
 	/// Perform setup operations for the vendor.
@@ -84,11 +89,10 @@ pub trait Vendor: 'static + Send + Sync + Clone + Default {
 		Ok(())
 	}
 
-	/// Handle an incoming message.
-	async fn on_message(&self, ctx: &Context, msg: Self::Message) {}
-
 	/// Handle a service call.
-	async fn on_service_call(&self, service: Service) -> Result<(), Box<dyn Error>> {
+	async fn on_service_call(&self, service: Service) -> Result<(), SandboxError> {
+		warn!("A service got called, but the vendor {} is not handling services", Self::NAME);
+
 		Ok(())
 	}
 

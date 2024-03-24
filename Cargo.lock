@@ -354,6 +354,7 @@ dependencies = [
  "svc",
  "tracing",
  "trg",
+ "vnd",
 ]
 
 [[package]]
@@ -2549,6 +2550,7 @@ dependencies = [
  "rumqttd",
  "tokio",
  "tokio-util",
+ "tracing",
 ]
 
 [[package]]
@@ -3561,6 +3563,7 @@ dependencies = [
 name = "rpc"
 version = "0.1.0"
 dependencies = [
+ "atm",
  "axum 0.7.4",
  "cls",
  "dashmap",
@@ -3571,12 +3574,14 @@ dependencies = [
  "ractor",
  "serde",
  "serde_json",
+ "svc",
  "thiserror",
  "tokio",
  "tokio-stream",
  "tokio-util",
  "tower-http",
  "tracing",
+ "trg",
  "uuid",
 ]
 
@@ -5208,6 +5213,7 @@ dependencies = [
  "cls",
  "dbm",
  "err",
+ "futures",
  "ractor",
  "serde",
  "serde_json",

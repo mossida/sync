@@ -30,4 +30,13 @@ impl Trigger {
 	pub fn check(&self, event: Event) -> bool {
 		event == self.r#type
 	}
+
+	pub fn new(name: String, r#type: Event, origin: TriggerOrigin) -> Self {
+		Self {
+			id: dbm::Id::rand(),
+			name,
+			r#type,
+			origin,
+		}
+	}
 }

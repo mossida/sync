@@ -1,20 +1,19 @@
-use std::sync::OnceLock;
+use std::{sync::OnceLock, thread};
 
-use rumqttd::{protocol::Error, Broker};
-use tokio_util::sync::CancellationToken;
+use rumqttd::Broker;
+use tracing::error;
 
 pub static BROKER: OnceLock<Broker> = OnceLock::new();
 
-pub async fn serve(ct: CancellationToken) -> Result<(), Error> {
+pub fn init() {
 	let config = cnf::get().mqtt.clone();
 
-	tokio::select! {
-		_ = ct.cancelled() => {},
-		_ = tokio::spawn(async move {
-			let mut broker = Broker::new(config);
-			let _ = broker.start();
-		}) => {}
-	}
+	let _ = thread::spawn(move || {
+		let mut broker = Broker::new(config);
+		let result = broker.start();
 
-	Ok(())
+		if let Err(e) = result {
+			error!("MQTT Broker got an error: {:?}", e);
+		}
+	});
 }

@@ -11,13 +11,15 @@ use err::Result;
 use ractor::{
 	concurrency::Duration,
 	factory::{Factory, FactoryMessage, Job},
-	Actor,
+	registry, Actor, ActorRef,
 };
-use rayon::iter::{IntoParallelRefIterator, ParallelIterator};
+
 use serde::{Deserialize, Serialize};
 use surrealdb::Action;
 use svc::Service;
+use tracing::error;
 use trg::Trigger;
+use vnd::sandbox::{Request, SandboxMessage};
 use worker::Worker;
 
 mod worker;
@@ -59,11 +61,25 @@ impl Automation {
 		let triggers: Vec<Trigger> = self.relationships().await?;
 		let services: Vec<Service> = self.relationships().await?;
 
-		let triggered: Vec<&Trigger> =
-			triggers.par_iter().filter(|t| t.check(event.clone())).collect();
+		let triggered: Vec<&Trigger> = triggers.iter().filter(|t| t.check(event.clone())).collect();
 
 		if !triggered.is_empty() {
-			services.par_iter().for_each(|s| s.run());
+			for service in services {
+				let entry: Option<ActorRef<SandboxMessage>> =
+					registry::where_is(service.component.to_raw()).map(Into::into);
+
+				if let Some(actor) = entry {
+					// TODO: Use result to handle errors
+					let _ = actor
+						.call(
+							|port| SandboxMessage::Request(Request::Call(service.to_owned()), port),
+							None,
+						)
+						.await;
+				} else {
+					error!("No actor found for service {:?}, this must not happen!", service.id());
+				}
+			}
 		}
 
 		Ok(())
@@ -80,6 +96,7 @@ pub async fn init() -> Result<(), err::Error> {
 		Some(FACTORY.to_string()),
 		Factory {
 			worker_count: 24,
+			collect_worker_stats: false,
 			..Default::default()
 		},
 		// TODO: Add correct triggers data structure

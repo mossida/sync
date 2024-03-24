@@ -83,6 +83,7 @@ impl Client {
 					detection_timeout: Duration::from_secs(5),
 					kill_worker: true,
 				}),
+				collect_worker_stats: false,
 				..Default::default()
 			},
 			Box::new(Worker {
