@@ -1,30 +1,40 @@
-use cls::class::any::Any;
+use atm::Automation;
+use cls::{class::any::Any, device::Device};
 use dbm::{resource::Base, DB};
 use futures::Future;
 use serde::{Deserialize, Serialize};
+use svc::{r#type::ServiceType, Service};
 use trg::Trigger;
 
 use crate::{
-	methods::{IntoMethod, Params},
+	methods::{get_parameter, IntoMethod, Params},
 	Output, RpcError,
 };
 
-static PARAM_RESOURCE: &str = "resource";
+static RESOURCE_PARAM: &str = "resource";
 
 #[derive(Serialize, Deserialize)]
 #[serde(untagged)]
 pub enum Resources {
 	Entity(Any),
+	Device(Device),
 	Trigger(Trigger),
+	Automation(Automation),
+	Service(Service),
+	ServiceType(ServiceType),
 }
 
 impl Resources {
 	pub fn is_valid(resource: &str) -> bool {
-		match resource {
-			Any::RESOURCE => true,
-			Trigger::RESOURCE => true,
-			_ => false,
-		}
+		matches!(
+			resource,
+			Any::RESOURCE
+				| Device::RESOURCE
+				| Trigger::RESOURCE
+				| Automation::RESOURCE
+				| Service::RESOURCE
+				| ServiceType::RESOURCE
+		)
 	}
 }
 
@@ -34,13 +44,11 @@ impl Resources {
 pub struct GetResource;
 
 async fn run(params: Params) -> Output {
-	let param =
-		params.get(PARAM_RESOURCE).ok_or(RpcError::MissingParameter(PARAM_RESOURCE.to_string()))?;
-
-	let resource = param
-		.as_str()
-		.filter(|r| Resources::is_valid(r))
-		.ok_or(RpcError::InvalidParameter(PARAM_RESOURCE.to_string()))?;
+	let resource = get_parameter(&params, RESOURCE_PARAM).and_then(|param: String| {
+		Resources::is_valid(param.as_str())
+			.then_some(param)
+			.ok_or(RpcError::InvalidParameter(RESOURCE_PARAM))
+	})?;
 
 	let db = &DB;
 	let data: Vec<Resources> =

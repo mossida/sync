@@ -24,9 +24,9 @@ pub enum RpcError {
 	#[error("Serialization error")]
 	SerializationError(#[from] serde_json::Error),
 	#[error("Missing parameter: {0}")]
-	MissingParameter(String),
+	MissingParameter(&'static str),
 	#[error("Invalid parameter: {0}")]
-	InvalidParameter(String),
+	InvalidParameter(&'static str),
 }
 
 impl Serialize for RpcError {

@@ -2,13 +2,24 @@ mod get;
 
 use dashmap::DashMap;
 use futures::Future;
-use serde::Deserialize;
+use serde::{de::DeserializeOwned, Deserialize};
 use serde_json::Value;
 use std::{future::IntoFuture, pin::Pin};
 
 use crate::{Output, RpcError};
 
 use self::get::*;
+
+fn get_parameter<T>(params: &Params, key: &'static str) -> Result<T, RpcError>
+where
+	T: DeserializeOwned,
+{
+	let param = params.get(key).ok_or(RpcError::MissingParameter(key))?;
+	let value: T = serde_json::from_value(param.value().clone())
+		.map_err(|_| RpcError::InvalidParameter(key))?;
+
+	Ok(value)
+}
 
 async fn resolve(method: Method) -> Output {
 	let Method {

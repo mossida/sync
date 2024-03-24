@@ -3562,6 +3562,7 @@ dependencies = [
 name = "rpc"
 version = "0.1.0"
 dependencies = [
+ "atm",
  "axum 0.7.4",
  "cls",
  "dashmap",
