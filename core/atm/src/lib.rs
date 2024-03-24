@@ -96,6 +96,7 @@ pub async fn init() -> Result<(), err::Error> {
 		Some(FACTORY.to_string()),
 		Factory {
 			worker_count: 24,
+			collect_worker_stats: false,
 			..Default::default()
 		},
 		// TODO: Add correct triggers data structure

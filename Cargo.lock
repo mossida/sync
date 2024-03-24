@@ -2550,6 +2550,7 @@ dependencies = [
  "rumqttd",
  "tokio",
  "tokio-util",
+ "tracing",
 ]
 
 [[package]]
