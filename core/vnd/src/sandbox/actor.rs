@@ -109,7 +109,7 @@ where
 			SandboxMessage::Event(event) => self.vendor.on_event(event).await,
 			SandboxMessage::Request(rq, rpc) => match rq {
 				Request::Call(service) => {
-					let is_registered = state.services.iter().any(|s| service.is(&s));
+					let is_registered = state.services.iter().any(|s| service.is(s));
 
 					match is_registered {
 						true => {

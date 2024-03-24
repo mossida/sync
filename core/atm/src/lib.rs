@@ -64,7 +64,7 @@ impl Automation {
 		let triggered: Vec<&Trigger> = triggers.iter().filter(|t| t.check(event.clone())).collect();
 
 		if !triggered.is_empty() {
-			while let Some(service) = services.iter().next() {
+			for service in services {
 				let entry: Option<ActorRef<SandboxMessage>> =
 					registry::where_is(service.component.to_raw()).map(Into::into);
 
