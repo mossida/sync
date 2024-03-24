@@ -13,24 +13,25 @@ where
 	V: Vendor,
 {
 	type Msg = ();
-	type Arguments = ();
-	type State = ();
+	type Arguments = V::Context;
+	type State = V::Context;
 
 	async fn pre_start(
 		&self,
 		_: ActorRef<Self::Msg>,
-		_: Self::Arguments,
+		context: Self::Arguments,
 	) -> Result<Self::State, ActorProcessingErr> {
-		Ok(())
+		Ok(context)
 	}
 
 	async fn handle(
 		&self,
 		_: ActorRef<Self::Msg>,
 		_: Self::Msg,
-		_: &mut Self::State,
+		context: &mut Self::State,
 	) -> Result<(), ActorProcessingErr> {
-		self.vendor.poll().await?;
+		let data = self.vendor.poll(context).await?;
+		let _ = self.vendor.process(context, data).await?;
 
 		Ok(())
 	}

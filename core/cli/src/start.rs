@@ -18,7 +18,7 @@ pub async fn init(_: StartCommandArgs) -> err::Result<()> {
 	spawner::init().await?;
 
 	// Interface components
-	mqtt::init();
+	mqtt::serve();
 	net::serve().await?;
 
 	Ok(())

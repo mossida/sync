@@ -57,22 +57,22 @@ where
 		}
 	}
 
-	pub async fn spawn_worker(&self, cell: ActorCell) -> Result<ActorRef<()>, ActorProcessingErr> {
+	pub async fn spawn_worker(
+		&self,
+		cell: ActorCell,
+		context: V::Context,
+	) -> Result<ActorRef<()>, ActorProcessingErr> {
 		let (worker, _) = Actor::spawn_linked(
 			None,
 			Worker {
 				vendor: self.vendor.clone(),
 			},
-			(),
+			context,
 			cell,
 		)
 		.await?;
 
-		if V::POLLING_INTERVAL.is_zero() {
-			let _ = worker.send_message(());
-		} else {
-			worker.send_interval(V::POLLING_INTERVAL, || ());
-		}
+		worker.send_interval(V::POLLING_INTERVAL, || ());
 
 		Ok(worker)
 	}

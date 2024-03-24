@@ -7,13 +7,13 @@ use svc::r#type::ServiceType;
 
 use dbm::resource::Resource;
 use tokio_util::sync::CancellationToken;
-use tracing::warn;
 use trg::Trigger;
 
 use crate::{component::Component as ComponentInstance, Vendor, SANDBOX_GROUP, SCOPE};
 
 use super::{Request, Response, Sandbox, SandboxMessage};
 
+#[derive(Clone)]
 pub struct SandboxArguments<Component>
 where
 	Component: Vendor,
@@ -27,8 +27,7 @@ pub struct State<Component>
 where
 	Component: Vendor,
 {
-	component: ComponentInstance<Component>,
-	configuration: Component::Configuration,
+	arguments: SandboxArguments<Component>,
 	tokens: Vec<CancellationToken>,
 	services: HashSet<ServiceType>,
 	triggers: HashSet<Trigger>,
@@ -48,19 +47,13 @@ where
 	async fn pre_start(
 		&self,
 		myself: ActorRef<Self::Msg>,
-		args: Self::Arguments,
+		arguments: Self::Arguments,
 	) -> Result<Self::State, ActorProcessingErr> {
 		// Join the sandbox group
 		pg::join_scoped(SCOPE.to_string(), SANDBOX_GROUP.to_string(), vec![myself.get_cell()]);
 
-		let SandboxArguments {
-			component,
-			configuration,
-		} = args;
-
 		// Setup vendor before listening to events
-		self.vendor.initialize(configuration.clone()).await;
-
+		let context = self.vendor.initialize(&arguments).await?;
 		let mut tokens = Vec::new();
 
 		if Component::SUBSCRIBE_BUS {
@@ -68,15 +61,14 @@ where
 			tokens.push(bus.subscribe().to_actor(myself.clone()));
 		}
 
-		let worker = self.spawn_worker(myself.get_cell()).await?;
+		let worker = self.spawn_worker(myself.get_cell(), context).await?;
 
 		let services = self.vendor.services().await;
-		let triggers = self.vendor.triggers(&component).await;
+		let triggers = self.vendor.triggers(&arguments.component).await;
 
 		Ok(State {
+			arguments,
 			tokens,
-			configuration,
-			component,
 			services,
 			triggers,
 			worker,
@@ -129,11 +121,11 @@ where
 
 	async fn handle_supervisor_evt(
 		&self,
-		myself: ActorRef<Self::Msg>,
-		message: SupervisionEvent,
-		state: &mut Self::State,
+		_: ActorRef<Self::Msg>,
+		_: SupervisionEvent,
+		_: &mut Self::State,
 	) -> Result<(), ActorProcessingErr> {
-		if let SupervisionEvent::ActorPanicked(_, _) = message {
+		/*if let SupervisionEvent::ActorPanicked(_, _) = message {
 			if state.panics >= Component::RETRIES {
 				warn!("Worker actor panicked {} times, giving up...", state.panics);
 				return Ok(());
@@ -142,8 +134,8 @@ where
 			warn!("Worker actor panicked! This should not happen, restarting...");
 			// Restart worker
 			state.panics += 1;
-			state.worker = self.spawn_worker(myself.get_cell()).await?;
-		}
+			state.worker = self.spawn_worker(myself.get_cell(), state.context.clone()).await?;
+		}*/
 
 		Ok(())
 	}

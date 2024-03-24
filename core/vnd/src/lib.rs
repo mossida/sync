@@ -2,11 +2,11 @@ use bus::Event;
 use component::Component;
 use ractor::async_trait;
 
-use sandbox::SandboxError;
+use sandbox::{actor::SandboxArguments, SandboxError};
 use serde::{de::DeserializeOwned, Serialize};
 use std::{collections::HashSet, hash::Hash, time::Duration};
 use svc::{r#type::ServiceType, Service};
-use tracing::{info, warn};
+use tracing::warn;
 use trg::Trigger;
 use vendors::Vendors;
 
@@ -20,16 +20,15 @@ pub mod vendors;
 pub static SCOPE: &str = "vendors";
 pub static SANDBOX_GROUP: &str = "sandboxes";
 
-pub enum VendorMessage {}
-
 #[async_trait]
 #[allow(unused_variables)]
 /// A trait representing a vendor.
 pub trait Vendor: 'static + Send + Sync + Clone + Default {
 	/// The configuration type associated with the vendor.
 	type Configuration: Serialize + DeserializeOwned + Hash + Clone + Send + Sync;
-	/// The message type associated with the vendor.
-	type Message: From<VendorMessage> + From<Event> + Send + Sync;
+
+	type Context: Send + Sync;
+	type PollData: Send + Sync;
 
 	/* CONSTANTS */
 
@@ -63,13 +62,14 @@ pub trait Vendor: 'static + Send + Sync + Clone + Default {
 	}
 
 	/// Perform setup operations for the vendor.
-	async fn initialize(&self, config: Self::Configuration) {
-		info!("{} setup", Self::NAME);
-	}
+	async fn initialize(
+		&self,
+		args: &SandboxArguments<Self>,
+	) -> Result<Self::Context, SandboxError>;
 
 	/// Main function where the vendor logic is executed.
 	/// This function should not create any resources.
-	/// It should only fetch data and update states
+	/// It should only fetch data whether is pushing or polling
 	///
 	/// If polling interval is set to 0, this function
 	/// will be called once to completion after the vendor
@@ -84,8 +84,15 @@ pub trait Vendor: 'static + Send + Sync + Clone + Default {
 	///
 	/// If the function fails to execute, it will be
 	/// retried RETRIES number of times.
-	async fn poll(&self) -> Result<(), SandboxError> {
-		info!("{} run", Self::NAME);
+	async fn poll(&self, ctx: &mut Self::Context) -> Result<Self::PollData, SandboxError>;
+
+	async fn process(
+		&self,
+		ctx: &mut Self::Context,
+		data: Self::PollData,
+	) -> Result<(), SandboxError> {
+		warn!("The vendor {} is not handling the data", Self::NAME);
+
 		Ok(())
 	}
 

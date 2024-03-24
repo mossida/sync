@@ -1,7 +1,11 @@
-use bus::Event;
+use ractor::async_trait;
 use serde::{Deserialize, Serialize};
 
-use crate::{component::Component, Vendor, VendorMessage};
+use crate::{
+	component::Component,
+	sandbox::{actor::SandboxArguments, SandboxError},
+	Vendor,
+};
 
 use super::Vendors;
 
@@ -13,27 +17,22 @@ pub struct TadoConfig {}
 #[derive(Clone, Default)]
 pub struct TadoVendor {}
 
+#[async_trait]
 impl Vendor for TadoVendor {
 	type Configuration = TadoConfig;
-	type Message = TadoMessage;
+
+	type Context = ();
+	type PollData = ();
 
 	const NAME: &'static str = "tado";
 	const VENDOR: Vendors = Vendors::Tado;
 	const SUBSCRIBE_BUS: bool = false;
-}
 
-pub enum TadoMessage {
-	BusEvent(Event),
-}
-
-impl From<VendorMessage> for TadoMessage {
-	fn from(_: VendorMessage) -> Self {
-		todo!()
+	async fn initialize(&self, _: &SandboxArguments<Self>) -> Result<Self::Context, SandboxError> {
+		Ok(())
 	}
-}
 
-impl From<Event> for TadoMessage {
-	fn from(event: Event) -> Self {
-		TadoMessage::BusEvent(event)
+	async fn poll(&self, _: &mut Self::Context) -> Result<Self::PollData, SandboxError> {
+		Ok(())
 	}
 }

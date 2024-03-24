@@ -4,8 +4,6 @@ use ractor::{
 	Actor, ActorProcessingErr, ActorRef,
 };
 
-use super::payload::Topic;
-
 #[derive(Clone)]
 pub struct Worker {}
 
