@@ -3,7 +3,6 @@ use dbm::{
 	resource::{Base, Resource},
 };
 use r#type::ServiceType;
-use ractor::Message;
 use serde::{Deserialize, Serialize};
 
 pub mod r#type;
@@ -11,21 +10,11 @@ pub mod r#type;
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Service {
 	id: dbm::Id,
-	component: dbm::Id,
-	service_type: dbm::Id,
+	pub component: dbm::Id,
+	pub service_type: dbm::Id,
 }
 
 impl Service {
-	pub fn execute<T>(&self)
-	where
-		T: From<Service> + Message,
-	{
-	}
-
-	pub fn run(&self) {
-		dbg!("Running service");
-	}
-
 	pub fn is(&self, service_type: &ServiceType) -> bool {
 		self.service_type == service_type.id
 	}

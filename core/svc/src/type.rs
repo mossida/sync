@@ -4,13 +4,13 @@ use dbm::{
 	resource::{Base, Resource},
 	Id, IdKind,
 };
-use err::Result;
+
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, Serialize, Deserialize, Hash)]
+#[derive(Debug, Clone, Serialize, Deserialize, Hash, PartialEq, Eq)]
 pub struct ServiceData {}
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, Hash, PartialEq, Eq)]
 pub struct ServiceType {
 	pub id: dbm::Id,
 	#[serde(flatten)]
@@ -28,16 +28,15 @@ impl Resource for ServiceType {
 }
 
 impl ServiceType {
-	pub async fn register(data: ServiceData) -> Result<Vec<Self>, err::Error> {
+	pub fn new(data: ServiceData) -> Self {
 		let mut hasher = DefaultHasher::new();
 		data.hash(&mut hasher);
 
 		let id: Id = IdKind::Record(hasher.finish().into()).into();
-		let service_type = ServiceType {
+
+		ServiceType {
 			id,
 			data,
-		};
-
-		service_type.create().await
+		}
 	}
 }

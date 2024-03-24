@@ -1,8 +1,4 @@
-use std::{
-	any::TypeId,
-	hash::{DefaultHasher, Hash, Hasher},
-	marker::PhantomData,
-};
+use std::{any::TypeId, marker::PhantomData};
 
 use cls::device::Device;
 use dbm::{
@@ -16,7 +12,7 @@ use serde_json::Value;
 use tracing::{error, info};
 
 use crate::{
-	sandbox::Sandbox,
+	sandbox::{actor::SandboxArguments, Sandbox},
 	vendors::{any::AnyVendor, implement, Vendors},
 	Vendor,
 };
@@ -65,25 +61,28 @@ where
 	/// Creates an instance of the provided class and spawns its actor.
 	/// It requires a configuration as every instance is different from another
 	/// based on its configuration.
-	pub async fn build(&self) -> Result<(), Error> {
+	pub async fn build(self) -> Result<(), Error> {
 		if TypeId::of::<V>() == TypeId::of::<AnyVendor>() {
 			unreachable!();
 		}
 
+		let name = self.id.to_raw();
 		let configuration: V::Configuration = serde_json::from_value(self.config.clone())?;
-		let mut hasher = DefaultHasher::new();
-		configuration.hash(&mut hasher);
-
-		let name = format!("{}-{}", V::NAME, hasher.finish());
-
 		let vendor: V = Default::default();
 		let sandbox = Sandbox::new(vendor);
-		let spawn = Actor::spawn(Some(name.clone()), sandbox, configuration).await;
+		let spawn = Actor::spawn(
+			Some(name.clone()),
+			sandbox,
+			SandboxArguments {
+				component: self,
+				configuration,
+			},
+		)
+		.await;
 
-		if let Err(e) = spawn {
-			error!("Couldn't spawn for {} because {}", name, e);
-		} else {
-			info!("Spawned actor for {}", name);
+		match spawn {
+			Err(e) => error!("Couldn't spawn for {} because {}", name, e),
+			Ok(_) => info!("Spawned actor for {}", name),
 		}
 
 		let bus = bus::get();

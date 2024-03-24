@@ -1,9 +1,11 @@
-use std::time::Duration;
+use std::{collections::HashSet, time::Duration};
 
 use bus::Event;
 use ractor::async_trait;
 use serde::{Deserialize, Serialize};
+use svc::r#type::{ServiceData, ServiceType};
 use tracing::debug;
+use trg::Trigger;
 
 use crate::{component::Component, sandbox::SandboxError, Vendor, VendorMessage};
 
@@ -26,7 +28,7 @@ impl Vendor for ZigbeeClass {
 	const VENDOR: Vendors = Vendors::Zigbee;
 
 	const SUBSCRIBE_BUS: bool = false;
-	const POLLING_INTERVAL: Duration = Duration::from_secs(3);
+	const POLLING_INTERVAL: Duration = Duration::from_secs(0);
 
 	async fn poll(&self) -> Result<(), SandboxError> {
 		debug!("Run called");
@@ -34,6 +36,21 @@ impl Vendor for ZigbeeClass {
 		debug!("After 4 seconds");
 
 		Ok(())
+	}
+
+	async fn services(&self) -> HashSet<ServiceType> {
+		let mut set = HashSet::new();
+
+		set.insert(ServiceType::new(ServiceData {}));
+		set
+	}
+
+	/// Get the triggers for the vendor.
+	async fn triggers(&self, _: &Component<Self>) -> HashSet<Trigger> {
+		let mut set = HashSet::new();
+
+		set.insert(Trigger::new("test".to_string(), Event::Time, trg::TriggerOrigin::System));
+		set
 	}
 }
 

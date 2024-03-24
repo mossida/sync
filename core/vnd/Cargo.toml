@@ -15,6 +15,7 @@ ractor = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
 tracing = { workspace = true }
+futures = { workspace = true }
 
 err = { path = "../err" }
 bus = { path = "../bus" }

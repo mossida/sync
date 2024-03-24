@@ -1,22 +1,37 @@
+use std::collections::HashSet;
+
 use bus::Consumer;
-use ractor::{async_trait, Actor, ActorProcessingErr, ActorRef, SupervisionEvent};
+use futures::future::join_all;
+use ractor::{async_trait, pg, Actor, ActorProcessingErr, ActorRef, SupervisionEvent};
 use svc::r#type::ServiceType;
 
+use dbm::resource::Resource;
 use tokio_util::sync::CancellationToken;
 use tracing::warn;
+use trg::Trigger;
 
-use crate::Vendor;
+use crate::{component::Component as ComponentInstance, Vendor, SANDBOX_GROUP, SCOPE};
 
-use super::{context::Context, Request, Response, Sandbox, SandboxMessage};
+use super::{Request, Response, Sandbox, SandboxMessage};
 
+pub struct SandboxArguments<Component>
+where
+	Component: Vendor,
+{
+	pub component: ComponentInstance<Component>,
+	pub configuration: Component::Configuration,
+}
+
+#[allow(dead_code)]
 pub struct State<Component>
 where
 	Component: Vendor,
 {
-	#[allow(dead_code)]
+	component: ComponentInstance<Component>,
 	configuration: Component::Configuration,
 	tokens: Vec<CancellationToken>,
-	services: Vec<ServiceType>,
+	services: HashSet<ServiceType>,
+	triggers: HashSet<Trigger>,
 	worker: ActorRef<()>,
 	panics: u8,
 }
@@ -26,15 +41,23 @@ impl<Component> Actor for Sandbox<Component>
 where
 	Component: Vendor,
 {
-	type Msg = SandboxMessage<Component::Message>;
-	type Arguments = Component::Configuration;
+	type Msg = SandboxMessage;
+	type Arguments = SandboxArguments<Component>;
 	type State = State<Component>;
 
 	async fn pre_start(
 		&self,
 		myself: ActorRef<Self::Msg>,
-		configuration: Self::Arguments,
+		args: Self::Arguments,
 	) -> Result<Self::State, ActorProcessingErr> {
+		// Join the sandbox group
+		pg::join_scoped(SCOPE.to_string(), SANDBOX_GROUP.to_string(), vec![myself.get_cell()]);
+
+		let SandboxArguments {
+			component,
+			configuration,
+		} = args;
+
 		// Setup vendor before listening to events
 		self.vendor.initialize(configuration.clone()).await;
 
@@ -46,12 +69,16 @@ where
 		}
 
 		let worker = self.spawn_worker(myself.get_cell()).await?;
+
 		let services = self.vendor.services().await;
+		let triggers = self.vendor.triggers(&component).await;
 
 		Ok(State {
 			tokens,
 			configuration,
+			component,
 			services,
+			triggers,
 			worker,
 			panics: 0,
 		})
@@ -60,9 +87,14 @@ where
 	async fn post_start(
 		&self,
 		_: ActorRef<Self::Msg>,
-		_: &mut Self::State,
+		state: &mut Self::State,
 	) -> Result<(), ActorProcessingErr> {
 		// TODO: Register services
+		let triggers: Vec<_> = state.triggers.iter().map(Resource::create).collect();
+		let services: Vec<_> = state.services.iter().map(Resource::create).collect();
+
+		join_all(triggers).await;
+		join_all(services).await;
 
 		Ok(())
 	}
@@ -75,10 +107,9 @@ where
 	) -> Result<(), ActorProcessingErr> {
 		match message {
 			SandboxMessage::Event(event) => self.vendor.on_event(event).await,
-			SandboxMessage::VendorMessage(msg) => __self.vendor.on_message(&Context {}, msg).await,
 			SandboxMessage::Request(rq, rpc) => match rq {
 				Request::Call(service) => {
-					let is_registered = state.services.iter().any(|s| service.is(s));
+					let is_registered = state.services.iter().any(|s| service.is(&s));
 
 					match is_registered {
 						true => {

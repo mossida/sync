@@ -1,8 +1,9 @@
-use std::future::IntoFuture;
+use std::{future::IntoFuture, pin::Pin};
 
+use futures::Future;
 use serde::Deserialize;
 
-use crate::{methods::Method, IntoFuture as Future, Output};
+use crate::{methods::Method, Output};
 
 #[derive(Deserialize)]
 pub struct Request {
@@ -13,7 +14,7 @@ pub struct Request {
 
 impl IntoFuture for Request {
 	type Output = Output;
-	type IntoFuture = Future<Self::Output>;
+	type IntoFuture = Pin<Box<dyn Future<Output = Output> + Send + Sync>>;
 
 	fn into_future(self) -> Self::IntoFuture {
 		self.method.into_future()

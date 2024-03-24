@@ -354,6 +354,7 @@ dependencies = [
  "svc",
  "tracing",
  "trg",
+ "vnd",
 ]
 
 [[package]]
@@ -3571,12 +3572,14 @@ dependencies = [
  "ractor",
  "serde",
  "serde_json",
+ "svc",
  "thiserror",
  "tokio",
  "tokio-stream",
  "tokio-util",
  "tower-http",
  "tracing",
+ "trg",
  "uuid",
 ]
 
@@ -5208,6 +5211,7 @@ dependencies = [
  "cls",
  "dbm",
  "err",
+ "futures",
  "ractor",
  "serde",
  "serde_json",

@@ -29,13 +29,12 @@ impl<D, E> From<Result<D, E>> for Response {
 	}
 }
 
-pub enum SandboxMessage<Message> {
+pub enum SandboxMessage {
 	Event(Event),
-	VendorMessage(Message),
 	Request(Request, RpcReplyPort<Response>),
 }
 
-impl<Message> From<Event> for SandboxMessage<Message> {
+impl From<Event> for SandboxMessage {
 	fn from(event: Event) -> Self {
 		Self::Event(event)
 	}

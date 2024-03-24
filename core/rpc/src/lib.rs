@@ -1,6 +1,3 @@
-use std::pin::Pin;
-
-use futures::Future;
 use serde::Serialize;
 use serde_json::Value;
 use thiserror::Error;
@@ -13,7 +10,6 @@ pub mod client;
 mod worker;
 
 type Output = Result<Value, RpcError>;
-type IntoFuture<T> = Pin<Box<dyn Future<Output = T> + Send + Sync>>;
 
 #[derive(Debug, Error)]
 pub enum RpcError {
@@ -27,6 +23,10 @@ pub enum RpcError {
 	ProcessingError(#[from] err::Error),
 	#[error("Serialization error")]
 	SerializationError(#[from] serde_json::Error),
+	#[error("Missing parameter: {0}")]
+	MissingParameter(String),
+	#[error("Invalid parameter: {0}")]
+	InvalidParameter(String),
 }
 
 impl Serialize for RpcError {
