@@ -81,13 +81,25 @@ where
 
 				match task {
 					Task::Poll => {
-						let data = self.vendor.poll(self.context.clone()).await?;
+						let result = self.vendor.poll(self.context.clone()).await;
 
-						state.factory.send_message(FactoryMessage::Dispatch(Job {
-							key: Task::Consume,
-							msg: Some(data),
-							options: Default::default(),
-						}))?;
+						if let Ok(data) = result {
+							if data.is_some() {
+								state.factory.send_message(FactoryMessage::Dispatch(Job {
+									key: Task::Consume,
+									msg: data,
+									options: Default::default(),
+								}))?;
+							}
+						} else {
+							if V::STOP_ON_ERROR {
+								let _ = state
+									.factory
+									.stop_and_wait(None, Some(V::POLLING_INTERVAL))
+									.await
+									.inspect_err(|_| state.factory.kill());
+							}
+						}
 					}
 					Task::Consume => {
 						if let Some(data) = data {

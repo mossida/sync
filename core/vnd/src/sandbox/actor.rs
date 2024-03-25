@@ -5,12 +5,13 @@ use futures::future::join_all;
 use ractor::{
 	async_trait,
 	factory::{Factory, FactoryMessage, Job, RoutingMode},
-	pg, Actor, ActorProcessingErr, ActorRef,
+	pg, Actor, ActorProcessingErr, ActorRef, SupervisionEvent,
 };
 use svc::r#type::ServiceType;
 
 use dbm::resource::Resource;
 use tokio_util::sync::CancellationToken;
+use tracing::error;
 use trg::Trigger;
 
 use crate::{component::Component as ComponentInstance, Vendor, SANDBOX_GROUP, SCOPE};
@@ -59,8 +60,8 @@ where
 		pg::join_scoped(SCOPE.to_string(), SANDBOX_GROUP.to_string(), vec![myself.get_cell()]);
 
 		// Setup vendor before listening to events
-		let context = self.vendor.initialize(&arguments).await?;
-		let reference = Arc::new(context);
+		let raw_context = self.vendor.initialize(&arguments).await?;
+		let context: Arc<_> = Arc::new(raw_context);
 		let mut tokens = Vec::new();
 
 		if Component::SUBSCRIBE_BUS {
@@ -68,7 +69,7 @@ where
 			tokens.push(bus.subscribe().to_actor(myself.clone()));
 		}
 
-		let (factory, _) = Actor::spawn(
+		let (factory, _) = Actor::spawn_linked(
 			None,
 			Factory {
 				worker_count: 2,
@@ -81,8 +82,9 @@ where
 			},
 			Box::new(Builder {
 				vendor: self.vendor.clone(),
-				context: reference,
+				context,
 			}),
+			myself.get_cell(),
 		)
 		.await?;
 
@@ -149,6 +151,22 @@ where
 		Ok(())
 	}
 
+	async fn handle_supervisor_evt(
+		&self,
+		_: ActorRef<Self::Msg>,
+		message: SupervisionEvent,
+		_: &mut Self::State,
+	) -> Result<(), ActorProcessingErr> {
+		match message {
+			SupervisionEvent::ActorTerminated(_, _, _) | SupervisionEvent::ActorPanicked(_, _) => {
+				// TODO: Handle factory termination
+				error!("Polling system has terminated");
+			}
+			_ => {}
+		}
+		Ok(())
+	}
+
 	async fn post_stop(
 		&self,
 		_: ActorRef<Self::Msg>,
@@ -156,6 +174,7 @@ where
 	) -> Result<(), ActorProcessingErr> {
 		state.factory.kill();
 		state.tokens.iter().for_each(|t| t.cancel());
+
 		self.vendor.stop().await;
 
 		Ok(())

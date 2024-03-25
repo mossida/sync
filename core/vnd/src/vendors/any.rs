@@ -27,7 +27,7 @@ impl Vendor for AnyVendor {
 		Ok(())
 	}
 
-	async fn poll(&self, _: RefContext<Self>) -> Result<Self::PollData, SandboxError> {
-		Ok(())
+	async fn poll(&self, _: RefContext<Self>) -> Result<Option<Self::PollData>, SandboxError> {
+		Ok(None)
 	}
 }

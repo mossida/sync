@@ -18,7 +18,6 @@ use crate::{
 
 use super::Vendors;
 
-mod factory;
 mod payload;
 
 pub type Zigbee = Component<ZigbeeClass>;
@@ -33,16 +32,23 @@ pub struct Context {
 	client: RwLock<mqtt::Client>,
 }
 
+#[derive(Clone, Debug, Serialize, Deserialize)]
+pub struct Data {
+	topic: String,
+	payload: String,
+}
+
 #[async_trait]
 impl Vendor for ZigbeeClass {
 	type Configuration = ZigbeeConfiguration;
 	type Context = Context;
-	type PollData = Notification;
+	type PollData = Data;
 
 	const NAME: &'static str = "zigbee";
 	const VENDOR: Vendors = Vendors::Zigbee;
 
 	const SUBSCRIBE_BUS: bool = false;
+	const STOP_ON_ERROR: bool = true;
 
 	async fn initialize(
 		&self,
@@ -59,11 +65,37 @@ impl Vendor for ZigbeeClass {
 		})
 	}
 
-	async fn poll(&self, ctx: RefContext<Self>) -> Result<Self::PollData, SandboxError> {
+	async fn poll(&self, ctx: RefContext<Self>) -> Result<Option<Self::PollData>, SandboxError> {
 		let mut client = ctx.client.write().await;
 		let notification = client.1.next().await?.ok_or("Link closed")?;
 
-		Ok(notification)
+		let data = match notification {
+			Notification::Forward(forward) => {
+				let publish = forward.publish;
+				let topic = String::from_utf8(publish.topic.to_vec());
+				let payload = String::from_utf8(publish.payload.to_vec());
+
+				match (topic, payload) {
+					(Ok(topic), Ok(payload)) => Some(Data {
+						topic,
+						payload,
+					}),
+					_ => None,
+				}
+			}
+			Notification::Disconnect(_, _) => {
+				return Err("Link closed".into());
+			}
+			_ => None,
+		};
+
+		Ok(data)
+	}
+
+	async fn consume(&self, _: RefContext<Self>, data: Self::PollData) -> Result<(), SandboxError> {
+		dbg!(data);
+
+		Ok(())
 	}
 
 	async fn services(&self) -> HashSet<ServiceType> {

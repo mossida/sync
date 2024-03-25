@@ -48,6 +48,8 @@ pub trait Vendor: 'static + Send + Sync + Clone + Default {
 	/// once to completion after the vendor is initialized
 	const POLLING_INTERVAL: Duration = Duration::from_millis(1);
 
+	const STOP_ON_ERROR: bool = false;
+
 	/* REGISTER FUNCTIONS */
 
 	/// Get the services provided by the vendor.
@@ -83,7 +85,7 @@ pub trait Vendor: 'static + Send + Sync + Clone + Default {
 	///
 	/// If the function fails to execute, it will be
 	/// retried RETRIES number of times.
-	async fn poll(&self, ctx: RefContext<Self>) -> Result<Self::PollData, SandboxError>;
+	async fn poll(&self, ctx: RefContext<Self>) -> Result<Option<Self::PollData>, SandboxError>;
 
 	async fn consume(
 		&self,

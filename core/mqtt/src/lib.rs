@@ -4,13 +4,10 @@ use std::{
 	thread,
 };
 
-use rumqttd::{
-	local::{LinkRx, LinkTx},
-	Broker,
-};
+use rumqttd::local::{LinkRx, LinkTx};
 use tracing::error;
 
-pub use rumqttd::Notification;
+pub use rumqttd::*;
 
 pub type Client = (LinkTx, LinkRx);
 
