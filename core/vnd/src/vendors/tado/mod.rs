@@ -4,7 +4,7 @@ use serde::{Deserialize, Serialize};
 use crate::{
 	component::Component,
 	sandbox::{actor::SandboxArguments, SandboxError},
-	Vendor,
+	RefContext, Vendor,
 };
 
 use super::Vendors;
@@ -32,7 +32,7 @@ impl Vendor for TadoVendor {
 		Ok(())
 	}
 
-	async fn poll(&self, _: &mut Self::Context) -> Result<Self::PollData, SandboxError> {
+	async fn poll(&self, _: RefContext<Self>) -> Result<Self::PollData, SandboxError> {
 		Ok(())
 	}
 }

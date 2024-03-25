@@ -4,7 +4,7 @@ use ractor::async_trait;
 
 use sandbox::{actor::SandboxArguments, SandboxError};
 use serde::{de::DeserializeOwned, Serialize};
-use std::{collections::HashSet, hash::Hash, time::Duration};
+use std::{collections::HashSet, hash::Hash, sync::Arc, time::Duration};
 use svc::{r#type::ServiceType, Service};
 use tracing::warn;
 use trg::Trigger;
@@ -19,6 +19,8 @@ pub mod vendors;
 
 pub static SCOPE: &str = "vendors";
 pub static SANDBOX_GROUP: &str = "sandboxes";
+
+pub type RefContext<V> = Arc<<V as Vendor>::Context>;
 
 #[async_trait]
 #[allow(unused_variables)]
@@ -39,15 +41,12 @@ pub trait Vendor: 'static + Send + Sync + Clone + Default {
 
 	/* CONFIGURATION */
 
-	/// The number of retries after poll function
-	/// fails to execute.
-	const RETRIES: u8 = 3;
 	/// Whether to subscribe to the bus.
 	const SUBSCRIBE_BUS: bool = false;
 	/// The polling interval for the poll function.
 	/// If set to 0, the run function will be called
 	/// once to completion after the vendor is initialized
-	const POLLING_INTERVAL: Duration = Duration::from_secs(0);
+	const POLLING_INTERVAL: Duration = Duration::from_millis(1);
 
 	/* REGISTER FUNCTIONS */
 
@@ -84,11 +83,11 @@ pub trait Vendor: 'static + Send + Sync + Clone + Default {
 	///
 	/// If the function fails to execute, it will be
 	/// retried RETRIES number of times.
-	async fn poll(&self, ctx: &mut Self::Context) -> Result<Self::PollData, SandboxError>;
+	async fn poll(&self, ctx: RefContext<Self>) -> Result<Self::PollData, SandboxError>;
 
-	async fn process(
+	async fn consume(
 		&self,
-		ctx: &mut Self::Context,
+		ctx: RefContext<Self>,
 		data: Self::PollData,
 	) -> Result<(), SandboxError> {
 		warn!("The vendor {} is not handling the data", Self::NAME);

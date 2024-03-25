@@ -1,4 +1,4 @@
-use std::{borrow::BorrowMut, collections::HashSet, time::Duration};
+use std::collections::HashSet;
 
 use bus::Event;
 use dbm::resource::Resource;
@@ -7,12 +7,13 @@ use mqtt::Notification;
 use ractor::async_trait;
 use serde::{Deserialize, Serialize};
 use svc::r#type::{ServiceData, ServiceType};
+use tokio::sync::RwLock;
 use trg::Trigger;
 
 use crate::{
 	component::Component,
 	sandbox::{actor::SandboxArguments, SandboxError},
-	Vendor,
+	RefContext, Vendor,
 };
 
 use super::Vendors;
@@ -29,7 +30,7 @@ pub struct ZigbeeConfiguration {}
 pub struct ZigbeeClass {}
 
 pub struct Context {
-	client: mqtt::Client,
+	client: RwLock<mqtt::Client>,
 }
 
 #[async_trait]
@@ -42,7 +43,6 @@ impl Vendor for ZigbeeClass {
 	const VENDOR: Vendors = Vendors::Zigbee;
 
 	const SUBSCRIBE_BUS: bool = false;
-	const POLLING_INTERVAL: Duration = Duration::from_millis(1);
 
 	async fn initialize(
 		&self,
@@ -50,17 +50,18 @@ impl Vendor for ZigbeeClass {
 	) -> Result<Self::Context, SandboxError> {
 		let name = args.component.id();
 
-		let (mut tx, rx) = mqtt::client(name.to_raw().as_str()).unwrap();
-		let _ = tx.subscribe("zigbee/#");
+		let (mut tx, rx) =
+			mqtt::client(name.to_raw().as_str()).map_err(|_| "Cannot create client")?;
+		let _ = tx.subscribe("zigbee/#")?;
 
 		Ok(Context {
-			client: (tx, rx),
+			client: RwLock::new((tx, rx)),
 		})
 	}
 
-	async fn poll(&self, ctx: &mut Self::Context) -> Result<Self::PollData, SandboxError> {
-		let rx = ctx.client.1.borrow_mut();
-		let notification = rx.next().await?.ok_or("Link closed")?;
+	async fn poll(&self, ctx: RefContext<Self>) -> Result<Self::PollData, SandboxError> {
+		let mut client = ctx.client.write().await;
+		let notification = client.1.next().await?.ok_or("Link closed")?;
 
 		Ok(notification)
 	}

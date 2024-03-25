@@ -1,8 +1,12 @@
-use std::collections::HashSet;
+use std::{collections::HashSet, sync::Arc};
 
 use bus::Consumer;
 use futures::future::join_all;
-use ractor::{async_trait, pg, Actor, ActorProcessingErr, ActorRef, SupervisionEvent};
+use ractor::{
+	async_trait,
+	factory::{Factory, FactoryMessage, Job, RoutingMode},
+	pg, Actor, ActorProcessingErr, ActorRef,
+};
 use svc::r#type::ServiceType;
 
 use dbm::resource::Resource;
@@ -11,7 +15,10 @@ use trg::Trigger;
 
 use crate::{component::Component as ComponentInstance, Vendor, SANDBOX_GROUP, SCOPE};
 
-use super::{Request, Response, Sandbox, SandboxMessage};
+use super::{
+	worker::{Builder, Task},
+	Request, Response, Sandbox, SandboxMessage,
+};
 
 #[derive(Clone)]
 pub struct SandboxArguments<Component>
@@ -31,8 +38,7 @@ where
 	tokens: Vec<CancellationToken>,
 	services: HashSet<ServiceType>,
 	triggers: HashSet<Trigger>,
-	worker: ActorRef<()>,
-	panics: u8,
+	factory: ActorRef<FactoryMessage<Task, Option<Component::PollData>>>,
 }
 
 #[async_trait]
@@ -54,6 +60,7 @@ where
 
 		// Setup vendor before listening to events
 		let context = self.vendor.initialize(&arguments).await?;
+		let reference = Arc::new(context);
 		let mut tokens = Vec::new();
 
 		if Component::SUBSCRIBE_BUS {
@@ -61,18 +68,41 @@ where
 			tokens.push(bus.subscribe().to_actor(myself.clone()));
 		}
 
-		let worker = self.spawn_worker(myself.get_cell(), context).await?;
+		let (factory, _) = Actor::spawn(
+			None,
+			Factory {
+				worker_count: 2,
+				worker_parallel_capacity: 1,
+				collect_worker_stats: false,
+				routing_mode: RoutingMode::StickyQueuer,
+				discard_threshold: Some(10),
+				dead_mans_switch: None,
+				..Default::default()
+			},
+			Box::new(Builder {
+				vendor: self.vendor.clone(),
+				context: reference,
+			}),
+		)
+		.await?;
+
+		factory.send_interval(Component::POLLING_INTERVAL, || {
+			FactoryMessage::Dispatch(Job {
+				key: Task::Poll,
+				msg: None,
+				options: Default::default(),
+			})
+		});
 
 		let services = self.vendor.services().await;
 		let triggers = self.vendor.triggers(&arguments.component).await;
 
 		Ok(State {
+			factory,
 			arguments,
 			tokens,
 			services,
 			triggers,
-			worker,
-			panics: 0,
 		})
 	}
 
@@ -119,35 +149,13 @@ where
 		Ok(())
 	}
 
-	async fn handle_supervisor_evt(
-		&self,
-		_: ActorRef<Self::Msg>,
-		_: SupervisionEvent,
-		_: &mut Self::State,
-	) -> Result<(), ActorProcessingErr> {
-		/*if let SupervisionEvent::ActorPanicked(_, _) = message {
-			if state.panics >= Component::RETRIES {
-				warn!("Worker actor panicked {} times, giving up...", state.panics);
-				return Ok(());
-			}
-
-			warn!("Worker actor panicked! This should not happen, restarting...");
-			// Restart worker
-			state.panics += 1;
-			state.worker = self.spawn_worker(myself.get_cell(), state.context.clone()).await?;
-		}*/
-
-		Ok(())
-	}
-
 	async fn post_stop(
 		&self,
 		_: ActorRef<Self::Msg>,
 		state: &mut Self::State,
 	) -> Result<(), ActorProcessingErr> {
-		state.worker.kill();
+		state.factory.kill();
 		state.tokens.iter().for_each(|t| t.cancel());
-
 		self.vendor.stop().await;
 
 		Ok(())

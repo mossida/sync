@@ -1,10 +1,46 @@
-use ractor::{async_trait, Actor, ActorProcessingErr, ActorRef};
+use std::sync::Arc;
 
-use crate::Vendor;
+use ractor::{
+	async_trait,
+	factory::{FactoryMessage, Job, WorkerBuilder, WorkerMessage, WorkerStartContext},
+	Actor, ActorProcessingErr, ActorRef,
+};
+
+use crate::{RefContext, Vendor};
+
+#[derive(Debug, Clone, Hash, PartialEq, Eq)]
+pub enum Task {
+	Poll,
+	Consume,
+}
 
 #[derive(Clone)]
-pub struct Worker<V> {
-	pub vendor: V,
+pub struct Worker<V>
+where
+	V: Vendor,
+{
+	pub vendor: Arc<V>,
+	pub context: RefContext<V>,
+}
+
+pub struct Builder<V>
+where
+	V: Vendor,
+{
+	pub vendor: Arc<V>,
+	pub context: RefContext<V>,
+}
+
+impl<V> WorkerBuilder<Worker<V>> for Builder<V>
+where
+	V: Vendor,
+{
+	fn build(&self, _: ractor::factory::WorkerId) -> Worker<V> {
+		Worker {
+			vendor: self.vendor.clone(),
+			context: self.context.clone(),
+		}
+	}
 }
 
 #[async_trait]
@@ -12,9 +48,9 @@ impl<V> Actor for Worker<V>
 where
 	V: Vendor,
 {
-	type Msg = ();
-	type Arguments = V::Context;
-	type State = V::Context;
+	type Msg = WorkerMessage<Task, Option<V::PollData>>;
+	type Arguments = WorkerStartContext<Task, Option<V::PollData>>;
+	type State = Self::Arguments;
 
 	async fn pre_start(
 		&self,
@@ -27,11 +63,42 @@ where
 	async fn handle(
 		&self,
 		_: ActorRef<Self::Msg>,
-		_: Self::Msg,
-		context: &mut Self::State,
+		message: Self::Msg,
+		state: &mut Self::State,
 	) -> Result<(), ActorProcessingErr> {
-		let data = self.vendor.poll(context).await?;
-		let _ = self.vendor.process(context, data).await?;
+		match message {
+			WorkerMessage::FactoryPing(time) => {
+				state
+					.factory
+					.send_message(FactoryMessage::WorkerPong(state.wid, time.elapsed()))?;
+			}
+			WorkerMessage::Dispatch(job) => {
+				let Job {
+					key: task,
+					msg: data,
+					..
+				} = job;
+
+				match task {
+					Task::Poll => {
+						let data = self.vendor.poll(self.context.clone()).await?;
+
+						state.factory.send_message(FactoryMessage::Dispatch(Job {
+							key: Task::Consume,
+							msg: Some(data),
+							options: Default::default(),
+						}))?;
+					}
+					Task::Consume => {
+						if let Some(data) = data {
+							self.vendor.consume(self.context.clone(), data).await?;
+						}
+					}
+				};
+
+				state.factory.send_message(FactoryMessage::Finished(state.wid, task))?;
+			}
+		};
 
 		Ok(())
 	}

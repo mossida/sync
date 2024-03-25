@@ -3,7 +3,7 @@ use ractor::async_trait;
 use crate::{
 	component::Component,
 	sandbox::{actor::SandboxArguments, SandboxError},
-	Vendor,
+	RefContext, Vendor,
 };
 
 use super::Vendors;
@@ -27,7 +27,7 @@ impl Vendor for AnyVendor {
 		Ok(())
 	}
 
-	async fn poll(&self, _: &mut Self::Context) -> Result<Self::PollData, SandboxError> {
+	async fn poll(&self, _: RefContext<Self>) -> Result<Self::PollData, SandboxError> {
 		Ok(())
 	}
 }
