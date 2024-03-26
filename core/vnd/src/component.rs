@@ -18,7 +18,7 @@ use crate::{
 };
 
 /// Represents an instance of a class.
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Component<V>
 where
 	V: Vendor,

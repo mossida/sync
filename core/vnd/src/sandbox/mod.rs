@@ -1,9 +1,9 @@
+use std::sync::Arc;
+
 use crate::Vendor;
 use bus::Event;
-use ractor::{Actor, ActorCell, ActorProcessingErr, ActorRef, RpcReplyPort};
+use ractor::{ActorProcessingErr, RpcReplyPort};
 use svc::Service;
-
-use self::worker::Worker;
 
 pub mod actor;
 pub mod context;
@@ -44,7 +44,7 @@ pub struct Sandbox<V>
 where
 	V: Vendor,
 {
-	vendor: V,
+	vendor: Arc<V>,
 }
 
 impl<V> Sandbox<V>
@@ -53,27 +53,7 @@ where
 {
 	pub fn new(vendor: V) -> Self {
 		Self {
-			vendor,
+			vendor: Arc::new(vendor),
 		}
-	}
-
-	pub async fn spawn_worker(&self, cell: ActorCell) -> Result<ActorRef<()>, ActorProcessingErr> {
-		let (worker, _) = Actor::spawn_linked(
-			None,
-			Worker {
-				vendor: self.vendor.clone(),
-			},
-			(),
-			cell,
-		)
-		.await?;
-
-		if V::POLLING_INTERVAL.is_zero() {
-			let _ = worker.send_message(());
-		} else {
-			worker.send_interval(V::POLLING_INTERVAL, || ());
-		}
-
-		Ok(worker)
 	}
 }

@@ -1,15 +1,26 @@
-use std::{collections::HashSet, time::Duration};
+use std::collections::HashSet;
 
 use bus::Event;
+use dbm::resource::Resource;
+
+use mqtt::Notification;
 use ractor::async_trait;
 use serde::{Deserialize, Serialize};
 use svc::r#type::{ServiceData, ServiceType};
-use tracing::debug;
+use tokio::sync::RwLock;
 use trg::Trigger;
 
-use crate::{component::Component, sandbox::SandboxError, Vendor, VendorMessage};
+use crate::{
+	component::Component,
+	sandbox::{actor::SandboxArguments, SandboxError},
+	RefContext, Vendor,
+};
+
+use self::client::{Client, Payload, Topic};
 
 use super::Vendors;
+
+mod client;
 
 pub type Zigbee = Component<ZigbeeClass>;
 
@@ -19,21 +30,73 @@ pub struct ZigbeeConfiguration {}
 #[derive(Clone, Default)]
 pub struct ZigbeeClass {}
 
+#[allow(dead_code)]
+pub struct Context<V>
+where
+	V: Vendor,
+{
+	mqtt: RwLock<mqtt::Client>,
+	client: Client,
+	arguments: SandboxArguments<V>,
+}
+
 #[async_trait]
 impl Vendor for ZigbeeClass {
 	type Configuration = ZigbeeConfiguration;
-	type Message = ZigbeeMessage;
+	type Context = Context<Self>;
+	type PollData = (Topic, Payload);
 
 	const NAME: &'static str = "zigbee";
 	const VENDOR: Vendors = Vendors::Zigbee;
 
 	const SUBSCRIBE_BUS: bool = false;
-	const POLLING_INTERVAL: Duration = Duration::from_secs(0);
+	const STOP_ON_ERROR: bool = true;
 
-	async fn poll(&self) -> Result<(), SandboxError> {
-		debug!("Run called");
-		tokio::time::sleep(Duration::from_secs(4)).await;
-		debug!("After 4 seconds");
+	async fn initialize(
+		&self,
+		arguments: SandboxArguments<Self>,
+	) -> Result<Self::Context, SandboxError> {
+		let name = arguments.component.id();
+
+		let (mut tx, rx) =
+			mqtt::client(name.to_raw().as_str()).map_err(|_| "Cannot create client")?;
+		let _ = tx.subscribe("zigbee/#")?;
+
+		Ok(Context {
+			mqtt: RwLock::new((tx, rx)),
+			client: Client {},
+			arguments,
+		})
+	}
+
+	async fn poll(&self, ctx: RefContext<Self>) -> Result<Option<Self::PollData>, SandboxError> {
+		let mut client = ctx.mqtt.write().await;
+		let notification = client.1.next().await?.ok_or("Link closed")?;
+
+		let data = match notification {
+			Notification::Forward(forward) => {
+				let publish = forward.publish;
+				let topic = String::from_utf8_lossy(&publish.topic);
+				let payload = publish.payload;
+
+				let topic: String = topic.chars().skip(7).collect();
+				Some((topic.into(), payload.into()))
+			}
+			Notification::Disconnect(_, _) => {
+				return Err("Link closed".into());
+			}
+			_ => None,
+		};
+
+		Ok(data)
+	}
+
+	async fn consume(
+		&self,
+		ctx: RefContext<Self>,
+		data: Self::PollData,
+	) -> Result<(), SandboxError> {
+		let _ = ctx.client.handle(data.0, data.1).await;
 
 		Ok(())
 	}
@@ -46,24 +109,10 @@ impl Vendor for ZigbeeClass {
 	}
 
 	/// Get the triggers for the vendor.
-	async fn triggers(&self, _: &Component<Self>) -> HashSet<Trigger> {
+	async fn triggers(&self) -> HashSet<Trigger> {
 		let mut set = HashSet::new();
 
 		set.insert(Trigger::new("test".to_string(), Event::Time, trg::TriggerOrigin::System));
 		set
-	}
-}
-
-pub enum ZigbeeMessage {}
-
-impl From<VendorMessage> for ZigbeeMessage {
-	fn from(_: VendorMessage) -> Self {
-		todo!()
-	}
-}
-
-impl From<Event> for ZigbeeMessage {
-	fn from(_: Event) -> Self {
-		todo!()
 	}
 }

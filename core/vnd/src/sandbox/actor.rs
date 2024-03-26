@@ -1,19 +1,27 @@
-use std::collections::HashSet;
+use std::{collections::HashSet, sync::Arc};
 
 use bus::Consumer;
 use futures::future::join_all;
-use ractor::{async_trait, pg, Actor, ActorProcessingErr, ActorRef, SupervisionEvent};
+use ractor::{
+	async_trait,
+	factory::{Factory, FactoryMessage, Job, RoutingMode},
+	pg, Actor, ActorProcessingErr, ActorRef, SupervisionEvent,
+};
 use svc::r#type::ServiceType;
 
 use dbm::resource::Resource;
 use tokio_util::sync::CancellationToken;
-use tracing::warn;
+use tracing::error;
 use trg::Trigger;
 
 use crate::{component::Component as ComponentInstance, Vendor, SANDBOX_GROUP, SCOPE};
 
-use super::{Request, Response, Sandbox, SandboxMessage};
+use super::{
+	worker::{Builder, Task},
+	Request, Response, Sandbox, SandboxMessage,
+};
 
+#[derive(Clone)]
 pub struct SandboxArguments<Component>
 where
 	Component: Vendor,
@@ -27,13 +35,10 @@ pub struct State<Component>
 where
 	Component: Vendor,
 {
-	component: ComponentInstance<Component>,
-	configuration: Component::Configuration,
 	tokens: Vec<CancellationToken>,
 	services: HashSet<ServiceType>,
 	triggers: HashSet<Trigger>,
-	worker: ActorRef<()>,
-	panics: u8,
+	factory: ActorRef<FactoryMessage<Task, Option<Component::PollData>>>,
 }
 
 #[async_trait]
@@ -48,19 +53,14 @@ where
 	async fn pre_start(
 		&self,
 		myself: ActorRef<Self::Msg>,
-		args: Self::Arguments,
+		arguments: Self::Arguments,
 	) -> Result<Self::State, ActorProcessingErr> {
 		// Join the sandbox group
 		pg::join_scoped(SCOPE.to_string(), SANDBOX_GROUP.to_string(), vec![myself.get_cell()]);
 
-		let SandboxArguments {
-			component,
-			configuration,
-		} = args;
-
 		// Setup vendor before listening to events
-		self.vendor.initialize(configuration.clone()).await;
-
+		let raw_context = self.vendor.initialize(arguments).await?;
+		let context: Arc<_> = Arc::new(raw_context);
 		let mut tokens = Vec::new();
 
 		if Component::SUBSCRIBE_BUS {
@@ -68,19 +68,41 @@ where
 			tokens.push(bus.subscribe().to_actor(myself.clone()));
 		}
 
-		let worker = self.spawn_worker(myself.get_cell()).await?;
+		let (factory, _) = Actor::spawn_linked(
+			None,
+			Factory {
+				worker_count: 2,
+				worker_parallel_capacity: 1,
+				collect_worker_stats: false,
+				routing_mode: RoutingMode::StickyQueuer,
+				discard_threshold: Some(10),
+				dead_mans_switch: None,
+				..Default::default()
+			},
+			Box::new(Builder {
+				vendor: self.vendor.clone(),
+				context,
+			}),
+			myself.get_cell(),
+		)
+		.await?;
+
+		factory.send_interval(Component::POLLING_INTERVAL, || {
+			FactoryMessage::Dispatch(Job {
+				key: Task::Poll,
+				msg: None,
+				options: Default::default(),
+			})
+		});
 
 		let services = self.vendor.services().await;
-		let triggers = self.vendor.triggers(&component).await;
+		let triggers = self.vendor.triggers().await;
 
 		Ok(State {
+			factory,
 			tokens,
-			configuration,
-			component,
 			services,
 			triggers,
-			worker,
-			panics: 0,
 		})
 	}
 
@@ -129,22 +151,20 @@ where
 
 	async fn handle_supervisor_evt(
 		&self,
-		myself: ActorRef<Self::Msg>,
+		_: ActorRef<Self::Msg>,
 		message: SupervisionEvent,
-		state: &mut Self::State,
+		_: &mut Self::State,
 	) -> Result<(), ActorProcessingErr> {
-		if let SupervisionEvent::ActorPanicked(_, _) = message {
-			if state.panics >= Component::RETRIES {
-				warn!("Worker actor panicked {} times, giving up...", state.panics);
-				return Ok(());
+		match message {
+			SupervisionEvent::ActorTerminated(_, _, _) => {
+				// TODO: Handle factory termination
+				error!("Polling system has terminated.");
 			}
-
-			warn!("Worker actor panicked! This should not happen, restarting...");
-			// Restart worker
-			state.panics += 1;
-			state.worker = self.spawn_worker(myself.get_cell()).await?;
+			SupervisionEvent::ActorPanicked(_, error) => {
+				error!("Polling system has terminated: {:?}", error);
+			}
+			_ => {}
 		}
-
 		Ok(())
 	}
 
@@ -153,7 +173,7 @@ where
 		_: ActorRef<Self::Msg>,
 		state: &mut Self::State,
 	) -> Result<(), ActorProcessingErr> {
-		state.worker.kill();
+		state.factory.kill();
 		state.tokens.iter().for_each(|t| t.cancel());
 
 		self.vendor.stop().await;

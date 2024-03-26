@@ -2,7 +2,7 @@
 macro_rules! implement {
     ($($module:ident => $enum:ident),*) => {
         // Define the enum
-        #[derive(serde::Serialize, serde::Deserialize, Debug)]
+        #[derive(serde::Serialize, serde::Deserialize, Debug, Clone)]
         #[serde(rename_all = "snake_case")]
         pub enum Vendors {
             Any,

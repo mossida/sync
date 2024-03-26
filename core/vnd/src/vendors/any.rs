@@ -1,4 +1,10 @@
-use crate::{component::Component, Vendor, VendorMessage};
+use ractor::async_trait;
+
+use crate::{
+	component::Component,
+	sandbox::{actor::SandboxArguments, SandboxError},
+	RefContext, Vendor,
+};
 
 use super::Vendors;
 
@@ -7,24 +13,21 @@ pub type Any = Component<AnyVendor>;
 #[derive(Debug, Clone, Default)]
 pub struct AnyVendor {}
 
-pub enum AnyMessage {}
-
+#[async_trait]
 impl Vendor for AnyVendor {
 	type Configuration = ();
-	type Message = AnyMessage;
+
+	type Context = ();
+	type PollData = ();
 
 	const NAME: &'static str = "any";
 	const VENDOR: Vendors = Vendors::Any;
-}
 
-impl From<VendorMessage> for AnyMessage {
-	fn from(_: VendorMessage) -> Self {
-		unreachable!()
+	async fn initialize(&self, _: SandboxArguments<Self>) -> Result<Self::Context, SandboxError> {
+		Ok(())
 	}
-}
 
-impl From<bus::Event> for AnyMessage {
-	fn from(_: bus::Event) -> Self {
-		unreachable!()
+	async fn poll(&self, _: RefContext<Self>) -> Result<Option<Self::PollData>, SandboxError> {
+		Ok(None)
 	}
 }

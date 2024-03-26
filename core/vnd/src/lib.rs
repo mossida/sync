@@ -1,12 +1,12 @@
 use bus::Event;
-use component::Component;
+
 use ractor::async_trait;
 
-use sandbox::SandboxError;
+use sandbox::{actor::SandboxArguments, SandboxError};
 use serde::{de::DeserializeOwned, Serialize};
-use std::{collections::HashSet, hash::Hash, time::Duration};
+use std::{collections::HashSet, hash::Hash, sync::Arc, time::Duration};
 use svc::{r#type::ServiceType, Service};
-use tracing::{info, warn};
+use tracing::warn;
 use trg::Trigger;
 use vendors::Vendors;
 
@@ -20,7 +20,7 @@ pub mod vendors;
 pub static SCOPE: &str = "vendors";
 pub static SANDBOX_GROUP: &str = "sandboxes";
 
-pub enum VendorMessage {}
+pub type RefContext<V> = Arc<<V as Vendor>::Context>;
 
 #[async_trait]
 #[allow(unused_variables)]
@@ -28,8 +28,9 @@ pub enum VendorMessage {}
 pub trait Vendor: 'static + Send + Sync + Clone + Default {
 	/// The configuration type associated with the vendor.
 	type Configuration: Serialize + DeserializeOwned + Hash + Clone + Send + Sync;
-	/// The message type associated with the vendor.
-	type Message: From<VendorMessage> + From<Event> + Send + Sync;
+
+	type Context: Send + Sync;
+	type PollData: Send + Sync;
 
 	/* CONSTANTS */
 
@@ -40,15 +41,14 @@ pub trait Vendor: 'static + Send + Sync + Clone + Default {
 
 	/* CONFIGURATION */
 
-	/// The number of retries after poll function
-	/// fails to execute.
-	const RETRIES: u8 = 3;
 	/// Whether to subscribe to the bus.
 	const SUBSCRIBE_BUS: bool = false;
 	/// The polling interval for the poll function.
 	/// If set to 0, the run function will be called
 	/// once to completion after the vendor is initialized
-	const POLLING_INTERVAL: Duration = Duration::from_secs(0);
+	const POLLING_INTERVAL: Duration = Duration::from_millis(1);
+
+	const STOP_ON_ERROR: bool = false;
 
 	/* REGISTER FUNCTIONS */
 
@@ -58,18 +58,17 @@ pub trait Vendor: 'static + Send + Sync + Clone + Default {
 	}
 
 	/// Get the triggers for the vendor.
-	async fn triggers(&self, instance: &Component<Self>) -> HashSet<Trigger> {
+	async fn triggers(&self) -> HashSet<Trigger> {
 		Default::default()
 	}
 
 	/// Perform setup operations for the vendor.
-	async fn initialize(&self, config: Self::Configuration) {
-		info!("{} setup", Self::NAME);
-	}
+	async fn initialize(&self, args: SandboxArguments<Self>)
+		-> Result<Self::Context, SandboxError>;
 
 	/// Main function where the vendor logic is executed.
 	/// This function should not create any resources.
-	/// It should only fetch data and update states
+	/// It should only fetch data whether is pushing or polling
 	///
 	/// If polling interval is set to 0, this function
 	/// will be called once to completion after the vendor
@@ -84,8 +83,15 @@ pub trait Vendor: 'static + Send + Sync + Clone + Default {
 	///
 	/// If the function fails to execute, it will be
 	/// retried RETRIES number of times.
-	async fn poll(&self) -> Result<(), SandboxError> {
-		info!("{} run", Self::NAME);
+	async fn poll(&self, ctx: RefContext<Self>) -> Result<Option<Self::PollData>, SandboxError>;
+
+	async fn consume(
+		&self,
+		ctx: RefContext<Self>,
+		data: Self::PollData,
+	) -> Result<(), SandboxError> {
+		warn!("The vendor {} is not handling the data", Self::NAME);
+
 		Ok(())
 	}
 

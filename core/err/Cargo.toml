@@ -13,6 +13,5 @@ miette = { version = "7.2.0", features = ["fancy"] }
 config = "0.14.0"
 
 surrealdb = { workspace = true }
-serde = { workspace = true }
 serde_json = { workspace = true }
 ractor = { workspace = true }

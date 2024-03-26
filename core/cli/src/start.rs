@@ -9,6 +9,8 @@ pub struct StartCommandArgs {}
 pub async fn init(_: StartCommandArgs) -> err::Result<()> {
 	// Critical components
 	bus::init();
+	mqtt::init();
+
 	dbm::init().await?;
 
 	// Non-critical components
@@ -16,7 +18,7 @@ pub async fn init(_: StartCommandArgs) -> err::Result<()> {
 	spawner::init().await?;
 
 	// Interface components
-	mqtt::init();
+	mqtt::serve();
 	net::serve().await?;
 
 	Ok(())

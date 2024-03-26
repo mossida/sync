@@ -9,18 +9,15 @@ license.workspace = true
 
 [dependencies]
 dashmap = { version = "5.5.3", features = ["serde"] }
-rayon = { version = "1.10.0" }
 
 ractor = { workspace = true }
 serde = { workspace = true }
-serde_json = { workspace = true }
 surrealdb = { workspace = true }
 futures = { workspace = true }
 tracing = { workspace = true }
 
 bus = { path = "../bus" }
 dbm = { path = "../dbm" }
-cls = { path = "../cls" }
 svc = { path = "../svc" }
 trg = { path = "../trg" }
 err = { path = "../err" }
