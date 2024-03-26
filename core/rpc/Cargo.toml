@@ -8,7 +8,7 @@ license.workspace = true
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-axum = { version = "0.7.4", features = ["ws"] }
+axum = { version = "0.7.5", features = ["ws"] }
 dashmap = { version = "5.5.3", features = ["serde"] }
 uuid = { version = "1.8.0", features = ["v4"] }
 tower-http = { version = "0.5.2", features = ["full"] }
