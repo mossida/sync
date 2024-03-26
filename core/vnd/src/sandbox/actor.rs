@@ -35,7 +35,6 @@ pub struct State<Component>
 where
 	Component: Vendor,
 {
-	arguments: SandboxArguments<Component>,
 	tokens: Vec<CancellationToken>,
 	services: HashSet<ServiceType>,
 	triggers: HashSet<Trigger>,
@@ -60,7 +59,7 @@ where
 		pg::join_scoped(SCOPE.to_string(), SANDBOX_GROUP.to_string(), vec![myself.get_cell()]);
 
 		// Setup vendor before listening to events
-		let raw_context = self.vendor.initialize(&arguments).await?;
+		let raw_context = self.vendor.initialize(arguments).await?;
 		let context: Arc<_> = Arc::new(raw_context);
 		let mut tokens = Vec::new();
 
@@ -97,11 +96,10 @@ where
 		});
 
 		let services = self.vendor.services().await;
-		let triggers = self.vendor.triggers(&arguments.component).await;
+		let triggers = self.vendor.triggers().await;
 
 		Ok(State {
 			factory,
-			arguments,
 			tokens,
 			services,
 			triggers,
@@ -158,9 +156,12 @@ where
 		_: &mut Self::State,
 	) -> Result<(), ActorProcessingErr> {
 		match message {
-			SupervisionEvent::ActorTerminated(_, _, _) | SupervisionEvent::ActorPanicked(_, _) => {
+			SupervisionEvent::ActorTerminated(_, _, _) => {
 				// TODO: Handle factory termination
-				error!("Polling system has terminated");
+				error!("Polling system has terminated.");
+			}
+			SupervisionEvent::ActorPanicked(_, error) => {
+				error!("Polling system has terminated: {:?}", error);
 			}
 			_ => {}
 		}

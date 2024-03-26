@@ -1,5 +1,9 @@
-use crate::vendors::zigbee::payload::expose::Expose;
 use serde::{Deserialize, Serialize};
+
+use super::expose::Expose;
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct Devices(pub Vec<Device>);
 
 // NOTE: Unstable, needs to matched with original schema
 #[derive(Debug, Serialize, Deserialize)]

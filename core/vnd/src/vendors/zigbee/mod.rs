@@ -16,9 +16,11 @@ use crate::{
 	RefContext, Vendor,
 };
 
+use self::client::{Client, Payload, Topic};
+
 use super::Vendors;
 
-mod payload;
+mod client;
 
 pub type Zigbee = Component<ZigbeeClass>;
 
@@ -28,21 +30,21 @@ pub struct ZigbeeConfiguration {}
 #[derive(Clone, Default)]
 pub struct ZigbeeClass {}
 
-pub struct Context {
-	client: RwLock<mqtt::Client>,
-}
-
-#[derive(Clone, Debug, Serialize, Deserialize)]
-pub struct Data {
-	topic: String,
-	payload: String,
+#[allow(dead_code)]
+pub struct Context<V>
+where
+	V: Vendor,
+{
+	mqtt: RwLock<mqtt::Client>,
+	client: Client,
+	arguments: SandboxArguments<V>,
 }
 
 #[async_trait]
 impl Vendor for ZigbeeClass {
 	type Configuration = ZigbeeConfiguration;
-	type Context = Context;
-	type PollData = Data;
+	type Context = Context<Self>;
+	type PollData = (Topic, Payload);
 
 	const NAME: &'static str = "zigbee";
 	const VENDOR: Vendors = Vendors::Zigbee;
@@ -52,34 +54,36 @@ impl Vendor for ZigbeeClass {
 
 	async fn initialize(
 		&self,
-		args: &SandboxArguments<Self>,
+		arguments: SandboxArguments<Self>,
 	) -> Result<Self::Context, SandboxError> {
-		let name = args.component.id();
+		let name = arguments.component.id();
 
 		let (mut tx, rx) =
 			mqtt::client(name.to_raw().as_str()).map_err(|_| "Cannot create client")?;
 		let _ = tx.subscribe("zigbee/#")?;
 
 		Ok(Context {
-			client: RwLock::new((tx, rx)),
+			mqtt: RwLock::new((tx, rx)),
+			client: Client {},
+			arguments,
 		})
 	}
 
 	async fn poll(&self, ctx: RefContext<Self>) -> Result<Option<Self::PollData>, SandboxError> {
-		let mut client = ctx.client.write().await;
+		let mut client = ctx.mqtt.write().await;
 		let notification = client.1.next().await?.ok_or("Link closed")?;
 
 		let data = match notification {
 			Notification::Forward(forward) => {
 				let publish = forward.publish;
 				let topic = String::from_utf8(publish.topic.to_vec());
-				let payload = String::from_utf8(publish.payload.to_vec());
+				let payload = publish.payload;
 
-				match (topic, payload) {
-					(Ok(topic), Ok(payload)) => Some(Data {
-						topic,
-						payload,
-					}),
+				match topic {
+					Ok(topic) => {
+						let topic: String = topic.chars().skip(7).collect();
+						Some((topic.into(), payload.into()))
+					}
 					_ => None,
 				}
 			}
@@ -92,8 +96,12 @@ impl Vendor for ZigbeeClass {
 		Ok(data)
 	}
 
-	async fn consume(&self, _: RefContext<Self>, data: Self::PollData) -> Result<(), SandboxError> {
-		dbg!(data);
+	async fn consume(
+		&self,
+		ctx: RefContext<Self>,
+		data: Self::PollData,
+	) -> Result<(), SandboxError> {
+		let _ = ctx.client.handle(data.0, data.1);
 
 		Ok(())
 	}
@@ -106,7 +114,7 @@ impl Vendor for ZigbeeClass {
 	}
 
 	/// Get the triggers for the vendor.
-	async fn triggers(&self, _: &Component<Self>) -> HashSet<Trigger> {
+	async fn triggers(&self) -> HashSet<Trigger> {
 		let mut set = HashSet::new();
 
 		set.insert(Trigger::new("test".to_string(), Event::Time, trg::TriggerOrigin::System));

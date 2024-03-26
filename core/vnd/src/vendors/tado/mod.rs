@@ -28,7 +28,7 @@ impl Vendor for TadoVendor {
 	const VENDOR: Vendors = Vendors::Tado;
 	const SUBSCRIBE_BUS: bool = false;
 
-	async fn initialize(&self, _: &SandboxArguments<Self>) -> Result<Self::Context, SandboxError> {
+	async fn initialize(&self, _: SandboxArguments<Self>) -> Result<Self::Context, SandboxError> {
 		Ok(())
 	}
 

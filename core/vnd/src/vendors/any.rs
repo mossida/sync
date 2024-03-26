@@ -23,7 +23,7 @@ impl Vendor for AnyVendor {
 	const NAME: &'static str = "any";
 	const VENDOR: Vendors = Vendors::Any;
 
-	async fn initialize(&self, _: &SandboxArguments<Self>) -> Result<Self::Context, SandboxError> {
+	async fn initialize(&self, _: SandboxArguments<Self>) -> Result<Self::Context, SandboxError> {
 		Ok(())
 	}
 

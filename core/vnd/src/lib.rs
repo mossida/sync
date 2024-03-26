@@ -1,5 +1,5 @@
 use bus::Event;
-use component::Component;
+
 use ractor::async_trait;
 
 use sandbox::{actor::SandboxArguments, SandboxError};
@@ -58,15 +58,13 @@ pub trait Vendor: 'static + Send + Sync + Clone + Default {
 	}
 
 	/// Get the triggers for the vendor.
-	async fn triggers(&self, instance: &Component<Self>) -> HashSet<Trigger> {
+	async fn triggers(&self) -> HashSet<Trigger> {
 		Default::default()
 	}
 
 	/// Perform setup operations for the vendor.
-	async fn initialize(
-		&self,
-		args: &SandboxArguments<Self>,
-	) -> Result<Self::Context, SandboxError>;
+	async fn initialize(&self, args: SandboxArguments<Self>)
+		-> Result<Self::Context, SandboxError>;
 
 	/// Main function where the vendor logic is executed.
 	/// This function should not create any resources.
