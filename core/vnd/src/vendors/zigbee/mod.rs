@@ -96,7 +96,7 @@ impl Vendor for ZigbeeClass {
 		ctx: RefContext<Self>,
 		data: Self::PollData,
 	) -> Result<(), SandboxError> {
-		let _ = ctx.client.handle(data.0, data.1);
+		let _ = ctx.client.handle(data.0, data.1).await;
 
 		Ok(())
 	}

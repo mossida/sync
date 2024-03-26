@@ -91,14 +91,12 @@ where
 									options: Default::default(),
 								}))?;
 							}
-						} else {
-							if V::STOP_ON_ERROR {
-								let _ = state
-									.factory
-									.stop_and_wait(None, Some(V::POLLING_INTERVAL))
-									.await
-									.inspect_err(|_| state.factory.kill());
-							}
+						} else if V::STOP_ON_ERROR {
+							let _ = state
+								.factory
+								.stop_and_wait(None, Some(V::POLLING_INTERVAL))
+								.await
+								.inspect_err(|_| state.factory.kill());
 						}
 					}
 					Task::Consume => {
