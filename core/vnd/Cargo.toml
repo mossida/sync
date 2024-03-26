@@ -12,13 +12,11 @@ bytes = { version = "1.6.0" }
 
 tokio = { workspace = true }
 tokio-util = { workspace = true }
-tokio-stream = { workspace = true }
 ractor = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
 tracing = { workspace = true }
 futures = { workspace = true }
-dashmap = { workspace = true }
 
 err = { path = "../err" }
 bus = { path = "../bus" }

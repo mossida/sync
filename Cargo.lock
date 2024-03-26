@@ -341,15 +341,12 @@ name = "atm"
 version = "0.1.0"
 dependencies = [
  "bus",
- "cls",
  "dashmap",
  "dbm",
  "err",
  "futures",
  "ractor",
- "rayon",
  "serde",
- "serde_json",
  "surrealdb",
  "svc",
  "tracing",
@@ -483,25 +480,6 @@ dependencies = [
  "tower-layer",
  "tower-service",
  "tracing",
-]
-
-[[package]]
-name = "axum-server"
-version = "0.6.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c1ad46c3ec4e12f4a4b6835e173ba21c25e484c9d02b49770bf006ce5367c036"
-dependencies = [
- "bytes",
- "futures-util",
- "http 1.1.0",
- "http-body 1.0.0",
- "http-body-util",
- "hyper 1.2.0",
- "hyper-util",
- "pin-project-lite",
- "tokio",
- "tower",
- "tower-service",
 ]
 
 [[package]]
@@ -693,11 +671,7 @@ checksum = "7ff69b9dd49fd426c69a0db9fc04dd934cdb6645ff000864d98f7e2af8830eaa"
 name = "bus"
 version = "0.1.0"
 dependencies = [
- "dbm",
- "err",
- "flume",
  "futures",
- "once_cell",
  "ractor",
  "serde",
  "tokio",
@@ -914,8 +888,6 @@ dependencies = [
  "err",
  "mqtt",
  "net",
- "tokio",
- "tokio-util",
  "tracing",
  "vnd",
 ]
@@ -951,8 +923,6 @@ dependencies = [
  "dbm",
  "serde",
  "serde_json",
- "serde_with",
- "uom",
 ]
 
 [[package]]
@@ -1122,16 +1092,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7059fff8937831a9ae6f0fe4d658ffabf58f2ca96aa9dec1c889f936f705f216"
 
 [[package]]
-name = "crossbeam-deque"
-version = "0.8.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "613f8cc01fe9cf1a3eb3d7f488fd2fa8388403e97039e2f73692932e291a770d"
-dependencies = [
- "crossbeam-epoch",
- "crossbeam-utils",
-]
-
-[[package]]
 name = "crossbeam-epoch"
 version = "0.9.18"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1249,7 +1209,6 @@ dependencies = [
  "serde",
  "surrealdb",
  "surrealdb-migrations",
- "thiserror",
  "tracing",
 ]
 
@@ -1378,12 +1337,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "fea41bba32d969b513997752735605054bc0dfa92b4c56bf1189f2e174be7a10"
 
 [[package]]
-name = "dyn-clone"
-version = "1.0.17"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0d6ef0072f8a535281e4876be788938b528e9a1d43900b82c2569af7da799125"
-
-[[package]]
 name = "earcutr"
 version = "0.4.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1430,22 +1383,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "5443807d6dff69373d433ab9ef5378ad8df50ca6298caf15de6e52e24aaf54d5"
 
 [[package]]
-name = "erased-serde"
-version = "0.4.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "388979d208a049ffdfb22fa33b9c81942215b940910bccfe258caeb25d125cb3"
-dependencies = [
- "serde",
-]
-
-[[package]]
 name = "err"
 version = "0.1.0"
 dependencies = [
  "config 0.14.0",
  "miette 7.2.0",
  "ractor",
- "serde",
  "serde_json",
  "surrealdb",
  "thiserror",
@@ -1801,25 +1744,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "h2"
-version = "0.4.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "31d030e59af851932b72ceebadf4a2b5986dba4c3b99dd2493f8273a0f151943"
-dependencies = [
- "bytes",
- "fnv",
- "futures-core",
- "futures-sink",
- "futures-util",
- "http 1.1.0",
- "indexmap 2.2.5",
- "slab",
- "tokio",
- "tokio-util",
- "tracing",
-]
-
-[[package]]
 name = "hash32"
 version = "0.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2002,7 +1926,7 @@ dependencies = [
  "futures-channel",
  "futures-core",
  "futures-util",
- "h2 0.3.24",
+ "h2",
  "http 0.2.12",
  "http-body 0.4.6",
  "httparse",
@@ -2025,7 +1949,6 @@ dependencies = [
  "bytes",
  "futures-channel",
  "futures-util",
- "h2 0.4.2",
  "http 1.1.0",
  "http-body 1.0.0",
  "httparse",
@@ -2160,12 +2083,6 @@ checksum = "a0c10553d664a4d0bcff9f4215d0aac67a639cc68ef660840afe309b807bc9f5"
 dependencies = [
  "generic-array",
 ]
-
-[[package]]
-name = "inventory"
-version = "0.3.15"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "f958d3d68f4167080a18141e10381e7634563984a537f2a49a30fd8e53ac5767"
 
 [[package]]
 name = "ipnet"
@@ -2548,8 +2465,6 @@ version = "0.1.0"
 dependencies = [
  "cnf",
  "rumqttd",
- "tokio",
- "tokio-util",
  "tracing",
 ]
 
@@ -2585,29 +2500,12 @@ name = "net"
 version = "0.1.0"
 dependencies = [
  "axum 0.7.5",
- "axum-server",
- "config 0.14.0",
  "err",
- "futures-util",
- "mqtt",
- "once_cell",
- "ractor",
- "revision",
  "rpc",
- "schemars",
- "serde",
- "serde_json",
- "surrealdb",
- "surrealdb-migrations",
  "tokio",
- "tokio-stream",
- "tokio-util",
  "tower",
  "tower-http",
  "tracing",
- "tracing-subscriber",
- "typetag",
- "uuid",
 ]
 
 [[package]]
@@ -2654,7 +2552,6 @@ dependencies = [
  "autocfg",
  "num-integer",
  "num-traits",
- "serde",
 ]
 
 [[package]]
@@ -2672,16 +2569,6 @@ dependencies = [
  "rand",
  "smallvec",
  "zeroize",
-]
-
-[[package]]
-name = "num-complex"
-version = "0.4.5"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "23c6602fda94a57c990fe0df199a035d83576b496aa29f4e634a8ac6004e68a6"
-dependencies = [
- "num-traits",
- "serde",
 ]
 
 [[package]]
@@ -2708,18 +2595,6 @@ dependencies = [
  "autocfg",
  "num-integer",
  "num-traits",
-]
-
-[[package]]
-name = "num-rational"
-version = "0.4.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "0638a1c9d0a3c0914158145bc76cff373a75a627e6ecbfb71cbe6f453a5a19b0"
-dependencies = [
- "autocfg",
- "num-integer",
- "num-traits",
- "serde",
 ]
 
 [[package]]
@@ -3273,26 +3148,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "rayon"
-version = "1.10.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b418a60154510ca1a002a752ca9714984e21e4241e804d32555251faf8b78ffa"
-dependencies = [
- "either",
- "rayon-core",
-]
-
-[[package]]
-name = "rayon-core"
-version = "1.12.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "1465873a3dfdaa8ae7cb14b4383657caab0b3e8a0aa9ae8e04b044854c8dfce2"
-dependencies = [
- "crossbeam-deque",
- "crossbeam-utils",
-]
-
-[[package]]
 name = "redox_syscall"
 version = "0.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3396,7 +3251,7 @@ dependencies = [
  "encoding_rs",
  "futures-core",
  "futures-util",
- "h2 0.3.24",
+ "h2",
  "http 0.2.12",
  "http-body 0.4.6",
  "hyper 0.14.28",
@@ -3570,7 +3425,6 @@ dependencies = [
  "dbm",
  "err",
  "futures",
- "futures-util",
  "ractor",
  "serde",
  "serde_json",
@@ -3582,7 +3436,6 @@ dependencies = [
  "tower-http",
  "tracing",
  "trg",
- "uuid",
 ]
 
 [[package]]
@@ -3812,30 +3665,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "schemars"
-version = "0.8.16"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "45a28f4c49489add4ce10783f7911893516f15afe45d015608d41faca6bc4d29"
-dependencies = [
- "dyn-clone",
- "schemars_derive",
- "serde",
- "serde_json",
-]
-
-[[package]]
-name = "schemars_derive"
-version = "0.8.16"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c767fd6fa65d9ccf9cf026122c1b555f2ef9a4f0cea69da4d7dbc3e258d30967"
-dependencies = [
- "proc-macro2",
- "quote",
- "serde_derive_internals",
- "syn 1.0.109",
-]
-
-[[package]]
 name = "scopeguard"
 version = "1.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3902,17 +3731,6 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 2.0.52",
-]
-
-[[package]]
-name = "serde_derive_internals"
-version = "0.26.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "85bf8229e7920a9f636479437026331ce11aa132b4dde37d121944a44d6e5f3c"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn 1.0.109",
 ]
 
 [[package]]
@@ -4433,10 +4251,7 @@ name = "svc"
 version = "0.1.0"
 dependencies = [
  "dbm",
- "err",
- "ractor",
  "serde",
- "surrealdb",
 ]
 
 [[package]]
@@ -4478,12 +4293,9 @@ name = "sync"
 version = "0.1.0"
 dependencies = [
  "cli",
- "cls",
- "dbm",
  "err",
  "tokio",
  "tracing-subscriber",
- "vnd",
 ]
 
 [[package]]
@@ -4954,7 +4766,6 @@ version = "0.1.0"
 dependencies = [
  "bus",
  "dbm",
- "ractor",
  "serde",
 ]
 
@@ -5019,30 +4830,6 @@ name = "typenum"
 version = "1.17.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "42ff0bf0c66b8238c6f3b578df37d0b7848e55df8577b3f74f92a69acceeb825"
-
-[[package]]
-name = "typetag"
-version = "0.2.16"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "661d18414ec032a49ece2d56eee03636e43c4e8d577047ab334c0ba892e29aaf"
-dependencies = [
- "erased-serde",
- "inventory",
- "once_cell",
- "serde",
- "typetag-impl",
-]
-
-[[package]]
-name = "typetag-impl"
-version = "0.2.16"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ac73887f47b9312552aa90ef477927ff014d63d1920ca8037c6c1951eab64bb1"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn 2.0.52",
-]
 
 [[package]]
 name = "ucd-trie"
@@ -5145,20 +4932,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8ecb6da28b8a351d773b68d5825ac39017e680750f980f3a1a85cd8dd28a47c1"
 
 [[package]]
-name = "uom"
-version = "0.36.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ffd36e5350a65d112584053ee91843955826bf9e56ec0d1351214e01f6d7cd9c"
-dependencies = [
- "num-bigint",
- "num-complex",
- "num-rational",
- "num-traits",
- "serde",
- "typenum",
-]
-
-[[package]]
 name = "url"
 version = "2.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -5218,7 +4991,6 @@ dependencies = [
  "bus",
  "bytes",
  "cls",
- "dashmap",
  "dbm",
  "err",
  "futures",
@@ -5228,7 +5000,6 @@ dependencies = [
  "serde_json",
  "svc",
  "tokio",
- "tokio-stream",
  "tokio-util",
  "tracing",
  "trg",

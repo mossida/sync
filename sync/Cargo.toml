@@ -14,6 +14,3 @@ tokio = { workspace = true }
 
 cli = { path = "../core/cli" }
 err = { path = "../core/err" }
-cls = { path = "../core/cls" }
-dbm = { path = "../core/dbm" }
-vnd = { path = "../core/vnd" }
