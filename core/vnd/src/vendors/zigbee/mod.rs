@@ -76,16 +76,11 @@ impl Vendor for ZigbeeClass {
 		let data = match notification {
 			Notification::Forward(forward) => {
 				let publish = forward.publish;
-				let topic = String::from_utf8(publish.topic.to_vec());
+				let topic = String::from_utf8_lossy(&publish.topic);
 				let payload = publish.payload;
 
-				match topic {
-					Ok(topic) => {
-						let topic: String = topic.chars().skip(7).collect();
-						Some((topic.into(), payload.into()))
-					}
-					_ => None,
-				}
+				let topic: String = topic.chars().skip(7).collect();
+				Some((topic.into(), payload.into()))
 			}
 			Notification::Disconnect(_, _) => {
 				return Err("Link closed".into());
