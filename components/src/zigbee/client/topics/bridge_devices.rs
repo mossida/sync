@@ -5,7 +5,7 @@ use std::{
 
 use vnd::sandbox::SandboxError;
 
-use crate::client::payload::device::Device;
+use crate::zigbee::client::payload::device::Device;
 
 use super::Method;
 

@@ -20,3 +20,5 @@ dbm = { path = "../dbm" }
 mqtt = { path = "../mqtt" }
 vnd = { path = "../vnd" }
 atm = { path = "../atm" }
+
+components = { path = "../../components" }

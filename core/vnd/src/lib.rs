@@ -9,8 +9,6 @@ use svc::{r#type::ServiceType, Service};
 use tracing::warn;
 use trg::Trigger;
 
-mod r#macro;
-
 pub mod component;
 pub mod sandbox;
 
@@ -18,8 +16,6 @@ pub static SCOPE: &str = "vendors";
 pub static SANDBOX_GROUP: &str = "sandboxes";
 
 pub type RefContext<V> = Arc<<V as Vendor>::Context>;
-
-pub trait Index: 'static + Send + Sync + Serialize + DeserializeOwned + Clone {}
 
 #[async_trait]
 #[allow(unused_variables)]
@@ -31,6 +27,7 @@ pub trait Vendor: 'static + Send + Sync + Clone + Default {
 	type Context: Send + Sync;
 	type PollData: Send + Sync;
 	/* CONFIGURATION */
+	const NAME: &'static str;
 
 	/// Whether to subscribe to the bus.
 	const SUBSCRIBE_BUS: bool = false;

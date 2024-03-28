@@ -1,5 +1,5 @@
 [workspace]
-members = ["sync", "core/*", "components/*"]
+members = ["sync", "core/*", "components"]
 resolver = "2"
 
 default-members = ["sync"]
