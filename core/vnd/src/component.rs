@@ -24,7 +24,7 @@ pub struct Component<V> {
 	config: Value,
 
 	#[serde(skip)]
-	marker: PhantomData<V>,
+	vendor: PhantomData<V>,
 }
 
 impl<V> Component<V>
@@ -36,7 +36,7 @@ where
 			id: dbm::Id::rand(),
 			r#type: Some(V::NAME.to_string()),
 			config,
-			marker: PhantomData,
+			vendor: PhantomData,
 		})
 	}
 
@@ -46,8 +46,7 @@ where
 	pub async fn build(&self) -> Result<(), Error> {
 		let name = self.id.to_raw();
 		let configuration: V::Configuration = serde_json::from_value(self.config.clone())?;
-		let vendor: V = Default::default();
-		let sandbox = Sandbox::new(vendor);
+		let sandbox = Sandbox::new();
 		let spawn = Actor::spawn(
 			Some(name.clone()),
 			sandbox,

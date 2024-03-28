@@ -41,18 +41,17 @@ pub trait Vendor: 'static + Send + Sync + Clone + Default {
 	/* REGISTER FUNCTIONS */
 
 	/// Get the services provided by the vendor.
-	async fn services(&self) -> HashSet<ServiceType> {
+	async fn services() -> HashSet<ServiceType> {
 		Default::default()
 	}
 
 	/// Get the triggers for the vendor.
-	async fn triggers(&self) -> HashSet<Trigger> {
+	async fn triggers() -> HashSet<Trigger> {
 		Default::default()
 	}
 
 	/// Perform setup operations for the vendor.
-	async fn initialize(&self, args: SandboxArguments<Self>)
-		-> Result<Self::Context, SandboxError>;
+	async fn initialize(args: SandboxArguments<Self>) -> Result<Self::Context, SandboxError>;
 
 	/// Main function where the vendor logic is executed.
 	/// This function should not create any resources.
@@ -71,28 +70,24 @@ pub trait Vendor: 'static + Send + Sync + Clone + Default {
 	///
 	/// If the function fails to execute, it will be
 	/// retried RETRIES number of times.
-	async fn poll(&self, ctx: RefContext<Self>) -> Result<Option<Self::PollData>, SandboxError>;
+	async fn poll(ctx: RefContext<Self>) -> Result<Option<Self::PollData>, SandboxError>;
 
-	async fn consume(
-		&self,
-		ctx: RefContext<Self>,
-		data: Self::PollData,
-	) -> Result<(), SandboxError> {
+	async fn consume(ctx: RefContext<Self>, data: Self::PollData) -> Result<(), SandboxError> {
 		warn!("The vendor is not handling the data");
 
 		Ok(())
 	}
 
 	/// Handle a service call.
-	async fn on_service_call(&self, service: Service) -> Result<(), SandboxError> {
+	async fn on_service_call(service: Service) -> Result<(), SandboxError> {
 		warn!("A service got called, but the vendor is not handling services");
 
 		Ok(())
 	}
 
 	/// Handle an event.
-	async fn on_event(&self, event: Event) {}
+	async fn on_event(event: Event) {}
 
 	/// Stop the vendor.
-	async fn stop(&self) {}
+	async fn stop() {}
 }
