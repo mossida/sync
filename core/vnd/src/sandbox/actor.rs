@@ -59,8 +59,8 @@ where
 		pg::join_scoped(SCOPE.to_string(), SANDBOX_GROUP.to_string(), vec![myself.get_cell()]);
 
 		// Setup vendor before listening to events
-		let raw_context = self.vendor.initialize(arguments).await?;
-		let context: Arc<_> = Arc::new(raw_context);
+		let raw_context = Component::initialize(arguments).await?;
+		let context = Arc::new(raw_context);
 		let mut tokens = Vec::new();
 
 		if Component::SUBSCRIBE_BUS {
@@ -79,8 +79,7 @@ where
 				dead_mans_switch: None,
 				..Default::default()
 			},
-			Box::new(Builder {
-				vendor: self.vendor.clone(),
+			Box::new(Builder::<Component> {
 				context,
 			}),
 			myself.get_cell(),
@@ -95,8 +94,8 @@ where
 			})
 		});
 
-		let services = self.vendor.services().await;
-		let triggers = self.vendor.triggers().await;
+		let services = Component::services().await;
+		let triggers = Component::triggers().await;
 
 		Ok(State {
 			factory,
@@ -128,14 +127,14 @@ where
 		state: &mut Self::State,
 	) -> Result<(), ActorProcessingErr> {
 		match message {
-			SandboxMessage::Event(event) => self.vendor.on_event(event).await,
+			SandboxMessage::Event(event) => Component::on_event(event).await,
 			SandboxMessage::Request(rq, rpc) => match rq {
 				Request::Call(service) => {
 					let is_registered = state.services.iter().any(|s| service.is(s));
 
 					match is_registered {
 						true => {
-							let call_result = self.vendor.on_service_call(service).await;
+							let call_result = Component::on_service_call(service).await;
 							let _ = rpc.send(call_result.into());
 						}
 						false => {
@@ -176,7 +175,7 @@ where
 		state.factory.kill();
 		state.tokens.iter().for_each(|t| t.cancel());
 
-		self.vendor.stop().await;
+		Component::stop().await;
 
 		Ok(())
 	}

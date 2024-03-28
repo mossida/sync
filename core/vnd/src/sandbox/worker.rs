@@ -1,5 +1,3 @@
-use std::sync::Arc;
-
 use ractor::{
 	async_trait,
 	factory::{FactoryMessage, Job, WorkerBuilder, WorkerMessage, WorkerStartContext},
@@ -19,7 +17,6 @@ pub struct Worker<V>
 where
 	V: Vendor,
 {
-	pub vendor: Arc<V>,
 	pub context: RefContext<V>,
 }
 
@@ -27,7 +24,6 @@ pub struct Builder<V>
 where
 	V: Vendor,
 {
-	pub vendor: Arc<V>,
 	pub context: RefContext<V>,
 }
 
@@ -37,7 +33,6 @@ where
 {
 	fn build(&self, _: ractor::factory::WorkerId) -> Worker<V> {
 		Worker {
-			vendor: self.vendor.clone(),
 			context: self.context.clone(),
 		}
 	}
@@ -81,7 +76,7 @@ where
 
 				match task {
 					Task::Poll => {
-						let result = self.vendor.poll(self.context.clone()).await;
+						let result = V::poll(self.context.clone()).await;
 
 						if let Ok(data) = result {
 							if data.is_some() {
@@ -101,7 +96,7 @@ where
 					}
 					Task::Consume => {
 						if let Some(data) = data {
-							self.vendor.consume(self.context.clone(), data).await?;
+							V::consume(self.context.clone(), data).await?;
 						}
 					}
 				};

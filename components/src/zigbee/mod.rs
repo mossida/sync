@@ -52,10 +52,7 @@ impl Vendor for Zigbee {
 	const SUBSCRIBE_BUS: bool = false;
 	const STOP_ON_ERROR: bool = true;
 
-	async fn initialize(
-		&self,
-		arguments: SandboxArguments<Self>,
-	) -> Result<Self::Context, SandboxError> {
+	async fn initialize(arguments: SandboxArguments<Self>) -> Result<Self::Context, SandboxError> {
 		let name = arguments.component.id();
 
 		let (mut tx, rx) =
@@ -69,7 +66,7 @@ impl Vendor for Zigbee {
 		})
 	}
 
-	async fn poll(&self, ctx: RefContext<Self>) -> Result<Option<Self::PollData>, SandboxError> {
+	async fn poll(ctx: RefContext<Self>) -> Result<Option<Self::PollData>, SandboxError> {
 		let mut client = ctx.mqtt.write().await;
 		let notification = client.1.next().await?.ok_or("Link closed")?;
 
@@ -91,17 +88,13 @@ impl Vendor for Zigbee {
 		Ok(data)
 	}
 
-	async fn consume(
-		&self,
-		ctx: RefContext<Self>,
-		data: Self::PollData,
-	) -> Result<(), SandboxError> {
+	async fn consume(ctx: RefContext<Self>, data: Self::PollData) -> Result<(), SandboxError> {
 		let _ = ctx.client.handle(data.0, data.1).await;
 
 		Ok(())
 	}
 
-	async fn services(&self) -> HashSet<ServiceType> {
+	async fn services() -> HashSet<ServiceType> {
 		let mut set = HashSet::new();
 
 		set.insert(ServiceType::new(ServiceData {}));
@@ -109,7 +102,7 @@ impl Vendor for Zigbee {
 	}
 
 	/// Get the triggers for the vendor.
-	async fn triggers(&self) -> HashSet<Trigger> {
+	async fn triggers() -> HashSet<Trigger> {
 		let mut set = HashSet::new();
 
 		set.insert(Trigger::new("test".to_string(), Event::Time, trg::TriggerOrigin::System));

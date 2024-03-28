@@ -1,4 +1,4 @@
-use std::sync::Arc;
+use std::marker::PhantomData;
 
 use crate::Vendor;
 use bus::Event;
@@ -6,7 +6,6 @@ use ractor::{ActorProcessingErr, RpcReplyPort};
 use svc::Service;
 
 pub mod actor;
-pub mod context;
 pub mod worker;
 
 pub type SandboxError = ActorProcessingErr;
@@ -40,20 +39,10 @@ impl From<Event> for SandboxMessage {
 	}
 }
 
+#[derive(Default)]
 pub struct Sandbox<V>
 where
 	V: Vendor,
 {
-	vendor: Arc<V>,
-}
-
-impl<V> Sandbox<V>
-where
-	V: Vendor,
-{
-	pub fn new(vendor: V) -> Self {
-		Self {
-			vendor: Arc::new(vendor),
-		}
-	}
+	vendor: PhantomData<V>,
 }
