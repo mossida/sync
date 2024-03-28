@@ -1,5 +1,3 @@
-use std::future::Future;
-
 use dbm::{resource::Base, DB};
 use enum_dispatch::enum_dispatch;
 use err::Error;
@@ -7,8 +5,9 @@ use serde::{Deserialize, Serialize};
 use vnd::component::Component;
 
 #[enum_dispatch(Components)]
+#[trait_variant::make(Send)]
 pub trait Spawner {
-	fn spawn(&self) -> impl Future<Output = Result<(), Error>> + Send;
+	async fn spawn(&self) -> Result<(), Error>;
 }
 
 pub async fn init() -> Result<(), Error> {

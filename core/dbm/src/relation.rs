@@ -1,15 +1,16 @@
 use err::{Error, Result};
 use surrealdb::Response;
 
-use crate::{resource::Resource, IntoFuture, DB};
+use crate::{resource::Resource, DB};
 
+#[trait_variant::make(Send + Sync)]
 pub trait Relation<W: Resource>: Resource {
 	/// indicates relation name
 	const RELATION: &'static str;
 	/// indicates if the relation is inverted
 	const INVERTED: bool = false;
 
-	fn relate(&self, with: &W) -> IntoFuture<'_, Result<Response, Error>> {
+	async fn relate(&self, with: &W) -> Result<Response, Error> {
 		let db = &DB;
 		let query = if Self::INVERTED {
 			"RELATE $with->$relation->$me"
@@ -23,10 +24,10 @@ pub trait Relation<W: Resource>: Resource {
 			.bind(("relation", Self::RELATION))
 			.bind(("with", (W::RESOURCE, with.id())));
 
-		Box::pin(async move { Ok(future.await?) })
+		async move { Ok(future.await?) }
 	}
 
-	fn relationships(&self) -> IntoFuture<'_, Result<Vec<W>, Error>> {
+	async fn relationships(&self) -> Result<Vec<W>, Error> {
 		let db = &DB;
 		let query = if Self::INVERTED {
 			"SELECT ->$relation->$me FROM $with"
@@ -40,9 +41,9 @@ pub trait Relation<W: Resource>: Resource {
 			.bind(("relation", Self::RELATION))
 			.bind(("with", W::RESOURCE));
 
-		Box::pin(async move {
+		async move {
 			let mut response = future.await?;
 			Ok(response.take(0)?)
-		})
+		}
 	}
 }

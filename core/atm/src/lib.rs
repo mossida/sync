@@ -58,8 +58,8 @@ impl Relation<Service> for Automation {
 impl Automation {
 	pub async fn trigger(self, event: bus::Event) -> Result<()> {
 		// TODO: Optimize using advanced graphing queries
-		let triggers: Vec<Trigger> = self.relationships().await?;
-		let services: Vec<Service> = self.relationships().await?;
+		let triggers = Relation::<Trigger>::relationships(&self).await?;
+		let services = Relation::<Service>::relationships(&self).await?;
 
 		let triggered: Vec<&Trigger> = triggers.iter().filter(|t| t.check(event.clone())).collect();
 

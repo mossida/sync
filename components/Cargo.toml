@@ -12,6 +12,7 @@ common = []
 [dependencies]
 enum_dispatch = { version = "*" }
 
+trait-variant = { workspace = true }
 tokio = { workspace = true }
 tokio-util = { workspace = true }
 serde = { workspace = true }
