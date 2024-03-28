@@ -8,14 +8,9 @@ use std::{collections::HashSet, hash::Hash, sync::Arc, time::Duration};
 use svc::{r#type::ServiceType, Service};
 use tracing::warn;
 use trg::Trigger;
-use vendors::Vendors;
-
-mod r#macro;
 
 pub mod component;
 pub mod sandbox;
-pub mod spawner;
-pub mod vendors;
 
 pub static SCOPE: &str = "vendors";
 pub static SANDBOX_GROUP: &str = "sandboxes";
@@ -31,15 +26,8 @@ pub trait Vendor: 'static + Send + Sync + Clone + Default {
 
 	type Context: Send + Sync;
 	type PollData: Send + Sync;
-
-	/* CONSTANTS */
-
-	/// The name of the vendor.
-	const NAME: &'static str;
-	/// The vendor type.
-	const VENDOR: Vendors;
-
 	/* CONFIGURATION */
+	const NAME: &'static str;
 
 	/// Whether to subscribe to the bus.
 	const SUBSCRIBE_BUS: bool = false;
@@ -90,14 +78,14 @@ pub trait Vendor: 'static + Send + Sync + Clone + Default {
 		ctx: RefContext<Self>,
 		data: Self::PollData,
 	) -> Result<(), SandboxError> {
-		warn!("The vendor {} is not handling the data", Self::NAME);
+		warn!("The vendor is not handling the data");
 
 		Ok(())
 	}
 
 	/// Handle a service call.
 	async fn on_service_call(&self, service: Service) -> Result<(), SandboxError> {
-		warn!("A service got called, but the vendor {} is not handling services", Self::NAME);
+		warn!("A service got called, but the vendor is not handling services");
 
 		Ok(())
 	}

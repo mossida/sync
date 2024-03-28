@@ -1,4 +1,4 @@
-use std::{any::TypeId, marker::PhantomData};
+use std::marker::PhantomData;
 
 use cls::device::Device;
 use dbm::{
@@ -13,18 +13,14 @@ use tracing::{error, info};
 
 use crate::{
 	sandbox::{actor::SandboxArguments, Sandbox},
-	vendors::{any::AnyVendor, implement, Vendors},
 	Vendor,
 };
 
 /// Represents an instance of a class.
 #[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct Component<V>
-where
-	V: Vendor,
-{
+pub struct Component<V> {
 	id: dbm::Id,
-	r#type: Vendors,
+	r#type: Option<String>,
 	config: Value,
 
 	#[serde(skip)]
@@ -35,24 +31,10 @@ impl<V> Component<V>
 where
 	V: Vendor,
 {
-	pub async fn implement(&self) -> err::Result<(), err::Error> {
-		// This should take ownership of the component and spawn the actor
-		implement(&self.r#type, self.config.clone()).await
-	}
-}
-
-impl<V> Component<V>
-where
-	V: Vendor,
-{
 	pub fn new(config: Value) -> Result<Self, Error> {
-		if TypeId::of::<V>() == TypeId::of::<AnyVendor>() {
-			unreachable!();
-		}
-
 		Ok(Self {
 			id: dbm::Id::rand(),
-			r#type: V::VENDOR,
+			r#type: Some(V::NAME.to_string()),
 			config,
 			marker: PhantomData,
 		})
@@ -61,11 +43,7 @@ where
 	/// Creates an instance of the provided class and spawns its actor.
 	/// It requires a configuration as every instance is different from another
 	/// based on its configuration.
-	pub async fn build(self) -> Result<(), Error> {
-		if TypeId::of::<V>() == TypeId::of::<AnyVendor>() {
-			unreachable!();
-		}
-
+	pub async fn build(&self) -> Result<(), Error> {
 		let name = self.id.to_raw();
 		let configuration: V::Configuration = serde_json::from_value(self.config.clone())?;
 		let vendor: V = Default::default();
@@ -74,7 +52,7 @@ where
 			Some(name.clone()),
 			sandbox,
 			SandboxArguments {
-				component: self,
+				component: self.clone(),
 				configuration,
 			},
 		)
@@ -94,7 +72,7 @@ where
 
 impl<V> Base for Component<V>
 where
-	V: Vendor,
+	V: Send + Sync,
 {
 	const RESOURCE: &'static str = "component";
 }

@@ -3,13 +3,15 @@ use std::{
 	pin::Pin,
 };
 
-use crate::sandbox::SandboxError;
+use vnd::sandbox::SandboxError;
+
+use crate::zigbee::client::payload::device::Device;
 
 use super::Method;
 
-pub type BridgeGroups<'a> = Method<'a, String>;
+pub type BridgeDevices<'a> = Method<'a, Vec<Device>>;
 
-impl<'a> IntoFuture for BridgeGroups<'a> {
+impl<'a> IntoFuture for BridgeDevices<'a> {
 	type Output = Result<(), SandboxError>;
 	type IntoFuture = Pin<Box<dyn Future<Output = Self::Output> + Send + Sync>>;
 
