@@ -34,7 +34,7 @@ async fn resolve(method: Method) -> Output {
 }
 
 pub trait IntoMethod {
-	fn into_method(params: Params) -> impl Future<Output = Output>;
+	async fn into_method(params: Params) -> Output;
 }
 
 pub type Params = DashMap<String, Value>;

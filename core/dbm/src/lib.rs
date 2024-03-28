@@ -1,7 +1,5 @@
-use std::pin::Pin;
-
 use err::Error;
-use futures::Future;
+
 use once_cell::sync::Lazy;
 use surrealdb::{engine::any::Any, opt::auth::Root, Surreal};
 use tracing::{info, instrument, trace};
@@ -14,9 +12,6 @@ mod id;
 pub mod link;
 pub mod relation;
 pub mod resource;
-
-/// Internal type to indicate an async method
-type IntoFuture<'r, T> = Pin<Box<dyn Future<Output = T> + Send + Sync + 'r>>;
 
 pub static DB: Lazy<Surreal<Any>> = Lazy::new(Surreal::init);
 

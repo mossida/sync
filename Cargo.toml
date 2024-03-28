@@ -13,6 +13,7 @@ license = "Business License"
 [workspace.dependencies]
 surrealdb = { version = "1.3.1" }
 
+trait-variant = { version = "0.1.2" }
 serde = { version = "1.0.197", features = ["derive"] }
 tracing = { version = "0.1.40" }
 async-trait = { version = "0.1.79" }

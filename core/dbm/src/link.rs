@@ -1,11 +1,12 @@
 use err::Error;
 
-use crate::{resource::Resource, Id, IntoFuture};
+use crate::{resource::Resource, Id};
 
+#[trait_variant::make(Send + Sync)]
 pub trait Link<W: Resource>: Resource {
 	fn id(&self) -> Id;
 
-	fn fetch(&self) -> IntoFuture<'_, Result<Option<W>, Error>> {
+	async fn fetch(&self) -> Result<Option<W>, Error> {
 		W::fetch(Link::id(self))
 	}
 }
