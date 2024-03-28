@@ -18,7 +18,7 @@ tracing = { version = "0.1.40" }
 async-trait = { version = "0.1.79" }
 futures = { version = "0.3.30" }
 ractor = { version = "0.9.7" }
-serde_json = { version = "1.0.114" }
+serde_json = { version = "1.0.115" }
 dashmap = { version = "5.5.3", features = ["serde"] }
 
 tokio = { version = "1.36.0", features = ["full"] }
