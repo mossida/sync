@@ -39,20 +39,10 @@ impl From<Event> for SandboxMessage {
 	}
 }
 
+#[derive(Default)]
 pub struct Sandbox<V>
 where
 	V: Vendor,
 {
 	vendor: PhantomData<V>,
-}
-
-impl<V> Sandbox<V>
-where
-	V: Vendor,
-{
-	pub fn new() -> Self {
-		Self {
-			vendor: PhantomData,
-		}
-	}
 }

@@ -46,7 +46,7 @@ where
 	pub async fn build(&self) -> Result<(), Error> {
 		let name = self.id.to_raw();
 		let configuration: V::Configuration = serde_json::from_value(self.config.clone())?;
-		let sandbox = Sandbox::new();
+		let sandbox = Sandbox::default();
 		let spawn = Actor::spawn(
 			Some(name.clone()),
 			sandbox,
