@@ -2,7 +2,7 @@ use std::ops::Deref;
 
 use tokio_util::bytes::Bytes;
 
-use crate::sandbox::SandboxError;
+use vnd::sandbox::SandboxError;
 
 use self::topics::{bridge_devices::BridgeDevices, bridge_groups::BridgeGroups};
 

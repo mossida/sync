@@ -1,21 +1,5 @@
 [workspace]
-members = [
-    "sync",
-    "core/atm",
-    "core/bus",
-    "core/cli",
-    "core/cls",
-    "core/cnf",
-    "core/dbm",
-    "core/err",
-    "core/mqtt",
-    "core/net",
-    "core/rpc",
-    "core/vnd",
-    "core/svc",
-    "core/trg",
-]
-
+members = ["sync", "core/*", "components/*"]
 resolver = "2"
 
 default-members = ["sync"]

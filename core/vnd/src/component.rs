@@ -1,4 +1,4 @@
-use std::{any::TypeId, marker::PhantomData};
+use std::marker::PhantomData;
 
 use cls::device::Device;
 use dbm::{
@@ -13,7 +13,6 @@ use tracing::{error, info};
 
 use crate::{
 	sandbox::{actor::SandboxArguments, Sandbox},
-	vendors::{any::AnyVendor, implement, Vendors},
 	Vendor,
 };
 
@@ -24,7 +23,6 @@ where
 	V: Vendor,
 {
 	id: dbm::Id,
-	r#type: Vendors,
 	config: Value,
 
 	#[serde(skip)]
@@ -35,24 +33,9 @@ impl<V> Component<V>
 where
 	V: Vendor,
 {
-	pub async fn implement(&self) -> err::Result<(), err::Error> {
-		// This should take ownership of the component and spawn the actor
-		implement(&self.r#type, self.config.clone()).await
-	}
-}
-
-impl<V> Component<V>
-where
-	V: Vendor,
-{
 	pub fn new(config: Value) -> Result<Self, Error> {
-		if TypeId::of::<V>() == TypeId::of::<AnyVendor>() {
-			unreachable!();
-		}
-
 		Ok(Self {
 			id: dbm::Id::rand(),
-			r#type: V::VENDOR,
 			config,
 			marker: PhantomData,
 		})
@@ -62,10 +45,6 @@ where
 	/// It requires a configuration as every instance is different from another
 	/// based on its configuration.
 	pub async fn build(self) -> Result<(), Error> {
-		if TypeId::of::<V>() == TypeId::of::<AnyVendor>() {
-			unreachable!();
-		}
-
 		let name = self.id.to_raw();
 		let configuration: V::Configuration = serde_json::from_value(self.config.clone())?;
 		let vendor: V = Default::default();

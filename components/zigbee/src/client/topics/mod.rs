@@ -2,7 +2,7 @@ use std::borrow::Cow;
 
 use serde::de::DeserializeOwned;
 
-use crate::sandbox::SandboxError;
+use vnd::sandbox::SandboxError;
 
 use super::{Client, Payload};
 

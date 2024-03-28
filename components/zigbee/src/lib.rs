@@ -9,26 +9,20 @@ use serde::{Deserialize, Serialize};
 use svc::r#type::{ServiceData, ServiceType};
 use tokio::sync::RwLock;
 use trg::Trigger;
-
-use crate::{
-	component::Component,
+use vnd::{
 	sandbox::{actor::SandboxArguments, SandboxError},
 	RefContext, Vendor,
 };
 
 use self::client::{Client, Payload, Topic};
 
-use super::Vendors;
-
 mod client;
-
-pub type Zigbee = Component<ZigbeeClass>;
 
 #[derive(Clone, Hash, Serialize, Deserialize)]
 pub struct ZigbeeConfiguration {}
 
 #[derive(Clone, Default)]
-pub struct ZigbeeClass {}
+pub struct Zigbee {}
 
 #[allow(dead_code)]
 pub struct Context<V>
@@ -41,13 +35,10 @@ where
 }
 
 #[async_trait]
-impl Vendor for ZigbeeClass {
+impl Vendor for Zigbee {
 	type Configuration = ZigbeeConfiguration;
 	type Context = Context<Self>;
 	type PollData = (Topic, Payload);
-
-	const NAME: &'static str = "zigbee";
-	const VENDOR: Vendors = Vendors::Zigbee;
 
 	const SUBSCRIBE_BUS: bool = false;
 	const STOP_ON_ERROR: bool = true;
