@@ -7,6 +7,6 @@ pub trait Link<W: Resource>: Resource {
 	fn id(&self) -> &Id;
 
 	async fn fetch(&self) -> Result<Option<W>, Error> {
-		W::fetch(&Link::id(self))
+		W::fetch(Link::id(self))
 	}
 }

@@ -24,7 +24,7 @@ where
 		}
 	}
 
-	pub async fn fetch<'s>(&'s self) -> Result<Cow<'s, S>, Error> {
+	pub async fn fetch(&self) -> Result<Cow<'_, S>, Error> {
 		match &self.0 {
 			Either::Left(s) => Ok(Cow::Borrowed(s)),
 			Either::Right(id) => {

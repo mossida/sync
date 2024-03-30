@@ -87,9 +87,7 @@ impl Vendor for Zigbee {
 	}
 
 	async fn services() -> HashSet<ServiceType> {
-		let set = HashSet::new();
-
-		set
+		HashSet::new()
 	}
 
 	/// Get the triggers for the vendor.
