@@ -25,6 +25,9 @@ pub enum Error {
 	#[error("Something went wrong during an actor spawn")]
 	#[diagnostic(code(sync::actor_error))]
 	ActorError(#[from] ractor::SpawnErr),
+	#[error("{0}")]
+	#[diagnostic(code(sync::custom_error))]
+	CustomError(String),
 }
 
 #[derive(Debug, Diagnostic, Error)]

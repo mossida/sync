@@ -16,6 +16,8 @@ impl<'a> IntoFuture for BridgeDevices<'a> {
 	type IntoFuture = Pin<Box<dyn Future<Output = Self::Output> + Send + Sync>>;
 
 	fn into_future(self) -> Self::IntoFuture {
-		todo!()
+		dbg!(self.payload);
+
+		Box::pin(async move { Ok(()) })
 	}
 }

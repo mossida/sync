@@ -28,3 +28,4 @@ cls = { path = "../cls" }
 trg = { path = "../trg" }
 svc = { path = "../svc" }
 atm = { path = "../atm" }
+vnd = { path = "../vnd" }

@@ -1,17 +1,15 @@
-use std::{collections::HashSet, future::Future};
+use std::collections::HashSet;
 
 use bus::Event;
 use dbm::resource::Resource;
 
-use err::Error;
 use mqtt::Notification;
 use ractor::async_trait;
 use serde::{Deserialize, Serialize};
-use svc::r#type::{ServiceData, ServiceType};
+use svc::r#type::ServiceType;
 use tokio::sync::RwLock;
 use trg::Trigger;
 use vnd::{
-	component::Component,
 	sandbox::{actor::SandboxArguments, SandboxError},
 	RefContext, Vendor,
 };
@@ -34,12 +32,6 @@ where
 	mqtt: RwLock<mqtt::Client>,
 	client: Client,
 	arguments: SandboxArguments<V>,
-}
-
-impl crate::spawner::Spawner for Component<Zigbee> {
-	fn spawn(&self) -> impl Future<Output = Result<(), Error>> + Send {
-		self.build()
-	}
 }
 
 #[async_trait]
@@ -95,10 +87,7 @@ impl Vendor for Zigbee {
 	}
 
 	async fn services() -> HashSet<ServiceType> {
-		let mut set = HashSet::new();
-
-		set.insert(ServiceType::new(ServiceData {}));
-		set
+		HashSet::new()
 	}
 
 	/// Get the triggers for the vendor.

@@ -51,7 +51,7 @@ impl Client {
 		match topic {
 			Topic::BridgeDevices => BridgeDevices::new(self, payload)?.await,
 			Topic::BridgeGroups => BridgeGroups::new(self, payload)?.await,
-			Topic::Unknown => todo!(),
+			Topic::Unknown => Err("Unknown topic".into()),
 		}
 	}
 }

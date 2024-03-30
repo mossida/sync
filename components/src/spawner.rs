@@ -1,13 +1,25 @@
+use std::future::Future;
+
 use dbm::{resource::Base, DB};
 use enum_dispatch::enum_dispatch;
 use err::Error;
 use serde::{Deserialize, Serialize};
-use vnd::component::Component;
+use vnd::{component::Component, Vendor};
 
 #[enum_dispatch(Components)]
 #[trait_variant::make(Send)]
 pub trait Spawner {
 	async fn spawn(&self) -> Result<(), Error>;
+}
+
+// Implement spawner for every component
+impl<V> Spawner for Component<V>
+where
+	V: Vendor,
+{
+	fn spawn(&self) -> impl Future<Output = Result<(), Error>> + Send {
+		self.build()
+	}
 }
 
 pub async fn init() -> Result<(), Error> {
