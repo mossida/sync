@@ -12,7 +12,7 @@ use crate::DB;
 pub trait Base: Sized + Serialize + DeserializeOwned + Send + Sync {
 	const RESOURCE: &'static str;
 
-	async fn fetch(id: crate::Id) -> Result<Option<Self>, Error> {
+	async fn fetch(id: &crate::Id) -> Result<Option<Self>, Error> {
 		let db = &DB;
 		db.select((Self::RESOURCE, id.to_raw())).into_future().map_err(Into::into)
 	}

@@ -1,3 +1,4 @@
+mod call;
 mod get;
 
 use dashmap::DashMap;
@@ -8,6 +9,7 @@ use std::{future::IntoFuture, pin::Pin};
 
 use crate::{Output, RpcError};
 
+use self::call::*;
 use self::get::*;
 
 fn get_parameter<T>(params: &Params, key: &'static str) -> Result<T, RpcError>
@@ -29,6 +31,7 @@ async fn resolve(method: Method) -> Output {
 
 	match method.as_str() {
 		"get_resource" => GetResource::into_method(params).await,
+		"call_service" => CallService::into_method(params).await,
 		_ => Err(RpcError::MethodNotFound),
 	}
 }

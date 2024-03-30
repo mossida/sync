@@ -11,13 +11,13 @@ use err::Result;
 use ractor::{
 	concurrency::Duration,
 	factory::{Factory, FactoryMessage, Job},
-	registry, Actor, ActorRef,
+	Actor,
 };
 
 use serde::{Deserialize, Serialize};
 use surrealdb::Action;
 use svc::Service;
-use tracing::error;
+
 use trg::Trigger;
 use vnd::sandbox::{Request, SandboxMessage};
 use worker::Worker;
@@ -65,20 +65,9 @@ impl Automation {
 
 		if !triggered.is_empty() {
 			for service in services {
-				let entry: Option<ActorRef<SandboxMessage>> =
-					registry::where_is(service.component.to_raw()).map(Into::into);
-
-				if let Some(actor) = entry {
-					// TODO: Use result to handle errors
-					let _ = actor
-						.call(
-							|port| SandboxMessage::Request(Request::Call(service.to_owned()), port),
-							None,
-						)
-						.await;
-				} else {
-					error!("No actor found for service {:?}, this must not happen!", service.id());
-				}
+				let _ = service
+					.call(|port, service| SandboxMessage::Request(Request::Call(service), port))
+					.await;
 			}
 		}
 

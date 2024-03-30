@@ -9,6 +9,7 @@ pub use id::IdKind;
 
 mod id;
 
+pub mod fetch;
 pub mod link;
 pub mod relation;
 pub mod resource;
