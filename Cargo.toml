@@ -16,7 +16,7 @@ surrealdb = { version = "1.4.0" }
 trait-variant = { version = "0.1.2" }
 serde = { version = "1.0.197", features = ["derive"] }
 tracing = { version = "0.1.40" }
-async-trait = { version = "0.1.79" }
+async-trait = { version = "0.1.80" }
 futures = { version = "0.3.30" }
 ractor = { version = "0.9.7" }
 serde_json = { version = "1.0.115" }
