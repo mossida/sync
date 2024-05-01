@@ -14,7 +14,7 @@ license = "Business License"
 surrealdb = { version = "1.4.2" }
 
 trait-variant = { version = "0.1.2" }
-serde = { version = "1.0.199", features = ["derive"] }
+serde = { version = "1.0.200", features = ["derive"] }
 tracing = { version = "0.1.40" }
 async-trait = { version = "0.1.80" }
 futures = { version = "0.3.30" }
