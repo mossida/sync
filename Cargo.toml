@@ -18,7 +18,7 @@ serde = { version = "1.0.200", features = ["derive"] }
 tracing = { version = "0.1.40" }
 async-trait = { version = "0.1.80" }
 futures = { version = "0.3.30" }
-ractor = { version = "0.9.7" }
+ractor = { version = "0.9.8" }
 serde_json = { version = "1.0.116" }
 dashmap = { version = "5.5.3", features = ["serde"] }
 
