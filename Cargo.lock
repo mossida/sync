@@ -4410,6 +4410,7 @@ dependencies = [
  "radix_trie",
  "rand",
  "regex",
+ "reqwest",
  "revision 0.7.0",
  "ring 0.17.8",
  "rmpv",
@@ -4469,9 +4470,9 @@ dependencies = [
 
 [[package]]
 name = "surrealdb-migrations"
-version = "1.4.0"
+version = "1.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2a4d57515a5d0710cc34680a9a3a7c5179b5a83ee3927554e487902e29986a89"
+checksum = "3e3d55d38833a5e8b00cd1f65be0fd340ecd1dda2e84fada664507b9a1531cdd"
 dependencies = [
  "chrono",
  "chrono-human-duration",

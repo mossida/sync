@@ -9,7 +9,7 @@ license.workspace = true
 
 [dependencies]
 once_cell = "1.18.0"
-surrealdb-migrations = "1.4.0"
+surrealdb-migrations = "1.4.1"
 either = { version = "1.11.0", features = ["serde"] }
 
 trait-variant = { workspace = true }
