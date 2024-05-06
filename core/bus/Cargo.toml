@@ -8,7 +8,7 @@ license.workspace = true
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-tokio-util = { version = "0.7.10" }
+tokio-util = { version = "0.7.11" }
 tokio-stream = { version = "0.1.15", features = ["sync"] }
 
 serde = { workspace = true }
