@@ -12,7 +12,7 @@ axum = { version = "0.7.5", features = ["ws"] }
 dashmap = { version = "5.5.3", features = ["serde"] }
 tower-http = { version = "0.5.2", features = ["full"] }
 tokio-stream = { version = "0.1.15" }
-thiserror = { version = "1.0.59" }
+thiserror = { version = "1.0.60" }
 
 serde = { workspace = true }
 serde_json = { workspace = true }
