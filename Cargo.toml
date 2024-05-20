@@ -11,7 +11,7 @@ edition = "2021"
 license = "Business License"
 
 [workspace.dependencies]
-surrealdb = { version = "1.4.2" }
+surrealdb = { version = "1.5.0" }
 
 trait-variant = { version = "0.1.2" }
 serde = { version = "1.0.202", features = ["derive"] }
