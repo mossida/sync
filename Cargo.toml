@@ -20,7 +20,7 @@ async-trait = { version = "0.1.80" }
 futures = { version = "0.3.30" }
 ractor = { version = "0.9.8" }
 serde_json = { version = "1.0.117" }
-dashmap = { version = "5.5.3", features = ["serde"] }
+dashmap = { version = "6.0.0", features = ["serde"] }
 
 tokio = { version = "1.38.0", features = ["full"] }
 tokio-util = { version = "0.7.11" }
