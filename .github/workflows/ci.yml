@@ -28,7 +28,7 @@ jobs:
           fetch-depth: 0
 
       - name: Install bun
-        uses: oven-sh/setup-bun@v1
+        uses: oven-sh/setup-bun@v2
 
       - name: Install commit lint
         run: bun install commitlint@latest | bun install @commitlint/config-conventional@latest
